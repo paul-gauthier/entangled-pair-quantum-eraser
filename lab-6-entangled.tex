@@ -29,12 +29,44 @@
 
 \input{fig.tex}
 
-\subsection*{Lab 6's Quantum Eraser}
+\subsection*{Introduction}
 
-In the prelab, we created the MZI operator $\hat{Z}'(\vartheta)$
+The existing Lab 6 apparatus seems capable of running a more compelling quantum
+eraser experiment that uses entangled pairs.
+Rather than marking the idler with its own ``which-way'' information, it is possible
+to mark the \emph{signal} with the idler's path through the MZI.
+Then by manipulating the signal, we can ``erase'' the which-way information
+and restore self-interference of the idler in the MZI.
+
+This experiment can be run purely by inputting new HWP and LP angles
+into the PC-based control screen.
+No changes are needed to the apparatus on the optical table.
+
+The MZI HWP$_t$ in the upper arm is set to $45^\circ$ and the idler LP$_i$ at the
+MZI output is set to $90^\circ$ (H).
+Only horizontally polarized photons can travel the bottom arm
+and pass the horizontal LP$_i$ filter.
+Only vertically polarized photons can travel the top arm
+and pass the horizontal LP$_i$ filter
+-- they will encounter HWP$_t$ and assume H polarization.
+Horizontally polarized photons entering the top arm will become V polarized
+and fail to pass the LP$_i$.
+
+Using $| \Phi^+ \rangle = \frac{1}{\sqrt2}(|HH\rangle + |VV\rangle)$
+entangled pairs means that the signal's polarization marks which
+path the idler can take through the MZI.
+This prevents the idler from self-interfering in the MZI.
+Adjusting the signal LP$_s$ to $45^\circ$ will erase the which way information
+by projecting the signal's polarization onto D.
+This will restore self-interference of the idler in the MZI.
+
+\subsection*{The Lab 6 quantum eraser}
+
+In the prelab, we created the MZI operator $\hat{Z}'(\vartheta)$.
 Let's compose a polarizer operator onto our MZI operator
 to create a quantum eraser operator for the full Lab 6 experiment.
 
+\paragraph{Linear polarizer operator}
 Here's an operator for a LP at angle $\theta$,
 operating on photons in the H=$90^\circ$, V=$0^\circ$ basis as we have been:
 
@@ -50,23 +82,44 @@ using projectors onto the spatial basis states:
 
 $$  \hat{P'}(\theta) = (|\psi_b\rangle\langle\psi_b| \otimes \hat{P}(\theta)) + (|\psi_t\rangle\langle\psi_t| \otimes \hat{I}) $$
 
-And now we can compose $\hat{P'}(\theta)$ as the final operator to create
-the quantum eraser operator from Lab 6.
+\paragraph{Operator for single photon}
+And now we can compose $\hat{P'}$ and $\hat{Z}'$
+to create an operator that encompasses all of the Lab 6 apparatus:
 
 $$\hat{E}'(\theta,\vartheta) = \hat{P'}(\theta) \hat{Z}'(\vartheta)$$
 
-We will use it with the MZI HWP$_u$ at $45^\circ$ and the
+We will use it with the MZI HWP$_t$ at $45^\circ$ and the
 MZI LP$_i$ at $90^\circ$, so
 $$
-\hat{E}'_{45,90}\;\equiv\;
+\hat{E}'_{45,90}\;=\;
 \hat{E}'\!\left(\theta=90^\circ,\;\vartheta=45^\circ\right)
 $$
 
-\subsection*{Extension to signal–idler photon pairs}
+
+\paragraph{Evaluating with single photons}
+
+As desired, sending single horizontal or vertical polarized photons through
+the experiment results in constant detection probabilities.
+Such photons can only travel one of the arms, so there is no self-interference.
+\begin{align*}
+|\langle \psi_b,H |\hat{E}'_{45,90} |\psi_b, H\rangle|^2 &= \frac{1}{4} \\
+|\langle \psi_b,H |\hat{E}'_{45,90} |\psi_b, V\rangle|^2 &= \frac{1}{4} \\
+\end{align*}
+
+Sending in diagonally polarized light produces a detection
+probability that varies with phase delay.
+Since diagonal polarization is a superposition of
+$\frac{1}{\sqrt2}(|H\rangle+|V\rangle)$,
+contributions from both arms can self-interfere.
+\begin{align*}
+|\langle \psi_b,H |\hat{E}'_{45,90} |\psi_b, D\rangle|^2 &= \frac{\cos{\left(\delta \right)}}{4} + \frac{1}{4}
+\end{align*}
+
+\subsection*{Extension to signal–idler pairs}
 
 Each photon spans a four–dimensional Hilbert space
-\((2\text{ paths}\otimes 2\text{ polarisations})\);               
-the pair occupies
+\((2\text{ paths} \otimes 2\text{ polarisations})\)
+so a pair occupies
 \(\mathcal{H}_{\mathrm{s}}\otimes\mathcal{H}_{\mathrm{i}}\) (dimension 16).
 \[
 \hat{\mathcal{E}}=
@@ -77,8 +130,8 @@ the pair occupies
 
 \paragraph{Input state}
 
-We prepare the Bell state with both photons in the \(b\)-path:
-
+We prepare the Bell state with both photons in the \(b\)-path,
+noting that the path state has no physical meaning for signal photons:
 \[
 |\Phi^{+}\rangle=
 \frac{\,|\psi_bH\rangle_{\!s}|\psi_bH\rangle_{\!i}
@@ -94,14 +147,13 @@ After the optical elements
 \]
 
 \paragraph{Coincident detection}
+Coincidences are detected when:
 
-(i) the \emph{signal} photon is detected, with \emph{no} restriction on
-its path or polarisation; and
+(i) the \emph{signal} photon is detected, with no restriction on its path or polarization, and
 
-(ii) the \emph{idler} photon is found in the \(b\)-path
-(its polarisation is not analysed).
+(ii) the \emph{idler} photon is found in the \(b\)-path showing that it exited the MZI towards the D$_i$ detector, with no restriction on its polarization.
 
-Operationally this is described by the projector
+This is described by the projector
 \[
 \hat{\Pi}=\mathbb{I}_{4}\;\otimes\;
 \bigl(|\psi_b\rangle\langle\psi_b|\otimes\mathbb{I}_{2}\bigr),
@@ -113,13 +165,21 @@ P(\delta)=\langle\Psi_{\mathrm{out}}|\hat{\Pi}|\Psi_{\mathrm{out}}\rangle.
 
 \paragraph{Probability and amplitude}
 
-With the signal polariser fixed at \(\theta=\pi/4\) one finds
+With the signal LP$_s$ set to $\theta=0^\circ$ or $90^\circ$ the probability of
+coincidence detections is constant.
+The signal carries which-way information about which path the idler took
+through the MZI, so the idler can not self-interfere.
 \[
-P(\delta)=\frac{1-\cos\delta}{8},\qquad
-\mathcal{A}(\delta)=\sqrt{P(\delta)}
-                  =\frac{\bigl|\sin(\delta/2)\bigr|}{2},
+P(\delta)=\frac{1}{8}
 \]
-in perfect agreement with the expressions computed by
-\texttt{sympy}.
+
+With the signal LP$_s$ set to $\theta=45^\circ$ the probability of
+coincidence detections varies with the MZI phase delay $\delta$.
+Projecting the signal onto the diagonal polarization erases the
+which-way information and restores the idler's self-interference.
+\[
+P(\delta)=\frac{1-\cos\delta}{8}
+\]
+
 
 \end{document}  
