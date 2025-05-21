@@ -127,8 +127,8 @@ assert V_out.norm()**2 == V.norm()**2/2
 
 P_hat_prime = TP(psi_x * psi_x.T, P_hat) + TP(psi_y * psi_y.T, I22)
 
-#show(P_hat)
-#show(P_hat_prime)
+show(P_hat)
+show(P_hat_prime)
 
 #show(P_hat_prime.subs(theta, pi/4))
 
@@ -146,7 +146,7 @@ E_hat_prime = P_hat_prime * Z_hat_prime
 
 # HWP_u at 45, LP_i at 90
 E_hat_prime_45_90 = E_hat_prime.subs(vartheta, pi/4).subs(theta, pi/2)
-show(E_hat_prime_45_90, 4)
+#show(E_hat_prime_45_90, 4)
 
 def test_E_hat_prime_45_90():
     # Send in D light
@@ -287,21 +287,26 @@ def demo_pair():
       • idler eraser at 45/90 (fixed)
     """
     # Build entangled polarisation Bell state in the b-path
-    psi_sv = TP(psi_b_H, psi_b_V)
-    psi_vh = TP(psi_b_V, psi_b_H)
-    bell_state = (psi_sv + psi_vh) / sqrt(2)   # 16×1 column state
+    #psi_hv = TP(psi_b_H, psi_b_V)
+    #psi_vh = TP(psi_b_V, psi_b_H)
+    #bell_state = (psi_hv + psi_vh) / sqrt(2)   # 16×1 column state
+
+    # Build phi+ state
+    psi_hh = TP(psi_b_H, psi_b_H)
+    psi_vv = TP(psi_b_V, psi_b_V)
+    bell_state = (psi_hh + psi_vv) / sqrt(2)   # 16×1 column state
+
+    theta_val = pi/4
 
     # Propagate through the apparatus
-    psi_out = process_signal_idler(bell_state, pi/4)
-
+    #psi_out = process_signal_idler(bell_state, theta_val)
     # Display the resulting state (scaled for readability)
-    show(psi_out, 4)
+    #show(psi_out, 4)
 
     # Amplitude and probability for coincident detection
-    amp, prob = coincident_amplitude_probability(bell_state, pi/4)
+    amp, prob = coincident_amplitude_probability(bell_state, theta_val)
+    amp = amp.rewrite(cos)
     show(amp)   # symbolic amplitude
     show(prob)  # symbolic probability
-    dump(amp.evalf(4))
-    dump(prob.evalf(4))
 
 demo_pair()
