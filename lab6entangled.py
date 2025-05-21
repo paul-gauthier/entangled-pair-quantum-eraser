@@ -231,6 +231,52 @@ def process_signal_idler(initial_state, theta_val):
     return total_op * initial_state
 
 
+def coincident_amplitude_probability(initial_state, theta_val):
+    """
+    Compute the probability-amplitude and probability for a coincident
+    detection in which
+
+      • the signal photon is detected on the b-path immediately after the
+        linear polariser P̂′(θ), and
+      • the idler photon is detected on the b-path with horizontal
+        polarisation (H) after the fixed eraser stage Ê′₄₅,₉₀.
+
+    Parameters
+    ----------
+    initial_state : sympy.Matrix (16×1)
+        Joint input state |ψ⟩ of  signal ⊗ idler  (before any optics).
+    theta_val : sympy expression or float
+        Signal-polariser angle θ (radians).
+
+    Returns
+    -------
+    tuple
+        (amplitude, probability)  where
+          amplitude   – complex probability amplitude  ⟨det|ψ_out⟩,
+          probability – real detection probability  |amplitude|².
+    """
+    # State after the two-stage optical process
+    psi_out = process_signal_idler(initial_state, theta_val)
+
+    # Detection ket  |b⟩ ⊗ |θ⟩  for the signal photon
+    pol_pass = Matrix([cos(theta_val + pi/2), sin(theta_val + pi/2)])
+    det_signal = TP(psi_b, pol_pass)
+
+    # Detection ket  |b⟩ ⊗ |H⟩  for the idler photon
+    det_idler = TP(psi_b, H)
+
+    # Joint detection ket
+    det_joint = TP(det_signal, det_idler)
+
+    # Probability amplitude  ⟨det_joint | ψ_out⟩
+    amplitude = (det_joint.H * psi_out)[0, 0]
+
+    # Detection probability
+    probability = simplify(abs(amplitude) ** 2)
+
+    return amplitude, probability
+
+
 def demo_pair():
     """
     Demonstration:
@@ -250,5 +296,12 @@ def demo_pair():
 
     # Display the resulting state (scaled for readability)
     show(psi_out, 4)
+
+    # Amplitude and probability for coincident detection
+    amp, prob = coincident_amplitude_probability(bell_state, pi/4)
+    show(amp)   # symbolic amplitude
+    show(prob)  # symbolic probability
+    dump(amp.evalf(4))
+    dump(prob.evalf(4))
 
 demo_pair()
