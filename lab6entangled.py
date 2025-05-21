@@ -295,5 +295,7 @@ def test_PE_hat_prime(psi_initial, theta_val):
 #   |φ⁺⟩ = (|H⟩ₛ|H⟩ᵢ + |V⟩ₛ|V⟩ᵢ) / √2
 #   Idler photon is injected into the bottom (b) arm of the MZI.
 # ---------------------------------------------------------------------
-psi_phi_plus = (psi_s_b_H + psi_i_b_H + psi_s_b_V + psi_i_b_V) / sqrt(2)
+psi_phi_plus = (psi_s_b_H + psi_i_b_H + psi_s_b_V + psi_i_b_V) / 2
+# Verify that |φ⁺⟩ is correctly normalised (⟨ψ|ψ⟩ = 1)
+assert simplify(psi_phi_plus.norm() - 1) == 0
 test_PE_hat_prime(psi_phi_plus, pi/2)
