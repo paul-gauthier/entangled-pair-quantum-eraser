@@ -188,3 +188,65 @@ def test_E_hat_prime_45_90():
     dump(min_prob_b.evalf(3))
     dump(max_prob_b.evalf(3))
     dump((max_prob_b - min_prob_b).evalf(3))
+
+
+###############################
+# Extension: two-photon (signal & idler) processing
+# -----------------------------------------------
+# Each photon spans a 4-D Hilbert space (2 spatial ⊗ 2 polarisation).
+# The composite space (signal ⊗ idler) is therefore 16-D.
+
+I44 = eye(4)
+
+# Idler: fixed “eraser” stage (Ê′₄₅,₉₀) – acts on idler only
+E_hat_prime_45_90_idler = TP(I44, E_hat_prime_45_90)
+
+# Signal: variable linear polariser P̂′(θ) – acts on signal only
+P_hat_prime_signal = TP(P_hat_prime, I44)
+
+
+def process_signal_idler(initial_state, theta_val):
+    """
+    Apply  P_hat_prime(theta)  to the signal photon followed by
+    E_hat_prime_45_90  to the idler photon.
+
+    Parameters
+    ----------
+    initial_state : sympy.Matrix (16×1)
+        Joint state |ψ⟩ of signal ⊗ idler.
+    theta_val : sympy expression or float
+        Polariser angle θ for the signal (radians).
+
+    Returns
+    -------
+    sympy.Matrix (16×1)
+        Final (unnormalised) state after the two-stage process.
+    """
+    # Substitute θ in the signal polariser
+    P_signal = P_hat_prime_signal.subs(theta, theta_val)
+
+    # Total operator  (E_idler) ⋅ (P_signal)
+    total_op = E_hat_prime_45_90_idler * P_signal
+
+    return total_op * initial_state
+
+
+def demo_pair():
+    """
+    Demonstration:
+      • signal & idler both travel the b-path  (|b⟩ₛ |b⟩ᵢ)
+      • entangled polarisation state
+          (|H⟩ₛ|V⟩ᵢ + |V⟩ₛ|H⟩ᵢ) / √2
+      • signal polariser at θ = π/4
+      • idler eraser at 45/90 (fixed)
+    """
+    # Build entangled polarisation Bell state in the b-path
+    psi_sv = TP(psi_b_H, psi_b_V)
+    psi_vh = TP(psi_b_V, psi_b_H)
+    bell_state = (psi_sv + psi_vh) / sqrt(2)   # 16×1 column state
+
+    # Propagate through the apparatus
+    psi_out = process_signal_idler(bell_state, pi/4)
+
+    # Display the resulting state (scaled for readability)
+    show(psi_out, 4)
