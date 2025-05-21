@@ -1,4 +1,4 @@
-\documentclass[twocolumn]{article}
+\documentclass{article}
 \usepackage{amsmath} % For math symbols and environments
 \usepackage{graphicx} % Required for including images
 \usepackage{amssymb} % For checkmark symbol if needed, and other symbols
@@ -28,6 +28,31 @@
 
 
 \input{fig.tex}
+
+
+Here's an operator for a LP at angle $\theta$,
+operating on photons in the H=$90^\circ$, V=$0^\circ$ basis as we have been:
+
+$$\hat{P}(\theta) = \left[\begin{matrix}\sin^{2}{\left(\theta \right)} & - \sin{\left(\theta \right)} \cos{\left(\theta \right)}\\- \sin{\left(\theta \right)} \cos{\left(\theta \right)} & \cos^{2}{\left(\theta \right)}\end{matrix}\right]$$
+
+
+Since the MZI LP is placed at the horizontal output, 
+we need an operator that applies the polarization filter $\hat{P}$
+to the polarization component of the state in spatial state $|\psi_b\rangle$,
+while leaving the polarization component in the top path $|\psi_t\rangle$ unchanged.
+We can construct an operator $\hat{P'}(\theta)$
+using projectors onto the spatial basis states:
+
+$$  \hat{P'}(\theta) = (|\psi_b\rangle\langle\psi_b| \otimes \hat{P}(\theta)) + (|\psi_t\rangle\langle\psi_t| \otimes \hat{I}) $$
+
+And now we can compose $\hat{P'}(\theta)$ as the final operator to create
+the quantum eraser operator from Lab 6.
+
+$$\hat{E}'(\theta,\vartheta) = \hat{P'}(\theta) \hat{Z}'(\vartheta)$$
+
+We will use it with the MZI HWP$_u$ at $45^\circ$ and the
+MZI LP$_i$ at $90^\circ$, so
+$$\hat{E}'(\theta=90^\circ,\vartheta=45^\circ)$$.
 
 
 \end{document}  
