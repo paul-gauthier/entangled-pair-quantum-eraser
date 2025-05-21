@@ -297,6 +297,8 @@ def demo_pair():
 
     # Amplitude and probability for coincident detection
     amp, prob = coincident_amplitude_probability(bell_state, theta_val)
+    expected_prob = (1 - cos(delta)) / 8
+    assert prob.equals(expected_prob), f"Probability {prob} != expected {expected_prob}"
     #amp = amp.rewrite(cos)
     #prob = prob.rewrite(cos)
     show(amp)   # symbolic amplitude
