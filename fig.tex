@@ -1,0 +1,119 @@
+% Custom style for quantum optics
+\tikzset{
+    >={Straight Barb[width=3pt,length=3pt]},  % Narrower default arrow
+    photon/.style={thick, red},
+    detector/.style={
+        draw=black, 
+        semicircle,
+        minimum width=0.6cm,
+        minimum height=0.6cm,
+        inner sep=0pt,
+        outer sep=0pt,
+        fill=yellow!10, 
+        text=black
+    },
+    hwp/.style={draw, rectangle, minimum width=0.25cm, minimum height=0.75cm, fill=blue!10, thick},
+    lp/.style={draw, rectangle, minimum width=0.25cm, minimum height=0.75cm, fill=gray!10, thick},
+    box/.style={draw, rectangle, rounded corners, inner sep=6pt},
+    beamsplitter/.style={
+        minimum width=0.5cm,
+        minimum height=0.5cm,
+        path picture={
+            \draw[very thick,dashed] (path picture bounding box.north east) -- (path picture bounding box.south west);
+        }
+    },
+    pbs/.style={draw, rectangle, minimum width=1cm, minimum height=1cm, fill=gray!20, thick},
+    mirror/.style={
+        minimum width=0.5cm,
+        minimum height=0.5cm,
+        path picture={
+            \draw[very thick] (path picture bounding box.north east) -- (path picture bounding box.south west);
+        }
+    },
+    stage/.style={
+        minimum width=0.5cm,
+        minimum height=0.5cm,
+        path picture={
+            \draw[<->,very thick] (path picture bounding box.north west) -- (path picture bounding box.south east);
+        }
+    },
+}
+
+\begin{figure*}[h]
+\centering
+\begin{tikzpicture}[scale=1.8]
+    
+    % Source
+  \node[draw, circle, minimum size=0.5cm] (S) at (0,0) {\small S};
+
+  \node[draw, rectangle, minimum width=0.25cm, minimum height=0.75cm, fill=red!10, thick,rotate=0,right=0.75cm of S] (FW) {};
+  \node[below=0.25cm of FW] () {\small Filter Wheel};
+  
+  \node[hwp,rotate=0,right=3.25cm of S] (HWP) {};
+  \node[below=0.25cm of HWP] () {\small HWP($0^\circ$)};
+
+  
+    \node[draw, rectangle, minimum size=0.5cm, right=5cm of S] (BIBO) at (0,0) {\small BiBO};
+    % Idler arm: Mach-Zehnder interferometer (MZI)
+    \node[beamsplitter, right=1.5cm of BIBO] (BS1) {};
+    \node[below=0.4cm of BS1] () {\small BS$_1$};
+
+    \node[mirror, above=2.5cm of BS1] (M1) {};
+    \node[mirror, right=2.5cm of BS1] (M2) {};
+    \node[stage] at ($(M2)+(0.2cm,-0.2cm)$) (STAGE) {};
+    \node at ($(STAGE)+(0.15cm,0.15cm)$) {$\varphi$};
+    \node[right=.4cm of STAGE,align=left] {\small Piezo-controlled\\stage};
+
+
+    \node[beamsplitter, right=2.5cm of M1] (BS2) {};
+    \node at ($(BS2)-(0.4,0.4)$) {\small BS$_2$};
+
+    \node[detector,rotate=270] (DI) at ($(BS2.east)+(1.5cm,0)$) {\rotatebox{90}{\small $D_i$}};
+
+    % Signal arm: LP with detector
+    \node[lp,rotate=270] at ($(BIBO)+(0,1.75cm)$) (LPs) {};
+    \node[left=0.5cm of LPs] () {\small LP$_s(90^\circ)$};
+    \node[detector,rotate=0, above=4cm of BIBO] (DS) {\small $D_s$};
+
+    \node[lp,rotate=0,right=1cm of BS2] (MZI_LP) {};
+    \node[below=0.1cm of MZI_LP] () {\small LP$_i(90^\circ)$};
+
+    % Pump and photon paths
+    \draw[->, thick, red] (S) -- (BIBO);
+
+    % Signal (upper) photon
+    \draw[->, thick, red] (BIBO) -- (DS);
+
+    % Idler photon through the MZI
+    \draw[-, thick, red] (BIBO) -- (BS1.center);
+    \draw[-, thick, red] (BS1.center) -- (M1.center);
+    \draw[-, thick, red] (BS1.center) -- (M2.center);
+    \draw[-, thick, red] (M1.center) -- (BS2.center);
+    \draw[->, thick, red] (M2.center) -- ($(BS2.north) + (0,.1cm)$);
+    \draw[-, thick, red] (BS2.center) -- (BS2.center);
+    \draw[->, thick, red] (BS2.center) -- (DI);
+    
+    % Coincidence Counter and connecting dashed lines
+    \node[draw, rectangle] (CC) at ($(DI |- DS)$) {\small CC};
+    \draw[-, dashed] (DI.west) -- (CC.south);
+    \draw[-, dashed] (DS.east) -- (CC.west);
+
+    % These overwrite the laser lines
+    \node[lp,rotate=270,fill=gray!50,minimum height=1.5cm] at ($(BS1)+(-0.2,0.6cm)$) (SHUTTER) {};
+    \node[align=right] at ($(SHUTTER)+(-0.4,0.35)$) {\small Shutter\\(retractable)};
+
+  \node[draw, rectangle, minimum width=0.25cm, minimum height=1.5cm, fill=gray!50, thick,rotate=0] at ($(S)+(1.35cm,0.2)$) (PM) {};
+  \node[above=0.25cm of PM,align=center] () {\small Power meter\\(retractable)};
+
+
+     % For Lab 6
+     \node[hwp,rotate=0,right=1.25cm of M1] (MZI_HWP) {};
+     \node[above=0.1cm of MZI_HWP] () {\small HWP($45^\circ$)};
+     \node[hwp,rotate=0,right=1.25cm of BS1] (MZI_HWP2) {};
+     \node[below=0.25cm of MZI_HWP2] () {\small HWP($0^\circ$)};
+
+\end{tikzpicture}
+\caption{
+\label{fig:apparatus}
+}
+\end{figure*}
