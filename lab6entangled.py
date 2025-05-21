@@ -140,44 +140,27 @@ P_hat_prime = TP(psi_x * psi_x.T, P_hat) + TP(psi_y * psi_y.T, I22)
 E_hat_prime = P_hat_prime * Z_hat_prime
 show(E_hat_prime, 2)
 
-E_hat_prime_45_45 = E_hat_prime.subs(vartheta, pi/4).subs(theta, pi/4)
-show(E_hat_prime_45_45, 4)
+# HWP_u at 45, LP_i at 90
+E_hat_prime_45_90 = E_hat_prime.subs(vartheta, pi/4).subs(theta, pi/2)
+show(E_hat_prime_45_90, 4)
 
-psi_eraser = (E_hat_prime_45_45 * psi_b_H)
+# Send in D light
+psi_eraser = (E_hat_prime_45_90 * psi_b_D)
 show(psi_eraser, 4)
 
-psi_x_D_final = psi_b_D.dot(psi_eraser)
-show(psi_x_D_final, 4)
-prob_psi_x_D_final = abs(psi_x_D_final)**2
-prob_psi_x_D_final = simplify(prob_psi_x_D_final.rewrite(cos))
-show(prob_psi_x_D_final)
-min_final = minimum(prob_psi_x_D_final, delta)
-max_final = maximum(prob_psi_x_D_final, delta)
+psi_x_H_final = psi_b_H.dot(psi_eraser)
+show(psi_x_H_final, 4)
+prob_psi_x_H_final = abs(psi_x_H_final)**2
+prob_psi_x_H_final = simplify(prob_psi_x_H_final.rewrite(cos))
+show(prob_psi_x_H_final)
+min_final = minimum(prob_psi_x_H_final, delta)
+max_final = maximum(prob_psi_x_H_final, delta)
 show(min_final)
 show(max_final)
 dump(min_final.evalf(3))
 dump(max_final.evalf(3))
 dump(max_final.evalf(3)-min_final.evalf(3))
 
-assert prob_psi_x_D_final.equals(q11alt_ans)
-
-psi_t_H_final = abs(psi_t_H.dot(psi_eraser))**2
-show(psi_t_H_final, 4)
-
-psi_t_V_final = abs(psi_t_V.dot(psi_eraser))**2
-show(psi_t_V_final, 4)
-
-# Projector onto the 't' spatial state, identity in polarization space
-# psi_t is Matrix([0, 1])
-# I22 is eye(2,2)
-projector_t_spatial = TP(psi_t * psi_t.T, I22)
-show(projector_t_spatial) # Optional: to see the projector matrix
-
-# Probability = <psi_eraser | P_t_spatial | psi_eraser>
-# .H gives the Hermitian conjugate (bra)
-# The result of the product is a 1x1 matrix, so access its element [0,0]
-prob_t_spatial_qm = (psi_eraser.H * projector_t_spatial * psi_eraser)[0,0]
-show(prob_t_spatial_qm) # To display the symbolic probability
 
 # Projector onto the 'b' spatial state, identity in polarization space
 # psi_b is Matrix([1, 0])
@@ -192,9 +175,6 @@ prob_b_spatial_qm = (psi_eraser.H * projector_b_spatial * psi_eraser)[0,0]
 show(prob_b_spatial_qm) # To display the symbolic probability
 prob_b_spatial_qm_simplified = simplify(prob_b_spatial_qm.rewrite(cos))
 show(prob_b_spatial_qm_simplified) # To display the simplified symbolic probability
-
-# Simplify the complementary probability expression for plotting
-prob_t_spatial_qm_simplified = simplify(prob_t_spatial_qm.rewrite(cos))
 
 min_prob_b = minimum(prob_b_spatial_qm_simplified, delta)
 max_prob_b = maximum(prob_b_spatial_qm_simplified, delta)
