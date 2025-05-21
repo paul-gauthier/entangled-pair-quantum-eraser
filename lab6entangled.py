@@ -127,8 +127,8 @@ assert V_out.norm()**2 == V.norm()**2/2
 
 P_hat_prime = TP(psi_x * psi_x.T, P_hat) + TP(psi_y * psi_y.T, I22)
 
-show(P_hat)
-show(P_hat_prime)
+#show(P_hat)
+#show(P_hat_prime)
 
 #show(P_hat_prime.subs(theta, pi/4))
 
@@ -297,7 +297,8 @@ def demo_pair():
 
     # Amplitude and probability for coincident detection
     amp, prob = coincident_amplitude_probability(bell_state, theta_val)
-    amp = amp.rewrite(cos)
+    #amp = amp.rewrite(cos)
+    #prob = prob.rewrite(cos)
     show(amp)   # symbolic amplitude
     show(prob)  # symbolic probability
 
