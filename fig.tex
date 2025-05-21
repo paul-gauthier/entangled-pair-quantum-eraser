@@ -39,8 +39,9 @@
     },
 }
 
-\begin{figure*}[h]
+\begin{figure}[htbp]
 \centering
+\resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[scale=1.8]
     
     % Source
@@ -114,6 +115,7 @@
 
 
 \end{tikzpicture}
+}% end resizebox
 \caption{
 Entangled pair quantum eraser experiment, where the signal photon's
 polarization carries the ``which-way'' information
@@ -125,4 +127,4 @@ Setting $\theta_s = 45^\circ$ erases the ``which-way'' information from the sign
 while $\theta_s \in \{0^\circ, 90^\circ\}$ retains it.
 \label{fig:apparatus}
 }
-\end{figure*}
+\end{figure}
