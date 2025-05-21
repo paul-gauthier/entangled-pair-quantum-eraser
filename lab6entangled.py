@@ -234,3 +234,27 @@ Identity_arm = I22
 # Operator that applies the polariser to signal photons only
 P_hat_arm_pol = TP(Identity_arm, P_hat)          # 4×4 operator on arm ⊗ polarisation
 P_triple      = TP(projector_s_pair, P_hat_arm_pol) + TP(projector_i_pair, Identity_4)
+
+PE_hat_prime = P_triple * E_triple
+
+show(PE_hat_prime)
+
+def test_PE_hat_prime(psi_initial, theta_val):
+    """
+    For a given psi_initial, theta_val, compute:
+
+    PE_hat_prime(theta=theta_val)|psi_initial>
+
+    Then:
+
+    1. Project onto the s basis state
+       - print the amplitude formula
+       - print the probability, ie: |amplitude|^2
+
+    1. Project onto the i,b basis state
+       - print the amplitude formula
+       - print the probability, ie: |amplitude|^2
+
+
+    """
+    pass
