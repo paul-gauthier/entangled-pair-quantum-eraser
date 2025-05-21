@@ -188,3 +188,26 @@ def test_E_hat_prime_45_90():
     dump(min_prob_b.evalf(3))
     dump(max_prob_b.evalf(3))
     dump((max_prob_b - min_prob_b).evalf(3))
+
+
+# "pair" basis states: signal and idler
+psi_s = Matrix([1, 0])
+psi_i = Matrix([0, 1])
+
+# Triple case basis states
+
+psi_s_b_H = TP(psi_s, psi_b_H)
+psi_s_b_V = TP(psi_s, psi_b_V)
+psi_s_t_H = TP(psi_s, psi_t_H)
+psi_s_t_V = TP(psi_s, psi_t_V)
+
+psi_i_b_H = TP(psi_i, psi_b_H)
+psi_i_b_V = TP(psi_i, psi_b_V)
+psi_i_t_H = TP(psi_i, psi_t_H)
+psi_i_t_V = TP(psi_i, psi_t_V)
+
+# Apply E_hat_prime_45_90 to the arm/polarization component
+# of states in the idler pair basis
+
+# Then, Apply P_hat(theta) to the polarization component
+# of states in the signal pair basis
