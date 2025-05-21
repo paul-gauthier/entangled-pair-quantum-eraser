@@ -194,7 +194,7 @@ def test_E_hat_prime_45_90():
 psi_s = Matrix([1, 0])
 psi_i = Matrix([0, 1])
 
-# Triple case basis states
+# Triple-case basis states
 
 psi_s_b_H = TP(psi_s, psi_b_H)
 psi_s_b_V = TP(psi_s, psi_b_V)
@@ -206,24 +206,15 @@ psi_i_b_V = TP(psi_i, psi_b_V)
 psi_i_t_H = TP(psi_i, psi_t_H)
 psi_i_t_V = TP(psi_i, psi_t_V)
 
-# Apply E_hat_prime_45_90 to the arm/polarization component
-# of states in the idler pair basis
 
-# Then, Apply P_hat(theta) to the polarization component
-# of states in the signal pair basis
 
 #########################################################
 # Triple–case operators
 #
-# 1.  E_triple acts only on the idler (|i⟩) sub-space, applying the
+#  E_triple acts only on the idler (|i⟩) sub-space, applying the
 #    experimentally-realised operator E_hat_prime_45_90 to the combined
 #    arm + polarisation degrees of freedom.  The signal (|s⟩) component
 #    passes through unchanged.
-#
-# 2.  P_triple(theta) acts only on the signal (|s⟩) sub-space, applying the
-#    linear-polariser operator P_hat_prime to the combined arm + polarisation
-#    degrees of freedom.  The idler (|i⟩) component is left untouched.
-#########################################################
 
 # Projectors onto the signal / idler pair basis states
 projector_s_pair = psi_s * psi_s.T      # |s><s|
@@ -234,20 +225,5 @@ Identity_4 = eye(4)                     # Identity on arm ⊗ polarisation
 # Operator acting on the idler sub-space
 E_triple = TP(projector_i_pair, E_hat_prime_45_90) + TP(projector_s_pair, Identity_4)
 
-def P_triple(theta_value):
-    """
-    Return the 8×8 triple-case operator that applies the linear polariser
-    P_hat(theta) on the signal arm only.
-
-    Parameters
-    ----------
-    theta_value : Expr | float | int
-        Angle θ to substitute into P_hat_prime.
-
-    Returns
-    -------
-    sympy.Matrix
-        8×8 operator acting on the full (pair ⊗ arm ⊗ polarisation) space.
-    """
-    P_hat_prime_theta = P_hat_prime.subs(theta, theta_value)
-    return TP(projector_s_pair, P_hat_prime_theta) + TP(projector_i_pair, Identity_4)
+# Apply P_hat(theta) to the polarization component of the triple-case state
+# of states in the signal pair basis
