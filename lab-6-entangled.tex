@@ -57,7 +57,103 @@ $$\hat{E}'(\theta,\vartheta) = \hat{P'}(\theta) \hat{Z}'(\vartheta)$$
 
 We will use it with the MZI HWP$_u$ at $45^\circ$ and the
 MZI LP$_i$ at $90^\circ$, so
-$$\hat{E}'(\theta=90^\circ,\vartheta=45^\circ)$$.
+$$
+\hat{E}'_{45,90}\;\equiv\;
+\hat{E}'\!\left(\theta=90^\circ,\;\vartheta=45^\circ\right)
+$$
 
+\subsection*{Matrix form of the spatially--conditioned polariser}
+
+The linear polariser acting only on the lower (\emph{b}) path is
+\[
+\hat{P}'(\theta)=
+|\psi_b\rangle\langle\psi_b|\otimes \hat{P}(\theta)
+\;+\;
+|\psi_t\rangle\langle\psi_t|\otimes \hat{I},
+\]
+so that, in the ordered basis
+\(
+\{\,|\psi_bH\rangle,|\psi_bV\rangle,
+     |\psi_tH\rangle,|\psi_tV\rangle\},
+\)
+\[
+\hat{P}'(\theta)=
+\begin{bmatrix}
+\sin^{2}\theta & -\sin\theta\cos\theta & 0 & 0\\
+-\sin\theta\cos\theta & \cos^{2}\theta & 0 & 0\\
+0 & 0 & 1 & 0\\
+0 & 0 & 0 & 1
+\end{bmatrix}.
+\]
+
+\subsection*{Single--photon quantum–eraser operator}
+
+Combining the MZI operator with the spatially–selective polariser gives
+\[
+\hat{E}'(\theta,\vartheta)=\hat{P}'(\theta)\,\hat{Z}'(\vartheta),
+\qquad
+\hat{E}'_{45,90}\equiv
+\hat{E}'\!\left(\tfrac{\pi}{2},\tfrac{\pi}{4}\right).
+\]
+
+\subsection*{Extension to signal–idler photon pairs}
+
+Each photon spans a four–dimensional Hilbert space
+\((2\text{ paths}\otimes 2\text{ polarisations})\);               
+the pair occupies
+\(\mathcal{H}_{\mathrm{s}}\otimes\mathcal{H}_{\mathrm{i}}\) (dimension 16).
+\[
+\hat{\mathcal{E}}=
+\mathbb{I}_{4}\otimes\hat{E}'_{45,90},\qquad
+\hat{\mathcal{P}}(\theta)=\hat{P}'(\theta)\otimes\mathbb{I}_{4},\qquad
+\hat{\mathcal{O}}(\theta)=\hat{\mathcal{E}}\;\hat{\mathcal{P}}(\theta).
+\]
+
+\paragraph{Input state}
+
+We prepare the Bell state
+\[
+|\Phi^{+}\rangle=
+\frac{\,|\psi_bH\rangle_{\!s}|\psi_bH\rangle_{\!i}
+      +|\psi_bV\rangle_{\!s}|\psi_bV\rangle_{\!i}}{\sqrt{2}}.
+\]
+
+\paragraph{Propagation}
+
+After the optical elements
+\[
+|\Psi_{\mathrm{out}}(\theta)\rangle
+=\hat{\mathcal{O}}(\theta)\,|\Phi^{+}\rangle.
+\]
+
+\paragraph{Coincident detection}
+
+A coincidence is recorded when
+(i) the \emph{signal} photon exits the \(b\)-path and passes the polariser,
+(ii) the \emph{idler} photon exits the \(b\)-path with horizontal polarisation~\(H\).
+The corresponding detection ket is
+\[
+|d(\theta)\rangle=
+\bigl(|\psi_b\rangle_{\!s}\otimes|{\theta}\rangle_{\!s}\bigr)
+\otimes
+\bigl(|\psi_b\rangle_{\!i}\otimes|H\rangle_{\!i}\bigr),
+\quad
+|{\theta}\rangle=-\sin\theta\,|H\rangle+\cos\theta\,|V\rangle.
+\]
+
+\paragraph{Amplitude and probability for \(\theta=\pi/4\)}
+
+Setting \(\theta=\pi/4\) yields
+\[
+\mathcal{A}(\delta)=
+\langle d(\tfrac{\pi}{4})|
+      \Psi_{\mathrm{out}}(\tfrac{\pi}{4})\rangle
+      =\frac{\mathrm{i}}{2}\,
+        \sin\!\Bigl(\frac{\delta}{2}\Bigr),
+\qquad
+P(\delta)=|\mathcal{A}(\delta)|^{2}
+        =\frac{1-\cos\delta}{8},
+\]
+exactly matching the symbolic results obtained with \texttt{sympy}.
 
 \end{document}  
