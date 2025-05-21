@@ -148,42 +148,43 @@ E_hat_prime = P_hat_prime * Z_hat_prime
 E_hat_prime_45_90 = E_hat_prime.subs(vartheta, pi/4).subs(theta, pi/2)
 show(E_hat_prime_45_90, 4)
 
-# Send in D light
-psi_eraser = (E_hat_prime_45_90 * psi_b_D)
-show(psi_eraser, 2)
+def test_E_hat_prime_45_90():
+    # Send in D light
+    psi_eraser = (E_hat_prime_45_90 * psi_b_D)
+    show(psi_eraser, 2)
 
-psi_x_H_final = psi_b_H.dot(psi_eraser)
-show(psi_x_H_final, 4)
-prob_psi_x_H_final = abs(psi_x_H_final)**2
-prob_psi_x_H_final = simplify(prob_psi_x_H_final.rewrite(cos))
-show(prob_psi_x_H_final)
-min_final = minimum(prob_psi_x_H_final, delta)
-max_final = maximum(prob_psi_x_H_final, delta)
-show(min_final)
-show(max_final)
-dump(min_final.evalf(3))
-dump(max_final.evalf(3))
-dump(max_final.evalf(3)-min_final.evalf(3))
+    psi_x_H_final = psi_b_H.dot(psi_eraser)
+    show(psi_x_H_final, 4)
+    prob_psi_x_H_final = abs(psi_x_H_final)**2
+    prob_psi_x_H_final = simplify(prob_psi_x_H_final.rewrite(cos))
+    show(prob_psi_x_H_final)
+    min_final = minimum(prob_psi_x_H_final, delta)
+    max_final = maximum(prob_psi_x_H_final, delta)
+    show(min_final)
+    show(max_final)
+    dump(min_final.evalf(3))
+    dump(max_final.evalf(3))
+    dump(max_final.evalf(3)-min_final.evalf(3))
 
 
-# Projector onto the 'b' spatial state, identity in polarization space
-# psi_b is Matrix([1, 0])
-# I22 is eye(2,2)
-projector_b_spatial = TP(psi_b * psi_b.T, I22)
-show(projector_b_spatial) # Optional: to see the projector matrix
+    # Projector onto the 'b' spatial state, identity in polarization space
+    # psi_b is Matrix([1, 0])
+    # I22 is eye(2,2)
+    projector_b_spatial = TP(psi_b * psi_b.T, I22)
+    show(projector_b_spatial) # Optional: to see the projector matrix
 
-# Probability = <psi_eraser | P_b_spatial | psi_eraser>
-# .H gives the Hermitian conjugate (bra)
-# The result of the product is a 1x1 matrix, so access its element [0,0]
-prob_b_spatial_qm = (psi_eraser.H * projector_b_spatial * psi_eraser)[0,0]
-show(prob_b_spatial_qm) # To display the symbolic probability
-prob_b_spatial_qm_simplified = simplify(prob_b_spatial_qm.rewrite(cos))
-show(prob_b_spatial_qm_simplified) # To display the simplified symbolic probability
+    # Probability = <psi_eraser | P_b_spatial | psi_eraser>
+    # .H gives the Hermitian conjugate (bra)
+    # The result of the product is a 1x1 matrix, so access its element [0,0]
+    prob_b_spatial_qm = (psi_eraser.H * projector_b_spatial * psi_eraser)[0,0]
+    show(prob_b_spatial_qm) # To display the symbolic probability
+    prob_b_spatial_qm_simplified = simplify(prob_b_spatial_qm.rewrite(cos))
+    show(prob_b_spatial_qm_simplified) # To display the simplified symbolic probability
 
-min_prob_b = minimum(prob_b_spatial_qm_simplified, delta)
-max_prob_b = maximum(prob_b_spatial_qm_simplified, delta)
-show(min_prob_b)
-show(max_prob_b)
-dump(min_prob_b.evalf(3))
-dump(max_prob_b.evalf(3))
-dump((max_prob_b - min_prob_b).evalf(3))
+    min_prob_b = minimum(prob_b_spatial_qm_simplified, delta)
+    max_prob_b = maximum(prob_b_spatial_qm_simplified, delta)
+    show(min_prob_b)
+    show(max_prob_b)
+    dump(min_prob_b.evalf(3))
+    dump(max_prob_b.evalf(3))
+    dump((max_prob_b - min_prob_b).evalf(3))
