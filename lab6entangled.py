@@ -241,20 +241,47 @@ show(PE_hat_prime)
 
 def test_PE_hat_prime(psi_initial, theta_val):
     """
-    For a given psi_initial, theta_val, compute:
+    For a given `psi_initial` and `theta_val` this routine
 
-    PE_hat_prime(theta=theta_val)|psi_initial>
+        1. Applies  PE_hat_prime(theta = theta_val) to the input state.
+        2. Projects the resulting state onto
+           a) the |s⟩ (signal) pair basis state
+           b) the |i,b⟩ (idler, bottom‐arm) basis state.
+        3. Displays, via `show`, the symbolic amplitudes and the corresponding
+           quantum–mechanical probabilities.
 
-    Then:
-
-    1. Project onto the s basis state
-       - print the amplitude formula
-       - print the probability, ie: |amplitude|^2
-
-    1. Project onto the i,b basis state
-       - print the amplitude formula
-       - print the probability, ie: |amplitude|^2
-
-
+    Parameters
+    ----------
+    psi_initial : sympy.Matrix (8×1)
+        Triple–case input state (pair ⊗ arm ⊗ polarisation).
+    theta_val   : sympy Expr / float
+        Value for the polariser angle θ that will be substituted into
+        PE_hat_prime before the operator is applied.
     """
-    pass
+    # 1. Evolve the state with the experimental operator at the requested θ.
+    psi_out = PE_hat_prime.subs(theta, theta_val) * psi_initial
+    show(psi_out, 4)                # Optional: inspect the full output state
+
+    # ------------------------------------------------------------------
+    # Helper projectors
+    #   • onto the |s⟩ pair state   : |s⟩⟨s| ⊗ 𝟙₄
+    #   • onto the |i,b⟩ basis state: |i⟩⟨i| ⊗ |b⟩⟨b| ⊗ 𝟙₂
+    # ------------------------------------------------------------------
+    projector_s_triple   = TP(projector_s_pair, Identity_4)
+    projector_i_b_triple = TP(projector_i_pair, psi_b * psi_b.T, I22)
+
+    # 2a. Signal component ------------------------------------------------
+    amp_s   = projector_s_triple * psi_out          # amplitude (4×1 vector)
+    show(amp_s, 4)
+    prob_s  = simplify((psi_out.H * projector_s_triple * psi_out)[0, 0]
+                       .rewrite(cos))
+    show(prob_s)
+    dump(prob_s.evalf(6))
+
+    # 2b. Idler, bottom‐arm component -------------------------------------
+    amp_i_b  = projector_i_b_triple * psi_out       # amplitude (2×1 vector)
+    show(amp_i_b, 4)
+    prob_i_b = simplify((psi_out.H * projector_i_b_triple * psi_out)[0, 0]
+                        .rewrite(cos))
+    show(prob_i_b)
+    dump(prob_i_b.evalf(6))
