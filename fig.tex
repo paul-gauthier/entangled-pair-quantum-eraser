@@ -50,7 +50,7 @@
   \node[below=0.25cm of FW] () {\small Filter Wheel};
   
   \node[hwp,rotate=0,right=3.25cm of S] (HWP) {};
-  \node[below=0.25cm of HWP] () {\small HWP($45^\circ$)};
+  \node[below=0.25cm of HWP] () {\small HWP$_p(45^\circ)$};
 
   
     \node[draw, rectangle, minimum size=0.5cm, right=5cm of S] (BIBO) at (0,0) {\small BiBO};
@@ -72,7 +72,7 @@
 
     % Signal arm: LP with detector
     \node[lp,rotate=270] at ($(BIBO)+(0,1.75cm)$) (LPs) {};
-    \node[left=0.5cm of LPs] () {\small LP$_s(\varphi)$};
+    \node[left=0.5cm of LPs] () {\small LP$_s(\theta_s)$};
     \node[detector,rotate=0, above=4cm of BIBO] (DS) {\small $D_s$};
 
     \node[lp,rotate=0,right=1cm of BS2] (MZI_LP) {};
@@ -80,9 +80,9 @@
 
      % For Lab 6
      \node[hwp,rotate=0,right=1.25cm of M1] (MZI_HWP) {};
-     \node[above=0.1cm of MZI_HWP] () {\small HWP($45^\circ$)};
+     \node[above=0.1cm of MZI_HWP] () {\small HWP$_t(45^\circ)$};
      \node[hwp,rotate=0,right=1.25cm of BS1] (MZI_HWP2) {};
-     \node[below=0.25cm of MZI_HWP2] () {\small HWP($0^\circ$)};
+     \node[below=0.25cm of MZI_HWP2] () {\small HWP$_b(0^\circ)$};
 
     % Pump and photon paths
     \draw[->, thick, red] (S) -- (BIBO);
@@ -119,13 +119,12 @@ Entangled pair quantum eraser experiment, where the signal photon's
 polarization carries the ``which-way'' information
 about the idler's path through the MZI.
 The apparatus is unchanged from Lab 6.
-Like in Lab 6, the MZI HWP in the upper arm is set to $45^\circ$
-and the MZI LP at the horizontal output by $D_i$
-is set to $90^\circ$.
-The only changes are: 1. Set the pump HWP to $45^\circ$ to generate entangled pairs;
-2. Vary the signal LP angle $\varphi$ to control the eraser.
-Setting $\varphi = 45^\circ$ erases the ``which-way'' information from the signal,
-while $\varphi \in \{0^\circ, 90^\circ\}$ retains it.
+Like in Lab 6, the MZI HWP$_u$ in the upper arm is set to $45^\circ$
+and the MZI/idler LP$_i$ is set to $90^\circ$.
+The only changes are: 1. Set the pump HWP$_p$ to $45^\circ$ to generate entangled pairs;
+2. Vary the signal LP$_s$ angle $\theta_s$ to control the eraser.
+Setting $\theta_s = 45^\circ$ erases the ``which-way'' information from the signal,
+while $\theta_s \in \{0^\circ, 90^\circ\}$ retains it.
 \label{fig:apparatus}
 }
 \end{figure*}
