@@ -237,7 +237,7 @@ P_triple      = TP(projector_s_pair, P_hat_arm_pol) + TP(projector_i_pair, Ident
 
 PE_hat_prime = P_triple * E_triple
 
-show(PE_hat_prime)
+#show(PE_hat_prime)
 
 def test_PE_hat_prime(psi_initial, theta_val):
     """
@@ -284,4 +284,8 @@ def test_PE_hat_prime(psi_initial, theta_val):
     prob_i_b = simplify((psi_out.H * projector_i_b_triple * psi_out)[0, 0]
                         .rewrite(cos))
     show(prob_i_b)
-    dump(prob_i_b.evalf(6))
+    show(prob_i_b.evalf(6))
+
+
+psi_i_b_D = (psi_i_b_H + psi_i_b_V)/sqrt(2)
+test_PE_hat_prime(psi_i_b_D + psi_s_b_H, pi/2)
