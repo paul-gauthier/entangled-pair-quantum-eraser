@@ -272,7 +272,7 @@ def test_PE_hat_prime(psi_initial, theta_val):
 
     # 2a. Signal component ------------------------------------------------
     amp_s   = projector_s_triple * psi_out          # amplitude (4×1 vector)
-    show(amp_s, 4)
+    show(amp_s)
     prob_s  = simplify((psi_out.H * projector_s_triple * psi_out)[0, 0]
                        .rewrite(cos))
     show(prob_s)
@@ -287,8 +287,8 @@ def test_PE_hat_prime(psi_initial, theta_val):
     show(prob_i_b.evalf(6))
 
 
-psi_i_b_D = (psi_i_b_H + psi_i_b_V)/sqrt(2)
-test_PE_hat_prime(psi_i_b_D + psi_s_b_H, pi/2)
+#psi_i_b_D = (psi_i_b_H + psi_i_b_V)/sqrt(2)
+#test_PE_hat_prime(psi_i_b_D + psi_s_b_H, pi/2)
 
 # ---------------------------------------------------------------------
 # Test case: SPDC–generated entangled polarisation |φ⁺⟩
@@ -296,20 +296,4 @@ test_PE_hat_prime(psi_i_b_D + psi_s_b_H, pi/2)
 #   Idler photon is injected into the bottom (b) arm of the MZI.
 # ---------------------------------------------------------------------
 psi_phi_plus = (psi_s_b_H + psi_i_b_H + psi_s_b_V + psi_i_b_V) / sqrt(2)
-
-
-def test_SPDC_phi_plus(theta_val=pi/2):
-    """
-    Apply PE_hat_prime to the SPDC entangled φ⁺ state with the idler in
-    the bottom arm (b).  This wraps `test_PE_hat_prime` for convenience.
-
-    Parameters
-    ----------
-    theta_val : sympy Expr or float, optional
-        Polariser angle θ substituted into PE_hat_prime (default π/2).
-    """
-    test_PE_hat_prime(psi_phi_plus, theta_val)
-
-
-# Run the φ⁺ test at θ = π/2
-test_SPDC_phi_plus()
+test_PE_hat_prime(psi_phi_plus, pi/2)
