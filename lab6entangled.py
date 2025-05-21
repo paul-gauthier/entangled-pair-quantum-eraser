@@ -236,10 +236,8 @@ def coincident_amplitude_probability(initial_state, theta_val):
     Compute the probability-amplitude and probability for a coincident
     detection in which
 
-      • the signal photon is detected on the b-path immediately after the
-        linear polariser P̂′(θ), and
-      • the idler photon is detected on the b-path with horizontal
-        polarisation (H) after the fixed eraser stage Ê′₄₅,₉₀.
+      • the signal photon is detected (no restriction on path or polarisation), and
+      • the idler photon exits the b-path (any polarisation).
 
     Parameters
     ----------
@@ -258,21 +256,15 @@ def coincident_amplitude_probability(initial_state, theta_val):
     # State after the two-stage optical process
     psi_out = process_signal_idler(initial_state, theta_val)
 
-    # Detection ket  |b⟩ ⊗ |θ⟩  for the signal photon
-    pol_pass = Matrix([cos(theta_val + pi/2), sin(theta_val + pi/2)])
-    det_signal = TP(psi_b, pol_pass)
+    # Projector onto the idler b-path (identity in polarisation)
+    projector_b_spatial = TP(psi_b * psi_b.T, I22)
+    proj_joint = TP(I44, projector_b_spatial)
 
-    # Detection ket  |b⟩ ⊗ |H⟩  for the idler photon
-    det_idler = TP(psi_b, H)
+    # Detection probability  ⟨ψ_out| P |ψ_out⟩
+    probability = simplify((psi_out.H * proj_joint * psi_out)[0, 0])
 
-    # Joint detection ket
-    det_joint = TP(det_signal, det_idler)
-
-    # Probability amplitude  ⟨det_joint | ψ_out⟩
-    amplitude = (det_joint.H * psi_out)[0, 0]
-
-    # Detection probability
-    probability = simplify(abs(amplitude) ** 2)
+    # Define a conventional amplitude as the positive square-root of P
+    amplitude = sqrt(probability)
 
     return amplitude, probability
 
