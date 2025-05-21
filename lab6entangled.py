@@ -89,7 +89,7 @@ W_hat_prime = Matrix([
 
 Z_hat_prime = B_hat_prime * W_hat_prime * A_hat_prime * M_hat_prime * B_hat_prime
 
-show(Z_hat_prime, 2)
+#show(Z_hat_prime, 2)
 
 
 
@@ -102,14 +102,18 @@ psi_t_D = (psi_t_H + psi_t_V) / sqrt(2)
 
 theta = symbols("theta", real=True)
 
-P_hat = Matrix([
+# This is for V=90, H=0
+P_hat_standard = Matrix([
     [cos(theta)**2, cos(theta)*sin(theta)],
     [cos(theta)*sin(theta), sin(theta)**2]
 ])
 
+# Convert to V=0, H=90 which we use in our lab
+P_hat = P_hat_standard.subs(theta, theta + pi/2)
+
 Diag_hat = P_hat.subs(theta, pi/4)
-H_out = show(Diag_hat * H, 2)
-V_out = show(Diag_hat * V, 2)
+H_out = Diag_hat * H
+V_out = Diag_hat * V
 
 D = (H+V)/sqrt(2)
 #show(D, sqrt(2))
@@ -138,7 +142,7 @@ P_hat_prime = TP(psi_x * psi_x.T, P_hat) + TP(psi_y * psi_y.T, I22)
 
 
 E_hat_prime = P_hat_prime * Z_hat_prime
-show(E_hat_prime, 2)
+#show(E_hat_prime, 2)
 
 # HWP_u at 45, LP_i at 90
 E_hat_prime_45_90 = E_hat_prime.subs(vartheta, pi/4).subs(theta, pi/2)
@@ -146,7 +150,7 @@ show(E_hat_prime_45_90, 4)
 
 # Send in D light
 psi_eraser = (E_hat_prime_45_90 * psi_b_D)
-show(psi_eraser, 4)
+show(psi_eraser, 2)
 
 psi_x_H_final = psi_b_H.dot(psi_eraser)
 show(psi_x_H_final, 4)
