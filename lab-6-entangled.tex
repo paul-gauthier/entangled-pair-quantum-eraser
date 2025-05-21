@@ -29,7 +29,7 @@
 
 \input{fig.tex}
 
-\section*{Lab 6's Quantum Eraser}
+\subsection*{Lab 6's Quantum Eraser}
 
 In the prelab, we created the MZI operator $\hat{Z}'(\vartheta)$
 Let's compose a polarizer operator onto our MZI operator
@@ -62,40 +62,6 @@ $$
 \hat{E}'\!\left(\theta=90^\circ,\;\vartheta=45^\circ\right)
 $$
 
-\subsection*{Matrix form of the spatially--conditioned polariser}
-
-The linear polariser acting only on the lower (\emph{b}) path is
-\[
-\hat{P}'(\theta)=
-|\psi_b\rangle\langle\psi_b|\otimes \hat{P}(\theta)
-\;+\;
-|\psi_t\rangle\langle\psi_t|\otimes \hat{I},
-\]
-so that, in the ordered basis
-\(
-\{\,|\psi_bH\rangle,|\psi_bV\rangle,
-     |\psi_tH\rangle,|\psi_tV\rangle\},
-\)
-\[
-\hat{P}'(\theta)=
-\begin{bmatrix}
-\sin^{2}\theta & -\sin\theta\cos\theta & 0 & 0\\
--\sin\theta\cos\theta & \cos^{2}\theta & 0 & 0\\
-0 & 0 & 1 & 0\\
-0 & 0 & 0 & 1
-\end{bmatrix}.
-\]
-
-\subsection*{Single--photon quantum–eraser operator}
-
-Combining the MZI operator with the spatially–selective polariser gives
-\[
-\hat{E}'(\theta,\vartheta)=\hat{P}'(\theta)\,\hat{Z}'(\vartheta),
-\qquad
-\hat{E}'_{45,90}\equiv
-\hat{E}'\!\left(\tfrac{\pi}{2},\tfrac{\pi}{4}\right).
-\]
-
 \subsection*{Extension to signal–idler photon pairs}
 
 Each photon spans a four–dimensional Hilbert space
@@ -111,7 +77,8 @@ the pair occupies
 
 \paragraph{Input state}
 
-We prepare the Bell state
+We prepare the Bell state with both photons in the \(b\)-path:
+
 \[
 |\Phi^{+}\rangle=
 \frac{\,|\psi_bH\rangle_{\!s}|\psi_bH\rangle_{\!i}
@@ -129,7 +96,7 @@ After the optical elements
 \paragraph{Coincident detection}
 
 A coincidence is recorded when
-(i) the \emph{signal} photon exits the \(b\)-path and passes the polariser,
+(i) the \emph{signal} photon exits (still in) the \(b\)-path and passes the polariser,
 (ii) the \emph{idler} photon exits the \(b\)-path with horizontal polarisation~\(H\).
 The corresponding detection ket is
 \[
