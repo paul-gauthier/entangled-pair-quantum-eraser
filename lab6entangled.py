@@ -227,3 +227,10 @@ E_triple = TP(projector_i_pair, E_hat_prime_45_90) + TP(projector_s_pair, Identi
 
 # Apply P_hat(theta) to the polarization component of the triple-case state
 # of states in the signal pair basis
+
+# Identity on the arm degree of freedom (2×2)
+Identity_arm = I22
+
+# Operator that applies the polariser to signal photons only
+P_hat_arm_pol = TP(Identity_arm, P_hat)          # 4×4 operator on arm ⊗ polarisation
+P_triple      = TP(projector_s_pair, P_hat_arm_pol) + TP(projector_i_pair, Identity_4)
