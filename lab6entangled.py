@@ -250,3 +250,5 @@ def demo_pair():
 
     # Display the resulting state (scaled for readability)
     show(psi_out, 4)
+
+demo_pair()
