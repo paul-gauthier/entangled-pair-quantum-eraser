@@ -66,7 +66,7 @@
 
 
     \node[beamsplitter, right=2.5cm of M1] (BS2) {};
-    \node at ($(BS2)-(0.4,0.4)$) {\small BS$_2$};
+    \node at ($(BS2)-(0.3,0.3)$) {\small BS$_2$};
 
     \node[detector,rotate=270] (DI) at ($(BS2.east)+(1.5cm,0)$) {\rotatebox{90}{\small $D_i$}};
 
@@ -77,6 +77,12 @@
 
     \node[lp,rotate=0,right=1cm of BS2] (MZI_LP) {};
     \node[below=0.1cm of MZI_LP] () {\small LP$_i(90^\circ)$};
+
+     % For Lab 6
+     \node[hwp,rotate=0,right=1.25cm of M1] (MZI_HWP) {};
+     \node[above=0.1cm of MZI_HWP] () {\small HWP($45^\circ$)};
+     \node[hwp,rotate=0,right=1.25cm of BS1] (MZI_HWP2) {};
+     \node[below=0.25cm of MZI_HWP2] () {\small HWP($0^\circ$)};
 
     % Pump and photon paths
     \draw[->, thick, red] (S) -- (BIBO);
@@ -106,16 +112,12 @@
   \node[above=0.25cm of PM,align=center] () {\small Power meter\\(retractable)};
 
 
-     % For Lab 6
-     \node[hwp,rotate=0,right=1.25cm of M1] (MZI_HWP) {};
-     \node[above=0.1cm of MZI_HWP] () {\small HWP($45^\circ$)};
-     \node[hwp,rotate=0,right=1.25cm of BS1] (MZI_HWP2) {};
-     \node[below=0.25cm of MZI_HWP2] () {\small HWP($0^\circ$)};
 
 \end{tikzpicture}
 \caption{
-Entangled signal-idler quantum eraser experiment, where the signal photon
-carries the ``which-way'' information about the idler's path through the MZI.
+Entangled pair quantum eraser experiment, where the signal photon's
+polarization carries the ``which-way'' information
+about the idler's path through the MZI.
 The apparatus is unchanged from Lab 6.
 Like in Lab 6, the MZI HWP in the upper arm is set to $45^\circ$
 and the MZI LP at the horizontal output by $D_i$
