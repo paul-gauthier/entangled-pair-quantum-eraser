@@ -95,32 +95,32 @@ After the optical elements
 
 \paragraph{Coincident detection}
 
-A coincidence is recorded when
-(i) the \emph{signal} photon exits (still in) the \(b\)-path and passes the polariser,
-(ii) the \emph{idler} photon exits the \(b\)-path with horizontal polarisation~\(H\).
-The corresponding detection ket is
+A coincidence is now registered under the relaxed conditions
+
+(i) the \emph{signal} photon is detected, with \emph{no} restriction on
+its path or polarisation; and
+
+(ii) the \emph{idler} photon is found in the \(b\)-path
+(its polarisation is not analysed).
+
+Operationally this is described by the projector
 \[
-|d(\theta)\rangle=
-\bigl(|\psi_b\rangle_{\!s}\otimes|{\theta}\rangle_{\!s}\bigr)
-\otimes
-\bigl(|\psi_b\rangle_{\!i}\otimes|H\rangle_{\!i}\bigr),
-\quad
-|{\theta}\rangle=-\sin\theta\,|H\rangle+\cos\theta\,|V\rangle.
+\hat{\Pi}=\mathbb{I}_{4}\;\otimes\;
+\bigl(|\psi_b\rangle\langle\psi_b|\otimes\mathbb{I}_{2}\bigr),
+\]
+so that the coincidence probability is
+\(P(\delta)=\langle\Psi_{\mathrm{out}}|\hat{\Pi}|\Psi_{\mathrm{out}}\rangle.\)
 \]
 
-\paragraph{Amplitude and probability for \(\theta=\pi/4\)}
+\paragraph{Probability and amplitude}
 
-Setting \(\theta=\pi/4\) yields
+With the signal polariser fixed at \(\theta=\pi/4\) one finds
 \[
-\mathcal{A}(\delta)=
-\langle d(\tfrac{\pi}{4})|
-      \Psi_{\mathrm{out}}(\tfrac{\pi}{4})\rangle
-      =\frac{\mathrm{i}}{2}\,
-        \sin\!\Bigl(\frac{\delta}{2}\Bigr),
-\qquad
-P(\delta)=|\mathcal{A}(\delta)|^{2}
-        =\frac{1-\cos\delta}{8},
+P(\delta)=\frac{1-\cos\delta}{8},\qquad
+\mathcal{A}(\delta)=\sqrt{P(\delta)}
+                  =\frac{\bigl|\sin(\delta/2)\bigr|}{2},
 \]
-exactly matching the symbolic results obtained with \texttt{sympy}.
+in perfect agreement with the expressions computed by
+\texttt{sympy}.
 
 \end{document}  
