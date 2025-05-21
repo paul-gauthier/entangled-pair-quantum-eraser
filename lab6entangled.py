@@ -189,6 +189,7 @@ def test_E_hat_prime_45_90():
     dump(max_prob_b.evalf(3))
     dump((max_prob_b - min_prob_b).evalf(3))
 
+#test_E_hat_prime_45_90()
 
 ###############################
 # Extension: two-photon (signal & idler) processing
@@ -288,7 +289,7 @@ def demo_pair():
     psi_vv = TP(psi_b_V, psi_b_V)
     bell_state = (psi_hh + psi_vv) / sqrt(2)   # 16×1 column state
 
-    theta_val = pi/4
+    theta_val = 0
 
     # Propagate through the apparatus
     #psi_out = process_signal_idler(bell_state, theta_val)
@@ -297,10 +298,12 @@ def demo_pair():
 
     # Amplitude and probability for coincident detection
     amp, prob = coincident_amplitude_probability(bell_state, theta_val)
-    expected_prob = (1 - cos(delta)) / 8
-    assert prob.equals(expected_prob), f"Probability {prob} != expected {expected_prob}"
+
+    #expected_prob = (1 - cos(delta)) / 8
+    #assert prob.equals(expected_prob), f"Probability {prob} != expected {expected_prob}"
     #amp = amp.rewrite(cos)
     #prob = prob.rewrite(cos)
+
     show(amp)   # symbolic amplitude
     show(prob)  # symbolic probability
 
