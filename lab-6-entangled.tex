@@ -31,36 +31,38 @@
 
 \subsection*{Introduction}
 
-The existing Lab 6 apparatus seems capable of running an even more compelling quantum
+The existing Lab 6 apparatus seems capable of an even more compelling quantum
 eraser experiment that uses entangled pairs.
 Rather than marking the idler with its own ``which-way'' information, it is possible
 to mark the \emph{signal} with the idler's path through the MZI.
 Then by manipulating the signal, we can ``erase'' the which-way information
 and restore self-interference of the idler in the MZI.
 
-This experiment can be run purely by inputting new HWP and LP angles
+This experiment can be run simply by inputting new HWP and LP angles
 into the normal PC control screen.
-No changes are needed to the apparatus on the optical table.
+With no changes to any apparatus on the optical table.
 
-We ensure that only horizontally polarized photons
+We ensure that only horizontally polarized idlers
 can reach the idler detector D$_i$ via the bottom MZI arm,
 and only vertical can reach it via the top arm.
-The MZI HWP$_t$ in the upper arm is set to $45^\circ$ and the idler LP$_i$ at the
-MZI output is set to $90^\circ$ (H).
-Therefore, only H photons can travel the bottom arm
-and pass the horizontal LP$_i$ filter.
-Only V photons can travel the top arm and pass LP$_i$
--- they will encounter HWP$_t$ and assume the needed H polarization.
-H photons entering the top arm will become V polarized
+To reach D$_i$ via the bottom arm, idlers only encounter
+LP$_i$ which is set to $90^\circ$ (H) -- only
+H photons entering the bottom arm can pass.
+To reach D$_i$ via the top arm, idlers pass through
+MZI HWP$_t$ set to $45^\circ$ before LP$_i$ -- only
+V photons entering the top arm can pass, as HWP$_t$
+will convert them to H.
+Photons entering the top arm as H will become V polarized
 and fail to pass LP$_i$.
 
 Using $| \Phi^+ \rangle = \frac{1}{\sqrt2}(|HH\rangle + |VV\rangle)$
 entangled pairs means that the signal's polarization marks which
 path the idler can take through the MZI.
-This prevents the idler from self-interfering in the MZI.
-Adjusting the signal LP$_s$ to $45^\circ$ will erase the which-way information
+This which-way info on the signal
+prevents the idler from self-interfering in the MZI.
+Adjusting the signal LP$_s$ to $45^\circ$ erases the which-way information
 by projecting the signal's polarization onto D.
-This will restore self-interference of the idler in the MZI.
+This restores self-interference of the idler in the MZI.
 
 \subsection*{Operator for Lab 6}
 
@@ -77,7 +79,7 @@ operating on photons in the H=$90^\circ$, V=$0^\circ$ basis as we have been:
 $$\hat{P}(\theta) = \left[\begin{matrix}\sin^{2}{\left(\theta \right)} & - \sin{\left(\theta \right)} \cos{\left(\theta \right)}\\- \sin{\left(\theta \right)} \cos{\left(\theta \right)} & \cos^{2}{\left(\theta \right)}\end{matrix}\right]$$
 
 
-Since the MZI LP is placed at the horizontal output, 
+Since the idler LP$_i$ is placed at the horizontal MZI output, 
 we need an operator that applies $\hat{P}$
 to the polarization component of the state in spatial state $|\psi_b\rangle$,
 while leaving the top path $|\psi_t\rangle$ unchanged.
@@ -90,8 +92,8 @@ to create an operator that encompasses all of the Lab 6 apparatus:
 
 $$\hat{E}'(\theta,\vartheta) = \hat{P'}(\theta) \hat{Z}'(\vartheta)$$
 
-We will use it with the MZI HWP$_t$ at $45^\circ$ and the
-MZI LP$_i$ at $90^\circ$, so
+We will use it with the MZI HWP$_t$ set to $\vartheta=45^\circ$ and 
+the idler LP$_i$ set to $\theta=90^\circ$, so
 $$
 \hat{E}'_{45,90}\;=\;
 \hat{E}'\!\left(\theta=90^\circ,\;\vartheta=45^\circ\right)
