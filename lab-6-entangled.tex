@@ -191,8 +191,54 @@ coincidence detections varies with the phase delay $\delta$.
 Projecting the signal onto the diagonal polarization erases the
 which-way information and restores the idler's self-interference.
 \[
-P(45^\circ, \delta)==\frac{1-\cos\delta}{8}
+P(45^\circ, \delta)=\frac{1-\cos\delta}{8}
 \]
 
+\subsection*{Experimental Tasks}
+
+\subsubsection*{Task 1: Setup}
+
+\begin{itemize}
+\item Set the pump HWP to $45^\circ$ to generate $| \Phi^+ \rangle = \frac{1}{\sqrt2}(|HH\rangle + |VV\rangle)$ pairs.
+\item Set the MZI HWP to $45^\circ$ so the upper arm swaps H/V polarizations.
+\item Set the MZI/idler LP to $90^\circ$ so only H can pass to the idler detector.
+\item Open the MZI arm shutter.
+\item Set the pump laser power to max.
+\item Set acquisition time to 10 sec. Long because we're losing $\approx 7/8$ of photons.
+\end{itemize}
+
+\subsubsection*{Task 2: Accidentals}
+
+\begin{itemize}
+\item Lower the power meter arm.
+\item Record the power meter reading.
+\item Acquire counts for blocked accidentals.
+\item Raise the power meter arm.
+\item Acquire counts for unblocked accidentals.
+\end{itemize}
+
+\subsubsection*{Task 3: Scan with eraser on at $45^\circ$}
+
+\begin{itemize}
+\item Set the signal LP to $45^\circ$, to project the signal polarization onto D and erase which-way info.
+\item Zero the stage position.
+\item Step through stage positions, acquiring counts at each step until 3 fringes/oscillations in coincidence counts are collected.
+\end{itemize}
+
+\subsubsection*{Task 4: Scan with eraser off at $0^\circ$}
+
+\begin{itemize}
+\item Set the signal LP to $0^\circ$, so V signals can pass (idler must use top arm).
+\item Zero the stage position.
+\item Step through stage positions, acquiring counts at each step. Scan the same range as Task 3.
+\end{itemize}
+
+\subsubsection*{Task 5: Scan with eraser off at $90^\circ$}
+
+\begin{itemize}
+\item Set the signal LP to $90^\circ$, so H signals can pass (idler must use lower arm).
+\item Zero the stage position.
+\item Step through stage positions, acquiring counts at each step. Scan the same range as Task 3.
+\end{itemize}
 
 \end{document}  
