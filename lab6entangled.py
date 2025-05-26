@@ -206,10 +206,10 @@ E_hat_prime_45_90_idler = TP(I44, E_hat_prime_45_90)
 P_hat_prime_signal = TP(P_hat_prime, I44)
 
 
-def process_signal_idler(initial_state, theta_val):
+def process_signal_idler(initial_state, theta_val, E_hat_prime_current):
     """
     Apply  P_hat_prime(theta)  to the signal photon followed by
-    E_hat_prime_45_90  to the idler photon.
+    E_hat_prime_current  to the idler photon.
 
     Parameters
     ----------
@@ -217,6 +217,8 @@ def process_signal_idler(initial_state, theta_val):
         Joint state |ψ⟩ of signal ⊗ idler.
     theta_val : sympy expression or float
         Polariser angle θ for the signal (radians).
+    E_hat_prime_current : sympy.Matrix
+        Operator to apply to the idler photon.
 
     Returns
     -------
@@ -226,13 +228,16 @@ def process_signal_idler(initial_state, theta_val):
     # Substitute θ in the signal polariser
     P_signal = P_hat_prime_signal.subs(theta, theta_val)
 
+    # Create the idler operator
+    E_hat_prime_current_idler = TP(I44, E_hat_prime_current)
+    
     # Total operator  (E_idler) ⋅ (P_signal)
-    total_op = E_hat_prime_45_90_idler * P_signal
+    total_op = E_hat_prime_current_idler * P_signal
 
     return total_op * initial_state
 
 
-def coincident_amplitude_probability(initial_state, theta_val):
+def coincident_amplitude_probability(initial_state, theta_val, E_hat_prime_current):
     """
     Compute the probability-amplitude and probability for a coincident
     detection in which
@@ -246,6 +251,8 @@ def coincident_amplitude_probability(initial_state, theta_val):
         Joint input state |ψ⟩ of  signal ⊗ idler  (before any optics).
     theta_val : sympy expression or float
         Signal-polariser angle θ (radians).
+    E_hat_prime_current : sympy.Matrix
+        Operator to apply to the idler photon.
 
     Returns
     -------
@@ -255,7 +262,7 @@ def coincident_amplitude_probability(initial_state, theta_val):
           probability – real detection probability  |amplitude|².
     """
     # State after the two-stage optical process
-    psi_out = process_signal_idler(initial_state, theta_val)
+    psi_out = process_signal_idler(initial_state, theta_val, E_hat_prime_current)
 
     # Projector onto the idler b-path (identity in polarisation)
     projector_b_spatial = TP(psi_b * psi_b.T, I22)
@@ -281,7 +288,7 @@ def demo_pair():
     """
 
     # HWP_u at vartheta=45, theta=LP_i at 90
-    #E_hat_prime_45_90 = E_hat_prime.subs(vartheta, pi/4).subs(theta, pi/2)
+    E_hat_prime_45_90 = E_hat_prime.subs(vartheta, pi/4).subs(theta, pi/2)
 
     # Build entangled polarisation Bell state in the b-path
     #psi_hv = TP(psi_b_H, psi_b_V)
@@ -296,12 +303,12 @@ def demo_pair():
     theta_val = 0
 
     # Propagate through the apparatus
-    #psi_out = process_signal_idler(bell_state, theta_val)
+    #psi_out = process_signal_idler(bell_state, theta_val, E_hat_prime_45_90)
     # Display the resulting state (scaled for readability)
     #show(psi_out, 4)
 
     # Amplitude and probability for coincident detection
-    amp, prob = coincident_amplitude_probability(bell_state, theta_val)
+    amp, prob = coincident_amplitude_probability(bell_state, theta_val, E_hat_prime_45_90)
 
     #expected_prob = (1 - cos(delta)) / 8
     #assert prob.equals(expected_prob), f"Probability {prob} != expected {expected_prob}"
