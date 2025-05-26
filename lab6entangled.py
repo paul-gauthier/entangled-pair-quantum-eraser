@@ -230,7 +230,7 @@ def process_signal_idler(initial_state, theta_val, E_hat_prime_current):
 
     # Create the idler operator
     E_hat_prime_current_idler = TP(I44, E_hat_prime_current)
-    
+
     # Total operator  (E_idler) ⋅ (P_signal)
     total_op = E_hat_prime_current_idler * P_signal
 
@@ -277,7 +277,7 @@ def coincident_amplitude_probability(initial_state, theta_val, E_hat_prime_curre
     return amplitude, probability
 
 
-def demo_pair():
+def demo_pair(mzi_hwp_angle, idler_lp_angle, signal_lp_angle):
     """
     Demonstration:
       • signal & idler both travel the b-path  (|b⟩ₛ |b⟩ᵢ)
@@ -287,8 +287,8 @@ def demo_pair():
       • idler eraser at 45/90 (fixed)
     """
 
-    # HWP_u at vartheta=45, theta=LP_i at 90
-    E_hat_prime_45_90 = E_hat_prime.subs(vartheta, pi/4).subs(theta, pi/2)
+    # HWP_u at vartheta=, LP_i at theta=
+    E_hat_prime_current = E_hat_prime.subs(vartheta, mzi_hwp_angle).subs(theta, idler_lp_angle)
 
     # Build entangled polarisation Bell state in the b-path
     #psi_hv = TP(psi_b_H, psi_b_V)
@@ -300,15 +300,8 @@ def demo_pair():
     psi_vv = TP(psi_b_V, psi_b_V)
     bell_state = (psi_hh + psi_vv) / sqrt(2)   # 16×1 column state
 
-    theta_val = 0
-
-    # Propagate through the apparatus
-    #psi_out = process_signal_idler(bell_state, theta_val, E_hat_prime_45_90)
-    # Display the resulting state (scaled for readability)
-    #show(psi_out, 4)
-
     # Amplitude and probability for coincident detection
-    amp, prob = coincident_amplitude_probability(bell_state, theta_val, E_hat_prime_45_90)
+    amp, prob = coincident_amplitude_probability(bell_state, signal_lp_angle, E_hat_prime_current)
 
     #expected_prob = (1 - cos(delta)) / 8
     #assert prob.equals(expected_prob), f"Probability {prob} != expected {expected_prob}"
@@ -318,4 +311,8 @@ def demo_pair():
     show(amp)   # symbolic amplitude
     show(prob)  # symbolic probability
 
-demo_pair()
+demo_pair(
+    mzi_hwp_angle=pi/4,
+    idler_lp_angle=pi/2,
+    signal_lp_angle=0,
+)
