@@ -144,7 +144,7 @@ P_hat_prime = TP(psi_x * psi_x.T, P_hat) + TP(psi_y * psi_y.T, I22)
 E_hat_prime = P_hat_prime * Z_hat_prime
 #show(E_hat_prime, 2)
 
-# HWP_u at 45, LP_i at 90
+# HWP_u at vartheta=45, theta=LP_i at 90
 E_hat_prime_45_90 = E_hat_prime.subs(vartheta, pi/4).subs(theta, pi/2)
 #show(E_hat_prime_45_90, 4)
 
@@ -279,6 +279,10 @@ def demo_pair():
       • signal polariser at θ = π/4
       • idler eraser at 45/90 (fixed)
     """
+
+    # HWP_u at vartheta=45, theta=LP_i at 90
+    #E_hat_prime_45_90 = E_hat_prime.subs(vartheta, pi/4).subs(theta, pi/2)
+
     # Build entangled polarisation Bell state in the b-path
     #psi_hv = TP(psi_b_H, psi_b_V)
     #psi_vh = TP(psi_b_V, psi_b_H)
