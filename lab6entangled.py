@@ -6,6 +6,7 @@ from sympy import *
 from sympy.physics.quantum import TensorProduct
 import numpy as np
 import matplotlib.pyplot as plt
+import math
 
 from show import show
 from dump import dump
@@ -319,27 +320,26 @@ signal_epsilon = math.radians(0)
 prob = demo_pair(
     phi_plus_state,
     mzi_hwp_angle=pi/4,  # swap H/V in the upper arm
-    idler_lp_angle=pi/2, # 90 degree = H
-    signal_lp_angle=pi/4,   # 45 = pi/4 = Eraser on
+    idler_lp_angle=pi/2 + idler_epsilon, # 90 degree = H
+    signal_lp_angle=pi/4 + signal_epsilon,   # 45 = pi/4 = Eraser on
 )
 # Proper settings, eraser off
 demo_pair(
     phi_plus_state,
     mzi_hwp_angle=pi/4,  # swap H/V in the upper arm
-    idler_lp_angle=pi/2, # 90 degree = H
-    signal_lp_angle=0,   # 0 = Eraser off
+    idler_lp_angle=pi/2 + idler_epsilon, # 90 degree = H
+    signal_lp_angle=0 + signal_epsilon,   # 0 = Eraser off
 )
 # Proper settings, eraser off
 demo_pair(
     phi_plus_state,
     mzi_hwp_angle=pi/4,    # swap H/V in the upper arm
-    idler_lp_angle=pi/2,   # 90 degree = H
-    signal_lp_angle=pi/2,  # 90 = Eraser off
+    idler_lp_angle=pi/2 + idler_epsilon,   # 90 degree = H
+    signal_lp_angle=pi/2 + signal_epsilon,  # 90 = Eraser off
 )
 
 expected_prob = (1 - cos(delta)) / 8
 assert prob.equals(expected_prob), f"Probability {prob} != expected {expected_prob}"
-
 
 exit()
 
@@ -353,8 +353,8 @@ exit()
 demo_pair(
     psi_vv, # Pump HWP was set to 45 => Pump @ 90/H => 0/V signals&idlers
     mzi_hwp_angle=pi/4,   # swap H/V in the upper arm
-    idler_lp_angle=pi/4,  # This was set to 45deg instead of 90 deg
-    signal_lp_angle=pi/4, # Eraser on
+    idler_lp_angle=pi/4 + idler_epsilon,  # This was set to 45deg instead of 90 deg
+    signal_lp_angle=pi/4 + signal_epsilon, # Eraser on
 )
 
 
@@ -362,6 +362,6 @@ demo_pair(
 prob = demo_pair(
     psi_vv, # Pump HWP was set to 45 => Pump @ 90/H => 0/V signals&idlers
     mzi_hwp_angle=pi/4,   # swap H/V in the upper arm
-    idler_lp_angle=pi/4,  # This was set to 45deg instead of 90 deg
-    signal_lp_angle=0, # Eraser off
+    idler_lp_angle=pi/4 + idler_epsilon,  # This was set to 45deg instead of 90 deg
+    signal_lp_angle=0 + signal_epsilon, # Eraser off
 )
