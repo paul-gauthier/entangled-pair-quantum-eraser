@@ -199,7 +199,7 @@ P(45^\circ, \delta)=\frac{1-\cos\delta}{8}
 \subsubsection*{Task 1: Setup}
 
 \begin{itemize}
-\item Set the pump HWP to $45^\circ$ to generate $| \Phi^+ \rangle = \frac{1}{\sqrt2}(|HH\rangle + |VV\rangle)$ pairs.
+\item Set the pump HWP to $22.5^\circ$ to generate $| \Phi^+ \rangle = \frac{1}{\sqrt2}(|HH\rangle + |VV\rangle)$ pairs.
 \item Set the MZI HWP to $45^\circ$ so the upper arm swaps H/V polarizations.
 \item Set the MZI/idler LP to $90^\circ$ so only H can pass to the idler detector.
 \item Open the MZI arm shutter.
@@ -211,15 +211,15 @@ P(45^\circ, \delta)=\frac{1-\cos\delta}{8}
 
 \begin{table}[h]
 \centering
-\begin{tabular}{ll}
+\begin{tabular}{lll}
 \toprule
-\textbf{Component} & \textbf{Setting} \\
+\textbf{Component} & \textbf{Setting} & Notes\\
 \midrule
-Idler LP  & \textbf{--} \\
-Signal LP & $45^\circ$ (varies) \\
-Pump HWP  & $45^\circ$ \\
-MZI LP    & $90^\circ$ \\
-MZI HWP   & $45^\circ$ \\
+Idler LP  & \textbf{--} & Input is disabled \\
+Signal LP & $45^\circ$ & Varies 45, 0, 90 to turn eraser on/off \\
+Pump HWP  & $22.5^\circ$ & Generate $|\Phi^+ \rangle$ pairs \\
+MZI LP    & $90^\circ$ & Only H photons can reach detector \\
+MZI HWP   & $45^\circ$ & Upper arm swaps H/V polarization\\
 \bottomrule
 \end{tabular}
 \end{table}
