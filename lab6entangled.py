@@ -305,7 +305,7 @@ def demo_pair(initial_state, mzi_hwp_angle, idler_lp_angle, signal_lp_angle):
 psi_hh = TP(psi_b_H, psi_b_H)
 psi_vv = TP(psi_b_V, psi_b_V)
 phi_plus_state = (psi_hh + psi_vv) / sqrt(2)   # 16×1 column state
-
+assert phi_plus_state.norm() == 1
 
 ##############################################################
 # Proper settings, eraser on
