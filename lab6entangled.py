@@ -308,11 +308,45 @@ def demo_pair(mzi_hwp_angle, idler_lp_angle, signal_lp_angle):
     #amp = amp.rewrite(cos)
     #prob = prob.rewrite(cos)
 
+    print("#"*80)
+    dump(mzi_hwp_angle, idler_lp_angle, signal_lp_angle)
     show(amp)   # symbolic amplitude
     show(prob)  # symbolic probability
 
+    return prob
+
+
+# Proper settings
 demo_pair(
-    mzi_hwp_angle=pi/4,
-    idler_lp_angle=pi/2,
-    signal_lp_angle=0,
+    mzi_hwp_angle=pi/4,  # swap H/V in the upper arm
+    idler_lp_angle=pi/2, # 90 degree = H
+    signal_lp_angle=0,   # 0 = Eraser off
 )
+# Proper settings
+prob = demo_pair(
+    mzi_hwp_angle=pi/4,  # swap H/V in the upper arm
+    idler_lp_angle=pi/2, # 90 degree = H
+    signal_lp_angle=pi/4,   # 45 = pi/4 = Eraser on
+)
+
+
+expected_prob = (1 - cos(delta)) / 8
+assert prob.equals(expected_prob), f"Probability {prob} != expected {expected_prob}"
+
+# Misconfigured on Friday, "eraser on"
+demo_pair(
+    mzi_hwp_angle=pi/4,   # swap H/V in the upper arm
+    idler_lp_angle=pi/4,  # This was set to 45deg instead of 90 deg
+    signal_lp_angle=pi/4, # Eraser on
+)
+
+# Misconfigured on Friday, "eraser off"
+prob = demo_pair(
+    mzi_hwp_angle=pi/4,   # swap H/V in the upper arm
+    idler_lp_angle=pi/4,  # This was set to 45deg instead of 90 deg
+    signal_lp_angle=0, # Eraser on
+)
+
+
+expected_prob = (1 + cos(delta)) / 8
+assert prob.equals(expected_prob), f"Probability {prob} != expected {expected_prob}"
