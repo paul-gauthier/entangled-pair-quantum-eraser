@@ -278,25 +278,12 @@ def coincident_amplitude_probability(initial_state, theta_val, E_hat_prime_curre
 
 
 def demo_pair(initial_state, mzi_hwp_angle, idler_lp_angle, signal_lp_angle):
-    """
-    Demonstration:
-      • signal & idler both travel the b-path  (|b⟩ₛ |b⟩ᵢ)
-      • entangled polarisation state
-          (|H⟩ₛ|V⟩ᵢ + |V⟩ₛ|H⟩ᵢ) / √2
-      • signal polariser at θ = π/4
-      • idler eraser at 45/90 (fixed)
-    """
 
     # HWP_u at vartheta=, LP_i at theta=
     E_hat_prime_current = E_hat_prime.subs(vartheta, mzi_hwp_angle).subs(theta, idler_lp_angle)
 
     # Amplitude and probability for coincident detection
     amp, prob = coincident_amplitude_probability(initial_state, signal_lp_angle, E_hat_prime_current)
-
-    #expected_prob = (1 - cos(delta)) / 8
-    #assert prob.equals(expected_prob), f"Probability {prob} != expected {expected_prob}"
-    #amp = amp.rewrite(cos)
-    #prob = prob.rewrite(cos)
 
     print("#"*80)
     dump(mzi_hwp_angle, idler_lp_angle, signal_lp_angle)
@@ -333,7 +320,13 @@ expected_prob = (1 - cos(delta)) / 8
 assert prob.equals(expected_prob), f"Probability {prob} != expected {expected_prob}"
 
 
+exit()
+
 ##############################################################
+#
+# This matches the collected data.
+# Both interfere, with N_c_eraser_on = 1/2 N_c_eraser_off
+#
 # Misconfigured on Friday, "eraser on"
 demo_pair(
     psi_vv, # Pump HWP was set to 45 => Pump @ 90/H => 0/V signals&idlers
