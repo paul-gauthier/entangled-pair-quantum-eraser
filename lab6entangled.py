@@ -408,7 +408,8 @@ plt.xlabel('Signal LP Epsilon (degrees from 0°)')
 plt.ylabel('Idler LP Epsilon (degrees from 90°)')
 plt.title('Visibility Heatmap: Eraser Off (Signal LP @ 0°+ε_sig, Idler LP @ 90°+ε_idl)')
 plt.grid(True, linestyle='--', alpha=0.6)
-plt.show()
+plt.savefig("visibility_heatmap_eraser_off.png")
+print("Saved heatmap to visibility_heatmap_eraser_off.png")
 
 exit()
 
