@@ -255,10 +255,9 @@ def process_signal_idler(initial_state, theta_val, E_hat_prime_current):
     return total_op * initial_state
 
 
-def coincident_amplitude_probability(initial_state, theta_val, E_hat_prime_current):
+def coincident_probability(initial_state, theta_val, E_hat_prime_current):
     """
-    Compute the probability-amplitude and probability for a coincident
-    detection in which
+    Compute the probability for a coincident detection in which
 
       • the signal photon is detected (no restriction on path or polarisation), and
       • the idler photon exits the b-path (any polarisation).
@@ -274,9 +273,6 @@ def coincident_amplitude_probability(initial_state, theta_val, E_hat_prime_curre
 
     Returns
     -------
-    tuple
-        (amplitude, probability)  where
-          amplitude   – complex probability amplitude  ⟨det|ψ_out⟩,
           probability – real detection probability  |amplitude|².
     """
     # State after the two-stage optical process
@@ -289,10 +285,7 @@ def coincident_amplitude_probability(initial_state, theta_val, E_hat_prime_curre
     # Detection probability  ⟨ψ_out| P |ψ_out⟩
     probability = simplify((psi_out.H * proj_joint * psi_out)[0, 0])
 
-    # Define a conventional amplitude as the positive square-root of P
-    amplitude = sqrt(probability)
-
-    return amplitude, probability
+    return probability
 
 
 def demo_pair(initial_state, mzi_hwp_angle, idler_lp_angle, signal_lp_angle):
@@ -300,12 +293,12 @@ def demo_pair(initial_state, mzi_hwp_angle, idler_lp_angle, signal_lp_angle):
     # HWP_u at vartheta=, LP_i at theta=
     E_hat_prime_current = E_hat_prime.subs(vartheta, mzi_hwp_angle).subs(theta, idler_lp_angle)
 
-    # Amplitude and probability for coincident detection
-    amp, prob = coincident_amplitude_probability(initial_state, signal_lp_angle, E_hat_prime_current)
+    # Probability for coincident detection
+    prob = coincident_probability(initial_state, signal_lp_angle, E_hat_prime_current)
 
     print("#"*80)
     dump(mzi_hwp_angle, idler_lp_angle, signal_lp_angle)
-    #show(amp)   # symbolic amplitude
+    #prob = simplify(prob.rewrite(sin))
     show(prob)  # symbolic probability
 
     return prob
@@ -332,7 +325,13 @@ demo_pair(
     idler_lp_angle=pi/2, # 90 degree = H
     signal_lp_angle=0,   # 0 = Eraser off
 )
-
+# Proper settings, eraser off
+demo_pair(
+    phi_plus_state,
+    mzi_hwp_angle=pi/4,    # swap H/V in the upper arm
+    idler_lp_angle=pi/2,   # 90 degree = H
+    signal_lp_angle=pi/2,  # 90 = Eraser off
+)
 
 expected_prob = (1 - cos(delta)) / 8
 assert prob.equals(expected_prob), f"Probability {prob} != expected {expected_prob}"
