@@ -180,7 +180,7 @@ def plot_counts(
         fmt="x",
         color=color_nc,
         #linestyle="--",
-        label=fr"Coincidence ($N_{{c,{label_suffix}}}$) with fit",
+        label=fr"Coincidence ($N_{{c,{label_suffix}}}$, $V={V_vis:.3f}$) with fit",
         capsize=3,
     )
     # Overlay best-fit cosine curve
