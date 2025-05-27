@@ -94,7 +94,7 @@ if __name__ == "__main__":
         Ni_on,
         Nc_on,
         output_filename="counts_vs_phase_delay_eraser_on.pdf",
-        label_suffix=r"_{\mathrm{on}}",
+        label_suffix=r"eraser-on",
     )
 
     # Plot with quantum-eraser OFF
@@ -104,5 +104,5 @@ if __name__ == "__main__":
         Ni_off,
         Nc_off,
         output_filename="counts_vs_phase_delay_eraser_off.pdf",
-        label_suffix=r"_{\mathrm{off}}",
+        label_suffix=r"eraser-off",
     )
