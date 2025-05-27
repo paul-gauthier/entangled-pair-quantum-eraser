@@ -66,14 +66,43 @@ N_s	N_i	N_c
 '''
 
 # ---------------------------------------------------------------------------
+# Parse the tab-separated tables into NumPy arrays
+def _parse_counts(tsv: str):
+    """Return (Ns, Ni, Nc) arrays parsed from a TSV block with a header row."""
+    rows = [
+        [float(x) for x in line.split()]
+        for line in tsv.strip().splitlines()[1:]  # skip header
+        if line.strip()
+    ]
+    counts = np.asarray(rows, dtype=float)
+    return counts[:, 0], counts[:, 1], counts[:, 2]
+
+
+# Pre-compute arrays for both configurations
+Ns_on, Ni_on, Nc_on = _parse_counts(eraser_on)
+Ns_off, Ni_off, Nc_off = _parse_counts(eraser_off)
+
+# ---------------------------------------------------------------------------
 # Delegate all plotting to the reusable utility in `plot_utils.py`
 from plot_utils import plot_counts
 
 if __name__ == "__main__":
+    # Plot with quantum-eraser ON
     plot_counts(
         piezo_steps,
-        Ns_counts,
-        Ni_counts,
-        Nc_counts,
-        output_filename="counts_vs_phase_delay_combined.pdf",
+        Ns_on,
+        Ni_on,
+        Nc_on,
+        output_filename="counts_vs_phase_delay_eraser_on.pdf",
+        label_suffix=r"_{\mathrm{on}}",
+    )
+
+    # Plot with quantum-eraser OFF
+    plot_counts(
+        piezo_steps,
+        Ns_off,
+        Ni_off,
+        Nc_off,
+        output_filename="counts_vs_phase_delay_eraser_off.pdf",
+        label_suffix=r"_{\mathrm{off}}",
     )
