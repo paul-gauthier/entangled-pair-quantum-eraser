@@ -155,7 +155,7 @@ def plot_counts(
         fmt="o",
         color=color_ns,
         #linestyle="-",
-        label=fr"Signal ($N_s{label_suffix}$)",
+        label=fr"Signal ($N_{{s,{label_suffix}}}$)",
         capsize=3,
     )
     ax1.errorbar(
@@ -165,7 +165,7 @@ def plot_counts(
         fmt="s",
         color=color_ni,
         #linestyle=":",
-        label=fr"Idler ($N_i{label_suffix}$)",
+        label=fr"Idler ($N_{{i,{label_suffix}}}$)",
         capsize=3,
     )
     ax1.grid(True, linestyle=":", alpha=0.7)
@@ -180,7 +180,7 @@ def plot_counts(
         fmt="x",
         color=color_nc,
         #linestyle="--",
-        label=fr"Coincidence ($N_c{label_suffix}$) with fit",
+        label=fr"Coincidence ($N_{{c,{label_suffix}}}$) with fit",
         capsize=3,
     )
     # Overlay best-fit cosine curve
