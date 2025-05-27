@@ -287,19 +287,49 @@ def coincident_probability(initial_state, theta_val, E_hat_prime_current):
 
 
 def demo_pair(initial_state, mzi_hwp_angle, idler_lp_angle, signal_lp_angle):
+    """
+    Compute the coincident-detection probability for the given parameters
+    and the corresponding interference visibility.
 
-    # HWP_u at vartheta=, LP_i at theta=
+    Parameters
+    ----------
+    initial_state :
+        16-component joint state |ψ⟩ of signal ⊗ idler.
+    mzi_hwp_angle :
+        HWP angle (ϑ) in the upper arm of the MZI.
+    idler_lp_angle :
+        Linear-polariser angle (θ) in the idler arm.
+    signal_lp_angle :
+        Linear-polariser angle (θ) in the signal arm.
+
+    Returns
+    -------
+    tuple
+        (probability expression, visibility expression)
+    """
+
+    # HWP_u at vartheta = mzi_hwp_angle, LP_i at theta = idler_lp_angle
     E_hat_prime_current = E_hat_prime.subs(vartheta, mzi_hwp_angle).subs(theta, idler_lp_angle)
 
     # Probability for coincident detection
     prob = coincident_probability(initial_state, signal_lp_angle, E_hat_prime_current)
 
-    print("#"*80)
-    dump(mzi_hwp_angle, idler_lp_angle, signal_lp_angle)
-    #prob = simplify(prob.rewrite(sin))
-    show(prob)  # symbolic probability
+    # Simplify and express in terms of cos(δ) before finding extrema
+    prob_simplified = simplify(prob.rewrite(cos))
 
-    return prob
+    # Extremal values with respect to the phase delay δ
+    min_prob = minimum(prob_simplified, delta)
+    max_prob = maximum(prob_simplified, delta)
+
+    # Visibility  V = (max − min) / (max + min)
+    visibility = simplify((max_prob - min_prob) / (max_prob + min_prob))
+
+    print("#" * 80)
+    dump(mzi_hwp_angle, idler_lp_angle, signal_lp_angle)
+    show(prob_simplified)  # symbolic probability
+    dump(min_prob.evalf(5), max_prob.evalf(5), visibility.evalf(5))
+
+    return prob_simplified, visibility
 
 
 # Build phi+ state
@@ -317,7 +347,7 @@ signal_epsilon = math.radians(0)
 
 
 # Proper settings, eraser on
-prob = demo_pair(
+prob, visibility = demo_pair(
     phi_plus_state,
     mzi_hwp_angle=pi/4,  # swap H/V in the upper arm
     idler_lp_angle=pi/2 + idler_epsilon, # 90 degree = H
@@ -360,7 +390,7 @@ demo_pair(
 
 
 # Misconfigured on Friday, "eraser off"
-prob = demo_pair(
+prob, visibility = demo_pair(
     psi_vv, # Pump HWP was set to 45 => Pump @ 90/H => 0/V signals&idlers
     mzi_hwp_angle=pi/4,   # swap H/V in the upper arm
     idler_lp_angle=pi/4 + idler_epsilon,  # This was set to 45deg instead of 90 deg
