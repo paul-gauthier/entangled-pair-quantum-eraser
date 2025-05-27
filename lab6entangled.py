@@ -217,9 +217,6 @@ def test_E_hat_prime_45_90():
 
 I44 = eye(4)
 
-# Idler: fixed “eraser” stage (Ê′₄₅,₉₀) – acts on idler only
-E_hat_prime_45_90_idler = TP(I44, E_hat_prime_45_90)
-
 # Signal: variable linear polariser P̂′(θ) – acts on signal only
 P_hat_prime_signal = TP(P_hat_prime, I44)
 
