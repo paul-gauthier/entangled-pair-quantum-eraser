@@ -411,6 +411,45 @@ plt.grid(True, linestyle='--', alpha=0.6)
 plt.savefig("visibility_heatmap_eraser_off.png")
 print("Saved heatmap to visibility_heatmap_eraser_off.png")
 
+
+print("Generating visibility heatmap for psi_vv, signal_lp_angle = 90 + epsilon...")
+epsilon_degrees_psi_vv = np.linspace(-5, 5, 11)  # -5 to +5 degrees in 1 degree steps
+visibility_values_psi_vv = np.zeros((len(epsilon_degrees_psi_vv), len(epsilon_degrees_psi_vv)))
+
+for i, idler_eps_deg in enumerate(epsilon_degrees_psi_vv):
+    for j, signal_eps_deg in enumerate(epsilon_degrees_psi_vv):
+        idler_eps_rad = math.radians(idler_eps_deg)
+        signal_eps_rad = math.radians(signal_eps_deg)
+
+        # Parameters for this point in the heatmap
+        # Initial state is psi_vv
+        # MZI HWP is pi/4
+        # Idler LP is pi/2 + idler_eps_rad
+        # Signal LP is pi/2 + signal_eps_rad
+        _prob_temp, vis_temp = demo_pair(
+            initial_state=psi_vv, # Using psi_vv state
+            mzi_hwp_angle=pi/4,
+            idler_lp_angle=pi/2 + idler_eps_rad,
+            signal_lp_angle=pi/2 + signal_eps_rad, # Signal LP at 90 deg + epsilon
+        )
+        visibility_values_psi_vv[i, j] = vis_temp.evalf()
+
+print("Finished generating data for psi_vv heatmap.")
+
+# Plotting the heatmap for psi_vv
+plt.figure(figsize=(8, 6))
+plt.imshow(visibility_values_psi_vv, origin='lower',
+           extent=[epsilon_degrees_psi_vv.min(), epsilon_degrees_psi_vv.max(),
+                   epsilon_degrees_psi_vv.min(), epsilon_degrees_psi_vv.max()],
+           aspect='auto', cmap='viridis')
+plt.colorbar(label='Visibility')
+plt.xlabel('Signal LP Epsilon (degrees from 90°)')
+plt.ylabel('Idler LP Epsilon (degrees from 90°)')
+plt.title('Visibility Heatmap: Initial State $\\psi_{VV}$, MZI HWP @ 45°, Idler LP @ 90°+$\\epsilon_{idl}$, Signal LP @ 90°+$\\epsilon_{sig}$')
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.savefig("visibility_heatmap_psi_vv_signal_lp_90.png")
+print("Saved heatmap to visibility_heatmap_psi_vv_signal_lp_90.png")
+
 exit()
 
 
