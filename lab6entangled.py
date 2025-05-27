@@ -12,6 +12,9 @@ from dump import dump
 
 TP = TensorProduct
 
+##############################################################
+# Basis states
+
 psi_x = psi_b = Matrix([1, 0])
 psi_y = psi_t = Matrix([0, 1])
 
@@ -34,7 +37,8 @@ psi_t_V = TP(psi_t, V)
 #show(psi_t_H)
 #show(psi_t_V)
 
-
+##############################################################
+# Beamsplitter
 B_hat = Matrix([
     [1, I],
     [I, 1],
@@ -47,6 +51,8 @@ I22 = eye(2,2)
 B_hat_prime = TP(B_hat, I22)
 #show(B_hat_prime, sqrt(2))
 
+##############################################################
+# Mirror
 M_hat = Matrix([
     [0, 1],
     [1, 0],
@@ -58,6 +64,8 @@ M_hat_prime = TP(M_hat, I22)
 #show(M_hat_prime)
 
 
+##############################################################
+# Phase delay (mirror on piezo stage)
 delta = symbols("delta", real=True)
 
 A_hat = Matrix([
@@ -71,7 +79,8 @@ A_hat_prime = TP(A_hat, I22)
 #show(A_hat_prime)
 
 
-
+##############################################################
+# HWP with adjustable angle in upper arm, HWP @ 0 degrees in lower arm
 # Q5
 vartheta = symbols("vartheta", real=True)
 
@@ -82,6 +91,12 @@ W_hat_prime = Matrix([
     [0, 0, 0, -1]
 ])
 
+##############################################################
+# Compose an MZI with:
+# - Adjustable HWP in upper arm
+# - Fixed HWP @ 0deg in lower arm
+# - Adjustable phase delay in lower arm
+#
 #show(W_hat_prime)
 #show(M_hat_prime * B_hat_prime, 2/sqrt(2))
 #show(A_hat_prime * M_hat_prime * B_hat_prime, 2/sqrt(2))
@@ -91,14 +106,11 @@ Z_hat_prime = B_hat_prime * W_hat_prime * A_hat_prime * M_hat_prime * B_hat_prim
 
 #show(Z_hat_prime, 2)
 
-
-
 psi_b_D = (psi_b_H + psi_b_V) / sqrt(2)
 psi_t_D = (psi_t_H + psi_t_V) / sqrt(2)
 
-###############################
+##############################################################
 # A linear polarizer set at angle theta
-
 
 theta = symbols("theta", real=True)
 
@@ -125,6 +137,8 @@ assert V_out.norm()**2 == V.norm()**2/2
 
 #dump(H_out.norm()**2, H.norm()**2)
 
+##############################################################
+# An adjustable polarizer for the x/horizontal exit of the MZI
 P_hat_prime = TP(psi_x * psi_x.T, P_hat) + TP(psi_y * psi_y.T, I22)
 
 #show(P_hat)
@@ -140,10 +154,14 @@ P_hat_prime = TP(psi_x * psi_x.T, P_hat) + TP(psi_y * psi_y.T, I22)
 #show(P_hat_prime.subs(theta, pi/4) * psi_t_H)
 #show(P_hat_prime.subs(theta, pi/4) * psi_t_V)
 
-
+##############################################################
+# An operator for the MZI with adjustable polarizer for the x/horizontal exit
 E_hat_prime = P_hat_prime * Z_hat_prime
 #show(E_hat_prime, 2)
 
+##############################################################
+# An instance of the MZI+LP at specific settings
+#
 # HWP_u at vartheta=45, theta=LP_i at 90
 E_hat_prime_45_90 = E_hat_prime.subs(vartheta, pi/4).subs(theta, pi/2)
 #show(E_hat_prime_45_90, 4)
@@ -191,7 +209,7 @@ def test_E_hat_prime_45_90():
 
 #test_E_hat_prime_45_90()
 
-###############################
+##############################################################
 # Extension: two-photon (signal & idler) processing
 # -----------------------------------------------
 # Each photon spans a 4-D Hilbert space (2 spatial ⊗ 2 polarisation).
