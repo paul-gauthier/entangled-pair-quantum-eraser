@@ -277,7 +277,7 @@ def coincident_amplitude_probability(initial_state, theta_val, E_hat_prime_curre
     return amplitude, probability
 
 
-def demo_pair(mzi_hwp_angle, idler_lp_angle, signal_lp_angle):
+def demo_pair(initial_state, mzi_hwp_angle, idler_lp_angle, signal_lp_angle):
     """
     Demonstration:
       • signal & idler both travel the b-path  (|b⟩ₛ |b⟩ᵢ)
@@ -290,18 +290,8 @@ def demo_pair(mzi_hwp_angle, idler_lp_angle, signal_lp_angle):
     # HWP_u at vartheta=, LP_i at theta=
     E_hat_prime_current = E_hat_prime.subs(vartheta, mzi_hwp_angle).subs(theta, idler_lp_angle)
 
-    # Build entangled polarisation Bell state in the b-path
-    #psi_hv = TP(psi_b_H, psi_b_V)
-    #psi_vh = TP(psi_b_V, psi_b_H)
-    #bell_state = (psi_hv + psi_vh) / sqrt(2)   # 16×1 column state
-
-    # Build phi+ state
-    psi_hh = TP(psi_b_H, psi_b_H)
-    psi_vv = TP(psi_b_V, psi_b_V)
-    bell_state = (psi_hh + psi_vv) / sqrt(2)   # 16×1 column state
-
     # Amplitude and probability for coincident detection
-    amp, prob = coincident_amplitude_probability(bell_state, signal_lp_angle, E_hat_prime_current)
+    amp, prob = coincident_amplitude_probability(initial_state, signal_lp_angle, E_hat_prime_current)
 
     #expected_prob = (1 - cos(delta)) / 8
     #assert prob.equals(expected_prob), f"Probability {prob} != expected {expected_prob}"
@@ -310,31 +300,43 @@ def demo_pair(mzi_hwp_angle, idler_lp_angle, signal_lp_angle):
 
     print("#"*80)
     dump(mzi_hwp_angle, idler_lp_angle, signal_lp_angle)
-    show(amp)   # symbolic amplitude
+    #show(amp)   # symbolic amplitude
     show(prob)  # symbolic probability
 
     return prob
 
 
-# Proper settings
-demo_pair(
-    mzi_hwp_angle=pi/4,  # swap H/V in the upper arm
-    idler_lp_angle=pi/2, # 90 degree = H
-    signal_lp_angle=0,   # 0 = Eraser off
-)
-# Proper settings
+# Build phi+ state
+psi_hh = TP(psi_b_H, psi_b_H)
+psi_vv = TP(psi_b_V, psi_b_V)
+phi_plus_state = (psi_hh + psi_vv) / sqrt(2)   # 16×1 column state
+
+
+##############################################################
+# Proper settings, eraser on
 prob = demo_pair(
+    phi_plus_state,
     mzi_hwp_angle=pi/4,  # swap H/V in the upper arm
     idler_lp_angle=pi/2, # 90 degree = H
     signal_lp_angle=pi/4,   # 45 = pi/4 = Eraser on
+)
+# Proper settings, eraser off
+demo_pair(
+    phi_plus_state,
+    mzi_hwp_angle=pi/4,  # swap H/V in the upper arm
+    idler_lp_angle=pi/2, # 90 degree = H
+    signal_lp_angle=0,   # 0 = Eraser off
 )
 
 
 expected_prob = (1 - cos(delta)) / 8
 assert prob.equals(expected_prob), f"Probability {prob} != expected {expected_prob}"
 
+
+##############################################################
 # Misconfigured on Friday, "eraser on"
 demo_pair(
+    psi_vv, # Pump HWP was set to 45 => Pump @ 90/H => 0/V signals&idlers
     mzi_hwp_angle=pi/4,   # swap H/V in the upper arm
     idler_lp_angle=pi/4,  # This was set to 45deg instead of 90 deg
     signal_lp_angle=pi/4, # Eraser on
@@ -342,11 +344,8 @@ demo_pair(
 
 # Misconfigured on Friday, "eraser off"
 prob = demo_pair(
+    psi_vv, # Pump HWP was set to 45 => Pump @ 90/H => 0/V signals&idlers
     mzi_hwp_angle=pi/4,   # swap H/V in the upper arm
     idler_lp_angle=pi/4,  # This was set to 45deg instead of 90 deg
-    signal_lp_angle=0, # Eraser on
+    signal_lp_angle=0, # Eraser off
 )
-
-
-expected_prob = (1 + cos(delta)) / 8
-assert prob.equals(expected_prob), f"Probability {prob} != expected {expected_prob}"
