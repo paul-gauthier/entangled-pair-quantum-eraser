@@ -146,6 +146,10 @@ def plot_counts(
     # Figure & axes ----------------------------------------------------------
     fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=(10, 8))
 
+    # Add title
+    if label_suffix:
+        fig.suptitle(f"Counts vs Phase Delay: {label_suffix}", fontsize=20)
+
     # Top panel: Ns & Ni -----------------------------------------------------
     ax1.set_ylabel(r"Counts/sec", fontsize=18)
     ax1.errorbar(
@@ -201,16 +205,6 @@ def plot_counts(
     xticklabels = [s.replace("1$\\pi$", "$\\pi$") for s in xticklabels]
     ax2.set_xticks(xticks)
     ax2.set_xticklabels(xticklabels)
-
-    # Secondary axis: stage displacement (nm) -------------------------------
-    secax = ax1.secondary_xaxis("top", functions=(delta_to_nm, nm_to_delta))
-    secax.set_xlabel("Stage Position (nm)", fontsize=18)
-
-    # Set ticks for the secondary x-axis to 0, 300, 600, ... nm
-    max_nm_val = delta_to_nm(np.max(delta))
-    nm_tick_step = 300
-    nm_ticks = np.arange(0, max_nm_val + nm_tick_step, nm_tick_step)
-    secax.set_xticks(nm_ticks)
 
     # Set ymax for the coincidence graph (ax2) as per user request
     nc_min_val = np.min(Nc)
