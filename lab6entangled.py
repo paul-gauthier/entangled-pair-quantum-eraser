@@ -372,7 +372,46 @@ if idler_epsilon == 0 and signal_epsilon == 0:
     expected_prob = (1 - cos(delta)) / 8
     assert prob.equals(expected_prob), f"Probability {prob} != expected {expected_prob}"
 
+
+print("Generating visibility heatmap for eraser off case (signal_lp_angle = 0 + epsilon)...")
+epsilon_degrees = np.linspace(-5, 5, 11)  # -5 to +5 degrees in 1 degree steps
+visibility_values = np.zeros((len(epsilon_degrees), len(epsilon_degrees)))
+
+for i, idler_eps_deg in enumerate(epsilon_degrees):
+    for j, signal_eps_deg in enumerate(epsilon_degrees):
+        idler_eps_rad = math.radians(idler_eps_deg)
+        signal_eps_rad = math.radians(signal_eps_deg)
+
+        # Parameters for this point in the heatmap
+        # Eraser off case: signal_lp_angle = 0 + signal_eps_rad
+        # Idler LP is pi/2 + idler_eps_rad
+        # MZI HWP is pi/4
+        # Initial state is phi_plus_state
+        _prob_temp, vis_temp = demo_pair(
+            initial_state=phi_plus_state,
+            mzi_hwp_angle=pi/4,
+            idler_lp_angle=pi/2 + idler_eps_rad,
+            signal_lp_angle=0 + signal_eps_rad,
+        )
+        visibility_values[i, j] = vis_temp.evalf()
+
+print("Finished generating data for heatmap.")
+
+# Plotting the heatmap
+plt.figure(figsize=(8, 6))
+plt.imshow(visibility_values, origin='lower',
+           extent=[epsilon_degrees.min(), epsilon_degrees.max(),
+                   epsilon_degrees.min(), epsilon_degrees.max()],
+           aspect='auto', cmap='viridis')
+plt.colorbar(label='Visibility')
+plt.xlabel('Signal LP Epsilon (degrees from 0°)')
+plt.ylabel('Idler LP Epsilon (degrees from 90°)')
+plt.title('Visibility Heatmap: Eraser Off (Signal LP @ 0°+ε_sig, Idler LP @ 90°+ε_idl)')
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.show()
+
 exit()
+
 
 ##############################################################
 #
