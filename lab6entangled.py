@@ -338,8 +338,9 @@ demo_pair(
     signal_lp_angle=pi/2 + signal_epsilon,  # 90 = Eraser off
 )
 
-expected_prob = (1 - cos(delta)) / 8
-assert prob.equals(expected_prob), f"Probability {prob} != expected {expected_prob}"
+if idler_epsilon == 0 and signal_epsilon == 0:
+    expected_prob = (1 - cos(delta)) / 8
+    assert prob.equals(expected_prob), f"Probability {prob} != expected {expected_prob}"
 
 exit()
 
