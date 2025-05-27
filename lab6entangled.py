@@ -308,6 +308,13 @@ phi_plus_state = (psi_hh + psi_vv) / sqrt(2)   # 16×1 column state
 assert phi_plus_state.norm() == 1
 
 ##############################################################
+
+
+idler_epsilon = math.radians(5)
+signal_epsilon = math.radians(0)
+
+
+
 # Proper settings, eraser on
 prob = demo_pair(
     phi_plus_state,
@@ -341,6 +348,7 @@ exit()
 # This matches the collected data.
 # Both interfere, with N_c_eraser_on = 1/2 N_c_eraser_off
 #
+
 # Misconfigured on Friday, "eraser on"
 demo_pair(
     psi_vv, # Pump HWP was set to 45 => Pump @ 90/H => 0/V signals&idlers
@@ -348,6 +356,7 @@ demo_pair(
     idler_lp_angle=pi/4,  # This was set to 45deg instead of 90 deg
     signal_lp_angle=pi/4, # Eraser on
 )
+
 
 # Misconfigured on Friday, "eraser off"
 prob = demo_pair(
