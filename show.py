@@ -15,6 +15,7 @@ def title(var):
 
 
 def show(orig_exp, n=None):
+    return
     # http://docs.python.org/library/traceback.html
     stack= traceback.extract_stack()
     var= stack[-2][3]
