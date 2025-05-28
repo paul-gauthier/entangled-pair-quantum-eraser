@@ -481,8 +481,15 @@ def plot_visibility_heatmap_xy(
     ax.set_xlabel(f'{nice[x_param]} {x_base_deg:.0f}+ε (deg)', fontsize=label_fontsize)
     ax.set_ylabel(f'{nice[y_param]} {y_base_deg:.0f}+ε (deg)', fontsize=label_fontsize)
 
-    # Construct title: Prefix from input + dynamic part with base angles
-    # Assumes plot_title is like "User Prefix : Old Dynamic Part"
+    # Construct title: Input state + dynamic configuration string
+    state_str = "Unknown State"
+    # These global state variables phi_plus_state and psi_vv are defined
+    # later in the script but are in scope when this function is called.
+    if initial_state.equals(phi_plus_state):
+        state_str = "Φ⁺"
+    elif initial_state.equals(psi_vv):
+        state_str = "ψ_VV"
+
     signal_deg = math.degrees(base_signal_lp_angle)
     hwp_deg = math.degrees(base_mzi_hwp_angle)
     idler_deg = math.degrees(base_idler_lp_angle)
@@ -490,8 +497,10 @@ def plot_visibility_heatmap_xy(
     signal_str = f"Signal {signal_deg:.0f}°{'+ε' if x_param == 'signal' or y_param == 'signal' else ''}"
     hwp_str = f"HWP {hwp_deg:.0f}°{'+ε' if x_param == 'hwp' or y_param == 'hwp' else ''}"
     idler_str = f"Idler {idler_deg:.0f}°{'+ε' if x_param == 'idler' or y_param == 'idler' else ''}"
-    dynamic_title_part = f"{signal_str}, {hwp_str}, {idler_str}"
-    final_title = dynamic_title_part
+
+    dynamic_config_str = f"{signal_str}, {hwp_str}, {idler_str}"
+    # The plot_title parameter is now effectively unused for title generation.
+    final_title = f"{state_str}: {dynamic_config_str}"
     ax.set_title(final_title, fontsize=title_fontsize)
     ax.tick_params(axis='both', which='major', labelsize=tick_fontsize)
     ax.grid(True, linestyle="--", alpha=0.6)
