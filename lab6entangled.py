@@ -397,8 +397,8 @@ assert phi_plus_state.norm() == 1
 ##############################################################
 
 
-idler_epsilon = math.radians(5)
-signal_epsilon = math.radians(5)
+idler_epsilon = math.radians(0)
+signal_epsilon = math.radians(0)
 
 
 
