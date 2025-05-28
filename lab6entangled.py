@@ -332,63 +332,6 @@ def demo_pair(initial_state, mzi_hwp_angle, idler_lp_angle, signal_lp_angle):
     return prob_simplified, visibility
 
 
-def plot_visibility_heatmap(fig, ax, initial_state, mzi_hwp_angle, idler_lp_angle_base_rad, signal_lp_angle_base_rad, plot_title_str):
-    """
-    Generates and saves a heatmap of visibility.
-
-    Visibility is computed by varying idler and signal linear polarizer angles
-    by an epsilon amount around their respective base angles.
-
-    Parameters
-    ----------
-    fig : matplotlib.figure.Figure
-        The figure object to draw on.
-    ax : matplotlib.axes.Axes
-        The axes object to draw on.
-    initial_state : sympy.Matrix
-        The initial quantum state for the demo_pair calculation.
-    mzi_hwp_angle : float or sympy expression
-        The MZI HWP angle (vartheta).
-    idler_lp_angle_base_rad : float or sympy expression
-        The base angle for the idler linear polarizer (in radians).
-    signal_lp_angle_base_rad : float or sympy expression
-        The base angle for the signal linear polarizer (in radians).
-    plot_title_str : str
-        The title for the heatmap plot.
-    """
-    print(f"Generating visibility heatmap for: {plot_title_str}")
-    epsilon_degrees_range = np.linspace(-5, 5, 11)  # -5 to +5 degrees in 1 degree steps
-    visibility_values = np.zeros((len(epsilon_degrees_range), len(epsilon_degrees_range)))
-
-    for i, idler_eps_deg in enumerate(epsilon_degrees_range):
-        for j, signal_eps_deg in enumerate(epsilon_degrees_range):
-            idler_eps_rad = math.radians(idler_eps_deg)
-            signal_eps_rad = math.radians(signal_eps_deg)
-
-            current_idler_lp_angle = idler_lp_angle_base_rad + idler_eps_rad
-            current_mzi_hwp_angle = mzi_hwp_angle + idler_eps_rad/2 # move hwp with idler lp
-            current_signal_lp_angle = signal_lp_angle_base_rad + signal_eps_rad
-
-            _prob_temp, vis_temp = demo_pair(
-                initial_state=initial_state,
-                mzi_hwp_angle=current_mzi_hwp_angle,
-                idler_lp_angle=current_idler_lp_angle,
-                signal_lp_angle=current_signal_lp_angle,
-            )
-            visibility_values[i, j] = vis_temp.evalf()
-
-    print(f"Finished generating data for: {plot_title_str}")
-
-    im = ax.imshow(visibility_values, origin='lower',
-               extent=[epsilon_degrees_range.min(), epsilon_degrees_range.max(),
-                       epsilon_degrees_range.min(), epsilon_degrees_range.max()],
-               aspect='auto', cmap='viridis')
-    fig.colorbar(im, ax=ax, label='Visibility')
-    ax.set_xlabel(f'Signal LP Epsilon (degrees from {math.degrees(signal_lp_angle_base_rad):.0f}°)')
-    ax.set_ylabel(f'Idler LP Epsilon (degrees from {math.degrees(idler_lp_angle_base_rad):.0f}°)')
-    ax.set_title(plot_title_str)
-    ax.grid(True, linestyle='--', alpha=0.6)
-
 # ------------------------------------------------------------------------
 # Generic 2-parameter visibility heat-map
 # ------------------------------------------------------------------------
@@ -422,6 +365,13 @@ def plot_visibility_heatmap_xy(
     eps_range_deg : 1-D array, optional
         Range of ε values (degrees).  Default = −5…+5 in 1° steps.
     """
+
+    # jitter so we don't analytically drop the influence of these angles
+    jitter = 1/100000
+    base_mzi_hwp_angle += jitter
+    base_idler_lp_angle += jitter
+    base_signal_lp_angle += jitter
+
     if x_param == y_param:
         raise ValueError("x_param and y_param must be distinct")
 
