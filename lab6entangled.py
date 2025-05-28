@@ -331,6 +331,7 @@ def demo_pair(initial_state, mzi_hwp_angle, idler_lp_angle, signal_lp_angle):
 
     return prob_simplified, visibility
 
+
 def plot_visibility_heatmap(initial_state, mzi_hwp_angle, idler_lp_angle_base_rad, signal_lp_angle_base_rad, plot_title_str, output_filename_str):
     """
     Generates and saves a heatmap of visibility.
@@ -363,11 +364,12 @@ def plot_visibility_heatmap(initial_state, mzi_hwp_angle, idler_lp_angle_base_ra
             signal_eps_rad = math.radians(signal_eps_deg)
 
             current_idler_lp_angle = idler_lp_angle_base_rad + idler_eps_rad
+            current_mzi_hwp_angle = mzi_hwp_angle # + 2*idler_eps_rad # factor-of-2 for each degree
             current_signal_lp_angle = signal_lp_angle_base_rad + signal_eps_rad
 
             _prob_temp, vis_temp = demo_pair(
                 initial_state=initial_state,
-                mzi_hwp_angle=mzi_hwp_angle,
+                mzi_hwp_angle=current_mzi_hwp_angle,
                 idler_lp_angle=current_idler_lp_angle,
                 signal_lp_angle=current_signal_lp_angle,
             )
@@ -432,6 +434,15 @@ if idler_epsilon == 0 and signal_epsilon == 0:
 plot_visibility_heatmap(
     initial_state=phi_plus_state,
     mzi_hwp_angle=pi/4,
+    idler_lp_angle_base_rad=pi/2,   # 90 degrees
+    signal_lp_angle_base_rad=pi/4,  # 45 degrees
+    plot_title_str='Visibility Heatmap: Eraser On ($\\Phi^+$ state, Signal LP @ 45°+$\\epsilon_{sig}$, Idler LP @ 90°+$\\epsilon_{idl}$)',
+    output_filename_str="visibility_heatmap_eraser_on_phi_plus.png"
+)
+
+plot_visibility_heatmap(
+    initial_state=phi_plus_state,
+    mzi_hwp_angle=pi/4,
     idler_lp_angle_base_rad=pi/2, # 90 degrees
     signal_lp_angle_base_rad=0,   # 0 degrees
     plot_title_str='Visibility Heatmap: Eraser Off (Signal LP @ 0°+ε_sig, Idler LP @ 90°+ε_idl)',
@@ -447,14 +458,6 @@ plot_visibility_heatmap(
     output_filename_str="visibility_heatmap_psi_vv_signal_lp_90.png"
 )
 
-plot_visibility_heatmap(
-    initial_state=phi_plus_state,
-    mzi_hwp_angle=pi/4,
-    idler_lp_angle_base_rad=pi/2,   # 90 degrees
-    signal_lp_angle_base_rad=pi/4,  # 45 degrees
-    plot_title_str='Visibility Heatmap: Eraser On ($\Phi^+$ state, Signal LP @ 45°+$\\epsilon_{sig}$, Idler LP @ 90°+$\\epsilon_{idl}$)',
-    output_filename_str="visibility_heatmap_eraser_on_phi_plus.png"
-)
 
 
 exit()
