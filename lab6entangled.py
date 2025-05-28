@@ -389,6 +389,89 @@ def plot_visibility_heatmap(fig, ax, initial_state, mzi_hwp_angle, idler_lp_angl
     ax.set_title(plot_title_str)
     ax.grid(True, linestyle='--', alpha=0.6)
 
+# ------------------------------------------------------------------------
+# Generic 2-parameter visibility heat-map
+# ------------------------------------------------------------------------
+def plot_visibility_heatmap_xy(
+    fig,
+    ax,
+    *,
+    initial_state,
+    base_mzi_hwp_angle,
+    base_idler_lp_angle,
+    base_signal_lp_angle,
+    x_param: str,
+    y_param: str,
+    plot_title: str,
+    eps_range_deg: np.ndarray | None = None,
+):
+    """
+    Draw a visibility heat-map as a function of two independent ε variations
+    applied to any pair of parameters chosen from {'signal', 'idler', 'hwp'}.
+
+    Parameters
+    ----------
+    fig, ax : matplotlib objects
+        Target figure/axes.
+    initial_state : sympy.Matrix
+        Input joint state |ψ⟩.
+    base_mzi_hwp_angle, base_idler_lp_angle, base_signal_lp_angle : float
+        Nominal angles (radians) about which epsilons are applied.
+    x_param, y_param : str
+        Parameter controlled by the x- / y-axis – one of
+        {'signal', 'idler', 'hwp'} and different from each other.
+    plot_title : str
+        Title for the axes.
+    eps_range_deg : 1-D array, optional
+        Range of ε values (degrees).  Default = −5…+5 in 1° steps.
+    """
+    if x_param == y_param:
+        raise ValueError("x_param and y_param must be distinct")
+
+    if eps_range_deg is None:
+        eps_range_deg = np.linspace(-5, 5, 11)
+
+    visibility_values = np.zeros((len(eps_range_deg), len(eps_range_deg)))
+
+    base_angles = {
+        "signal": base_signal_lp_angle,
+        "idler":  base_idler_lp_angle,
+        "hwp":    base_mzi_hwp_angle,
+    }
+
+    for i, y_eps_deg in enumerate(eps_range_deg):
+        for j, x_eps_deg in enumerate(eps_range_deg):
+            # Start from the nominal settings
+            angles = base_angles.copy()
+
+            # Apply ε deviations
+            angles[x_param] += math.radians(x_eps_deg)
+            angles[y_param] += math.radians(y_eps_deg)
+
+            # Evaluate visibility
+            _, vis_temp = demo_pair(
+                initial_state=initial_state,
+                mzi_hwp_angle=angles["hwp"],
+                idler_lp_angle=angles["idler"],
+                signal_lp_angle=angles["signal"],
+            )
+            visibility_values[i, j] = float(vis_temp.evalf())
+
+    im = ax.imshow(
+        visibility_values,
+        origin="lower",
+        extent=[eps_range_deg.min(), eps_range_deg.max()] * 2,
+        aspect="auto",
+        cmap="viridis",
+    )
+    fig.colorbar(im, ax=ax, label="Visibility")
+
+    nice = {"signal": "Signal LP", "idler": "Idler LP", "hwp": "MZI HWP"}
+    ax.set_xlabel(f'{nice[x_param]} ε (deg)')
+    ax.set_ylabel(f'{nice[y_param]} ε (deg)')
+    ax.set_title(plot_title)
+    ax.grid(True, linestyle="--", alpha=0.6)
+
 # Build phi+ state
 psi_hh = TP(psi_b_H, psi_b_H)
 psi_vv = TP(psi_b_V, psi_b_V)
@@ -423,38 +506,112 @@ demo_pair(
 expected_prob = (1 - cos(delta)) / 8
 assert prob.equals(expected_prob), f"Probability {prob} != expected {expected_prob}"
 
-fig, axes = plt.subplots(1, 3, figsize=(24, 7)) # Create a figure with 1 row and 3 columns
+fig, axes = plt.subplots(3, 3, figsize=(24, 21))  # 3×3 grid: rows = base states, cols = param pairs
 
-plot_visibility_heatmap(
-    fig, axes[0],
+# -----------------------------------------------------------------------------
+# Row 0 – Φ⁺, eraser ON (Signal 45°, Idler 90°)
+# -----------------------------------------------------------------------------
+plot_visibility_heatmap_xy(
+    fig, axes[0, 0],
     initial_state=phi_plus_state,
     mzi_hwp_angle=pi/4,
-    idler_lp_angle_base_rad=pi/2,   # 90 degrees
-    signal_lp_angle_base_rad=pi/4,  # 45 degrees
-    plot_title_str='Eraser On ($\\Phi^+$ state, Signal LP @ 45°+$\\epsilon_{sig}$, Idler LP @ 90°+$\\epsilon_{idl}$)'
+    base_mzi_hwp_angle=pi/4,
+    base_idler_lp_angle=pi/2,
+    base_signal_lp_angle=pi/4,
+    x_param="signal", y_param="idler",
+    plot_title='Φ⁺, eraser-on : Idler ε  vs  Signal ε',
 )
 
-plot_visibility_heatmap(
-    fig, axes[1],
+plot_visibility_heatmap_xy(
+    fig, axes[0, 1],
+    initial_state=phi_plus_state,
+    base_mzi_hwp_angle=pi/4,
+    base_idler_lp_angle=pi/2,
+    base_signal_lp_angle=pi/4,
+    x_param="signal", y_param="hwp",
+    plot_title='Φ⁺, eraser-on : HWP ε  vs  Signal ε',
+)
+
+plot_visibility_heatmap_xy(
+    fig, axes[0, 2],
+    initial_state=phi_plus_state,
+    base_mzi_hwp_angle=pi/4,
+    base_idler_lp_angle=pi/2,
+    base_signal_lp_angle=pi/4,
+    x_param="idler", y_param="hwp",
+    plot_title='Φ⁺, eraser-on : HWP ε  vs  Idler ε',
+)
+
+# -----------------------------------------------------------------------------
+# Row 1 – Φ⁺, eraser OFF (Signal 0°, Idler 90°)
+# -----------------------------------------------------------------------------
+plot_visibility_heatmap_xy(
+    fig, axes[1, 0],
     initial_state=phi_plus_state,
     mzi_hwp_angle=pi/4,
-    idler_lp_angle_base_rad=pi/2, # 90 degrees
-    signal_lp_angle_base_rad=0,   # 0 degrees
-    plot_title_str='Eraser Off ($\\Phi^+$ state, Signal LP @ 0°+$\\epsilon_{sig}$, Idler LP @ 90°+$\\epsilon_{idl}$)'
+    base_mzi_hwp_angle=pi/4,
+    base_idler_lp_angle=pi/2,
+    base_signal_lp_angle=0,
+    x_param="signal", y_param="idler",
+    plot_title='Φ⁺, eraser-off : Idler ε  vs  Signal ε',
 )
 
-plot_visibility_heatmap(
-    fig, axes[2],
+plot_visibility_heatmap_xy(
+    fig, axes[1, 1],
+    initial_state=phi_plus_state,
+    base_mzi_hwp_angle=pi/4,
+    base_idler_lp_angle=pi/2,
+    base_signal_lp_angle=0,
+    x_param="signal", y_param="hwp",
+    plot_title='Φ⁺, eraser-off : HWP ε  vs  Signal ε',
+)
+
+plot_visibility_heatmap_xy(
+    fig, axes[1, 2],
+    initial_state=phi_plus_state,
+    base_mzi_hwp_angle=pi/4,
+    base_idler_lp_angle=pi/2,
+    base_signal_lp_angle=0,
+    x_param="idler", y_param="hwp",
+    plot_title='Φ⁺, eraser-off : HWP ε  vs  Idler ε',
+)
+
+# -----------------------------------------------------------------------------
+# Row 2 – |ψ_VV⟩ input (Signal 90°, Idler 90°)
+# -----------------------------------------------------------------------------
+plot_visibility_heatmap_xy(
+    fig, axes[2, 0],
     initial_state=psi_vv,
-    mzi_hwp_angle=pi/4,
-    idler_lp_angle_base_rad=pi/2, # 90 degrees
-    signal_lp_angle_base_rad=pi/2, # 90 degrees
-    plot_title_str='Initial State $\\psi_{VV}$, MZI HWP @ 45°, Idler LP @ 90°+$\\epsilon_{idl}$, Signal LP @ 90°+$\\epsilon_{sig}$'
+    base_mzi_hwp_angle=pi/4,
+    base_idler_lp_angle=pi/2,
+    base_signal_lp_angle=pi/2,
+    x_param="signal", y_param="idler",
+    plot_title='ψ_VV : Idler ε  vs  Signal ε',
+)
+
+plot_visibility_heatmap_xy(
+    fig, axes[2, 1],
+    initial_state=psi_vv,
+    base_mzi_hwp_angle=pi/4,
+    base_idler_lp_angle=pi/2,
+    base_signal_lp_angle=pi/2,
+    x_param="signal", y_param="hwp",
+    plot_title='ψ_VV : HWP ε  vs  Signal ε',
+)
+
+plot_visibility_heatmap_xy(
+    fig, axes[2, 2],
+    initial_state=psi_vv,
+    base_mzi_hwp_angle=pi/4,
+    base_idler_lp_angle=pi/2,
+    base_signal_lp_angle=pi/2,
+    x_param="idler", y_param="hwp",
+    plot_title='ψ_VV : HWP ε  vs  Idler ε',
 )
 
 plt.tight_layout()
 output_filename_combined = "visibility_heatmaps_combined.png"
-plt.savefig(output_filename_combined)
+plt.savefig(output_filename_combined, dpi=300)
 print(f"Saved combined heatmap to {output_filename_combined}")
 
 
