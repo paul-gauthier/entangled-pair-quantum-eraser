@@ -464,15 +464,22 @@ def plot_visibility_heatmap_xy(
         aspect="auto",
         cmap="viridis",
     )
-    fig.colorbar(im, ax=ax, label="Visibility")
+
+    title_fontsize = 18
+    label_fontsize = 16
+    tick_fontsize = 14
+
+    cb = fig.colorbar(im, ax=ax)
+    cb.set_label("Visibility", fontsize=label_fontsize)
+    cb.ax.tick_params(labelsize=tick_fontsize)
 
     nice = {"signal": "Signal LP", "idler": "Idler LP", "hwp": "MZI HWP"}
 
     x_base_deg = math.degrees(base_angles[x_param])
     y_base_deg = math.degrees(base_angles[y_param])
 
-    ax.set_xlabel(f'{nice[x_param]} {x_base_deg:.0f}+ε (deg)')
-    ax.set_ylabel(f'{nice[y_param]} {y_base_deg:.0f}+ε (deg)')
+    ax.set_xlabel(f'{nice[x_param]} {x_base_deg:.0f}+ε (deg)', fontsize=label_fontsize)
+    ax.set_ylabel(f'{nice[y_param]} {y_base_deg:.0f}+ε (deg)', fontsize=label_fontsize)
 
     # Construct title: Prefix from input + dynamic part with base angles
     # Assumes plot_title is like "User Prefix : Old Dynamic Part"
@@ -485,7 +492,8 @@ def plot_visibility_heatmap_xy(
     idler_str = f"Idler {idler_deg:.0f}°{'+ε' if x_param == 'idler' or y_param == 'idler' else ''}"
     dynamic_title_part = f"{signal_str}, {hwp_str}, {idler_str}"
     final_title = dynamic_title_part
-    ax.set_title(final_title)
+    ax.set_title(final_title, fontsize=title_fontsize)
+    ax.tick_params(axis='both', which='major', labelsize=tick_fontsize)
     ax.grid(True, linestyle="--", alpha=0.6)
 
 # Build phi+ state
