@@ -514,7 +514,6 @@ fig, axes = plt.subplots(3, 3, figsize=(24, 21))  # 3×3 grid: rows = base state
 plot_visibility_heatmap_xy(
     fig, axes[0, 0],
     initial_state=phi_plus_state,
-    mzi_hwp_angle=pi/4,
     base_mzi_hwp_angle=pi/4,
     base_idler_lp_angle=pi/2,
     base_signal_lp_angle=pi/4,
@@ -548,7 +547,6 @@ plot_visibility_heatmap_xy(
 plot_visibility_heatmap_xy(
     fig, axes[1, 0],
     initial_state=phi_plus_state,
-    mzi_hwp_angle=pi/4,
     base_mzi_hwp_angle=pi/4,
     base_idler_lp_angle=pi/2,
     base_signal_lp_angle=0,
