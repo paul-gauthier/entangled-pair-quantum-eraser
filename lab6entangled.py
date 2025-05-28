@@ -629,6 +629,7 @@ plot_visibility_heatmap_xy(
 )
 
 plt.tight_layout()
+fig.subplots_adjust(left=0.05, right=0.95, top=0.95, bottom=0.05) # Add margin
 output_filename_combined = "visibility_heatmaps_combined.png"
 plt.savefig(output_filename_combined, dpi=300)
 print(f"Saved combined heatmap to {output_filename_combined}")
