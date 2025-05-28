@@ -402,7 +402,6 @@ def plot_visibility_heatmap_xy(
     base_signal_lp_angle,
     x_param: str,
     y_param: str,
-    plot_title: str,
     eps_range_deg: np.ndarray | None = None,
 ):
     """
@@ -420,8 +419,6 @@ def plot_visibility_heatmap_xy(
     x_param, y_param : str
         Parameter controlled by the x- / y-axis – one of
         {'signal', 'idler', 'hwp'} and different from each other.
-    plot_title : str
-        Title for the axes.
     eps_range_deg : 1-D array, optional
         Range of ε values (degrees).  Default = −5…+5 in 1° steps.
     """
@@ -551,7 +548,6 @@ plot_visibility_heatmap_xy(
     base_idler_lp_angle=pi/2,
     base_signal_lp_angle=pi/4,
     x_param="signal", y_param="idler",
-    plot_title='Φ⁺, eraser-on : Idler ε  vs  Signal ε',
 )
 
 plot_visibility_heatmap_xy(
@@ -561,7 +557,6 @@ plot_visibility_heatmap_xy(
     base_idler_lp_angle=pi/2,
     base_signal_lp_angle=pi/4,
     x_param="signal", y_param="hwp",
-    plot_title='Φ⁺, eraser-on : HWP ε  vs  Signal ε',
 )
 
 plot_visibility_heatmap_xy(
@@ -571,7 +566,6 @@ plot_visibility_heatmap_xy(
     base_idler_lp_angle=pi/2,
     base_signal_lp_angle=pi/4,
     x_param="idler", y_param="hwp",
-    plot_title='Φ⁺, eraser-on : HWP ε  vs  Idler ε',
 )
 
 # -----------------------------------------------------------------------------
@@ -584,7 +578,6 @@ plot_visibility_heatmap_xy(
     base_idler_lp_angle=pi/2,
     base_signal_lp_angle=0,
     x_param="signal", y_param="idler",
-    plot_title='Φ⁺, eraser-off : Idler ε  vs  Signal ε',
 )
 
 plot_visibility_heatmap_xy(
@@ -594,7 +587,6 @@ plot_visibility_heatmap_xy(
     base_idler_lp_angle=pi/2,
     base_signal_lp_angle=0,
     x_param="signal", y_param="hwp",
-    plot_title='Φ⁺, eraser-off : HWP ε  vs  Signal ε',
 )
 
 plot_visibility_heatmap_xy(
@@ -604,7 +596,6 @@ plot_visibility_heatmap_xy(
     base_idler_lp_angle=pi/2,
     base_signal_lp_angle=0,
     x_param="idler", y_param="hwp",
-    plot_title='Φ⁺, eraser-off : HWP ε  vs  Idler ε',
 )
 
 # -----------------------------------------------------------------------------
@@ -617,7 +608,6 @@ plot_visibility_heatmap_xy(
     base_idler_lp_angle=pi/2,
     base_signal_lp_angle=pi/2,
     x_param="signal", y_param="idler",
-    plot_title='ψ_VV : Idler ε  vs  Signal ε',
 )
 
 plot_visibility_heatmap_xy(
@@ -627,7 +617,6 @@ plot_visibility_heatmap_xy(
     base_idler_lp_angle=pi/2,
     base_signal_lp_angle=pi/2,
     x_param="signal", y_param="hwp",
-    plot_title='ψ_VV : HWP ε  vs  Signal ε',
 )
 
 plot_visibility_heatmap_xy(
@@ -637,7 +626,6 @@ plot_visibility_heatmap_xy(
     base_idler_lp_angle=pi/2,
     base_signal_lp_angle=pi/2,
     x_param="idler", y_param="hwp",
-    plot_title='ψ_VV : HWP ε  vs  Idler ε',
 )
 
 plt.tight_layout()
