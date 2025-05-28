@@ -404,12 +404,19 @@ def plot_visibility_heatmap_xy(
             )
             visibility_values[i, j] = float(vis_temp.evalf())
 
+    # Calculate vmin and vmax for a 0.5 range centered on the mean visibility
+    mean_visibility = np.mean(visibility_values)
+    vmin = mean_visibility - 0.25
+    vmax = mean_visibility + 0.25
+
     im = ax.imshow(
         visibility_values,
         origin="lower",
         extent=[eps_range_deg.min(), eps_range_deg.max()] * 2,
         aspect="auto",
         cmap="viridis",
+        vmin=vmin,
+        vmax=vmax,
     )
 
     title_fontsize = 24 # Increased font size
