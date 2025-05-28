@@ -447,6 +447,16 @@ plot_visibility_heatmap(
     output_filename_str="visibility_heatmap_psi_vv_signal_lp_90.png"
 )
 
+plot_visibility_heatmap(
+    initial_state=phi_plus_state,
+    mzi_hwp_angle=pi/4,
+    idler_lp_angle_base_rad=pi/2,   # 90 degrees
+    signal_lp_angle_base_rad=pi/4,  # 45 degrees
+    plot_title_str='Visibility Heatmap: Eraser On ($\Phi^+$ state, Signal LP @ 45°+$\\epsilon_{sig}$, Idler LP @ 90°+$\\epsilon_{idl}$)',
+    output_filename_str="visibility_heatmap_eraser_on_phi_plus.png"
+)
+
+
 exit()
 
 
