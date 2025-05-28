@@ -332,7 +332,7 @@ def demo_pair(initial_state, mzi_hwp_angle, idler_lp_angle, signal_lp_angle):
     return prob_simplified, visibility
 
 
-def plot_visibility_heatmap(initial_state, mzi_hwp_angle, idler_lp_angle_base_rad, signal_lp_angle_base_rad, plot_title_str, output_filename_str):
+def plot_visibility_heatmap(fig, ax, initial_state, mzi_hwp_angle, idler_lp_angle_base_rad, signal_lp_angle_base_rad, plot_title_str):
     """
     Generates and saves a heatmap of visibility.
 
@@ -341,6 +341,10 @@ def plot_visibility_heatmap(initial_state, mzi_hwp_angle, idler_lp_angle_base_ra
 
     Parameters
     ----------
+    fig : matplotlib.figure.Figure
+        The figure object to draw on.
+    ax : matplotlib.axes.Axes
+        The axes object to draw on.
     initial_state : sympy.Matrix
         The initial quantum state for the demo_pair calculation.
     mzi_hwp_angle : float or sympy expression
@@ -351,8 +355,6 @@ def plot_visibility_heatmap(initial_state, mzi_hwp_angle, idler_lp_angle_base_ra
         The base angle for the signal linear polarizer (in radians).
     plot_title_str : str
         The title for the heatmap plot.
-    output_filename_str : str
-        The filename to save the heatmap PNG.
     """
     print(f"Generating visibility heatmap for: {plot_title_str}")
     epsilon_degrees_range = np.linspace(-5, 5, 11)  # -5 to +5 degrees in 1 degree steps
@@ -377,18 +379,15 @@ def plot_visibility_heatmap(initial_state, mzi_hwp_angle, idler_lp_angle_base_ra
 
     print(f"Finished generating data for: {plot_title_str}")
 
-    plt.figure(figsize=(8, 6))
-    plt.imshow(visibility_values, origin='lower',
+    im = ax.imshow(visibility_values, origin='lower',
                extent=[epsilon_degrees_range.min(), epsilon_degrees_range.max(),
                        epsilon_degrees_range.min(), epsilon_degrees_range.max()],
                aspect='auto', cmap='viridis')
-    plt.colorbar(label='Visibility')
-    plt.xlabel(f'Signal LP Epsilon (degrees from {math.degrees(signal_lp_angle_base_rad):.0f}°)')
-    plt.ylabel(f'Idler LP Epsilon (degrees from {math.degrees(idler_lp_angle_base_rad):.0f}°)')
-    plt.title(plot_title_str)
-    plt.grid(True, linestyle='--', alpha=0.6)
-    plt.savefig(output_filename_str)
-    print(f"Saved heatmap to {output_filename_str}")
+    fig.colorbar(im, ax=ax, label='Visibility')
+    ax.set_xlabel(f'Signal LP Epsilon (degrees from {math.degrees(signal_lp_angle_base_rad):.0f}°)')
+    ax.set_ylabel(f'Idler LP Epsilon (degrees from {math.degrees(idler_lp_angle_base_rad):.0f}°)')
+    ax.set_title(plot_title_str)
+    ax.grid(True, linestyle='--', alpha=0.6)
 
 # Build phi+ state
 psi_hh = TP(psi_b_H, psi_b_H)
@@ -430,34 +429,39 @@ if idler_epsilon == 0 and signal_epsilon == 0:
     expected_prob = (1 - cos(delta)) / 8
     assert prob.equals(expected_prob), f"Probability {prob} != expected {expected_prob}"
 
+fig, axes = plt.subplots(1, 3, figsize=(24, 7)) # Create a figure with 1 row and 3 columns
 
 plot_visibility_heatmap(
+    fig, axes[0],
     initial_state=phi_plus_state,
     mzi_hwp_angle=pi/4,
     idler_lp_angle_base_rad=pi/2,   # 90 degrees
     signal_lp_angle_base_rad=pi/4,  # 45 degrees
-    plot_title_str='Visibility Heatmap: Eraser On ($\\Phi^+$ state, Signal LP @ 45°+$\\epsilon_{sig}$, Idler LP @ 90°+$\\epsilon_{idl}$)',
-    output_filename_str="visibility_heatmap_eraser_on_phi_plus.png"
+    plot_title_str='Eraser On ($\\Phi^+$ state, Signal LP @ 45°+$\\epsilon_{sig}$, Idler LP @ 90°+$\\epsilon_{idl}$)'
 )
 
 plot_visibility_heatmap(
+    fig, axes[1],
     initial_state=phi_plus_state,
     mzi_hwp_angle=pi/4,
     idler_lp_angle_base_rad=pi/2, # 90 degrees
     signal_lp_angle_base_rad=0,   # 0 degrees
-    plot_title_str='Visibility Heatmap: Eraser Off (Signal LP @ 0°+ε_sig, Idler LP @ 90°+ε_idl)',
-    output_filename_str="visibility_heatmap_eraser_off.png"
+    plot_title_str='Eraser Off ($\\Phi^+$ state, Signal LP @ 0°+$\\epsilon_{sig}$, Idler LP @ 90°+$\\epsilon_{idl}$)'
 )
 
 plot_visibility_heatmap(
+    fig, axes[2],
     initial_state=psi_vv,
     mzi_hwp_angle=pi/4,
     idler_lp_angle_base_rad=pi/2, # 90 degrees
     signal_lp_angle_base_rad=pi/2, # 90 degrees
-    plot_title_str='Visibility Heatmap: Initial State $\\psi_{VV}$, MZI HWP @ 45°, Idler LP @ 90°+$\\epsilon_{idl}$, Signal LP @ 90°+$\\epsilon_{sig}$',
-    output_filename_str="visibility_heatmap_psi_vv_signal_lp_90.png"
+    plot_title_str='Initial State $\\psi_{VV}$, MZI HWP @ 45°, Idler LP @ 90°+$\\epsilon_{idl}$, Signal LP @ 90°+$\\epsilon_{sig}$'
 )
 
+plt.tight_layout()
+output_filename_combined = "visibility_heatmaps_combined.png"
+plt.savefig(output_filename_combined)
+print(f"Saved combined heatmap to {output_filename_combined}")
 
 
 exit()
