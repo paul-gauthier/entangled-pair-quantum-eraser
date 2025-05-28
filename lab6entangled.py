@@ -465,9 +465,9 @@ def plot_visibility_heatmap_xy(
         cmap="viridis",
     )
 
-    title_fontsize = 18
-    label_fontsize = 16
-    tick_fontsize = 14
+    title_fontsize = 24 # Increased font size
+    label_fontsize = 20 # Increased font size
+    tick_fontsize = 18  # Increased font size
 
     cb = fig.colorbar(im, ax=ax)
     cb.set_label("Visibility", fontsize=label_fontsize)
