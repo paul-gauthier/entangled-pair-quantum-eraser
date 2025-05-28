@@ -366,7 +366,7 @@ def plot_visibility_heatmap(fig, ax, initial_state, mzi_hwp_angle, idler_lp_angl
             signal_eps_rad = math.radians(signal_eps_deg)
 
             current_idler_lp_angle = idler_lp_angle_base_rad + idler_eps_rad
-            current_mzi_hwp_angle = mzi_hwp_angle # + 2*idler_eps_rad # factor-of-2 for each degree
+            current_mzi_hwp_angle = mzi_hwp_angle + idler_eps_rad/2 # move hwp with idler lp
             current_signal_lp_angle = signal_lp_angle_base_rad + signal_eps_rad
 
             _prob_temp, vis_temp = demo_pair(
