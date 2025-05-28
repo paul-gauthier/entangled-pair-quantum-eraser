@@ -470,7 +470,7 @@ def plot_visibility_heatmap_xy(
     cb.set_label("Visibility", fontsize=label_fontsize)
     cb.ax.tick_params(labelsize=tick_fontsize)
 
-    nice = {"signal": "LP$_s_", "idler": "LP$_i$", "hwp": "MZI HWP"}
+    nice = {"signal": "LP$_s$", "idler": "LP$_i$", "hwp": "MZI HWP"}
 
     x_base_deg = math.degrees(base_angles[x_param])
     y_base_deg = math.degrees(base_angles[y_param])
@@ -485,7 +485,7 @@ def plot_visibility_heatmap_xy(
     if initial_state.equals(phi_plus_state):
         state_str = "Φ⁺"
     elif initial_state.equals(psi_vv):
-        state_str = "ψ_VV"
+        state_str = "ψ$_{VV}$"
 
     signal_deg = math.degrees(base_signal_lp_angle)
     hwp_deg = math.degrees(base_mzi_hwp_angle)
@@ -630,7 +630,7 @@ plot_visibility_heatmap_xy(
 
 plt.tight_layout()
 fig.subplots_adjust(left=0.05, right=0.95, top=0.95, bottom=0.05) # Add margin
-output_filename_combined = "visibility_heatmaps_combined.png"
+output_filename_combined = "visibility_heatmaps_combined.pdf"
 plt.savefig(output_filename_combined, dpi=300)
 print(f"Saved combined heatmap to {output_filename_combined}")
 
