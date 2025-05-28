@@ -473,7 +473,7 @@ def plot_visibility_heatmap_xy(
     cb.set_label("Visibility", fontsize=label_fontsize)
     cb.ax.tick_params(labelsize=tick_fontsize)
 
-    nice = {"signal": "Signal LP", "idler": "Idler LP", "hwp": "MZI HWP"}
+    nice = {"signal": "LP$_s_", "idler": "LP$_i$", "hwp": "MZI HWP"}
 
     x_base_deg = math.degrees(base_angles[x_param])
     y_base_deg = math.degrees(base_angles[y_param])
