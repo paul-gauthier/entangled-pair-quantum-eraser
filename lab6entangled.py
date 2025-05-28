@@ -628,12 +628,6 @@ plot_visibility_heatmap_xy(
     x_param="idler", y_param="hwp",
 )
 
-# Add row labels
-label_fontsize_rows = 20 # Consistent with plot_visibility_heatmap_xy
-axes[0, 0].set_ylabel("Entangled eraser on", fontsize=label_fontsize_rows)
-axes[1, 0].set_ylabel("Entangled eraser off", fontsize=label_fontsize_rows)
-axes[2, 0].set_ylabel("Lab 6 eraser off", fontsize=label_fontsize_rows)
-
 plt.tight_layout()
 output_filename_combined = "visibility_heatmaps_combined.png"
 plt.savefig(output_filename_combined, dpi=300)
