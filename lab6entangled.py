@@ -398,36 +398,30 @@ assert phi_plus_state.norm() == 1
 ##############################################################
 
 
-idler_epsilon = math.radians(0)
-signal_epsilon = math.radians(0)
-
-
-
 # Proper settings, eraser on
 prob, visibility = demo_pair(
     phi_plus_state,
     mzi_hwp_angle=pi/4,  # swap H/V in the upper arm
-    idler_lp_angle=pi/2 + idler_epsilon, # 90 degree = H
-    signal_lp_angle=pi/4 + signal_epsilon,   # 45 = pi/4 = Eraser on
+    idler_lp_angle=pi/2, # 90 degree = H
+    signal_lp_angle=pi/4,   # 45 = pi/4 = Eraser on
 )
 # Proper settings, eraser off
 demo_pair(
     phi_plus_state,
     mzi_hwp_angle=pi/4,  # swap H/V in the upper arm
-    idler_lp_angle=pi/2 + idler_epsilon, # 90 degree = H
-    signal_lp_angle=0 + signal_epsilon,   # 0 = Eraser off
+    idler_lp_angle=pi/2, # 90 degree = H
+    signal_lp_angle=0,   # 0 = Eraser off
 )
 # Proper settings, eraser off
 demo_pair(
     phi_plus_state,
     mzi_hwp_angle=pi/4,    # swap H/V in the upper arm
-    idler_lp_angle=pi/2 + idler_epsilon,   # 90 degree = H
-    signal_lp_angle=pi/2 + signal_epsilon,  # 90 = Eraser off
+    idler_lp_angle=pi/2,   # 90 degree = H
+    signal_lp_angle=pi/2,  # 90 = Eraser off
 )
 
-if idler_epsilon == 0 and signal_epsilon == 0:
-    expected_prob = (1 - cos(delta)) / 8
-    assert prob.equals(expected_prob), f"Probability {prob} != expected {expected_prob}"
+expected_prob = (1 - cos(delta)) / 8
+assert prob.equals(expected_prob), f"Probability {prob} != expected {expected_prob}"
 
 fig, axes = plt.subplots(1, 3, figsize=(24, 7)) # Create a figure with 1 row and 3 columns
 
@@ -477,8 +471,8 @@ exit()
 demo_pair(
     psi_vv, # Pump HWP was set to 45 => Pump @ 90/H => 0/V signals&idlers
     mzi_hwp_angle=pi/4,   # swap H/V in the upper arm
-    idler_lp_angle=pi/4 + idler_epsilon,  # This was set to 45deg instead of 90 deg
-    signal_lp_angle=pi/4 + signal_epsilon, # Eraser on
+    idler_lp_angle=pi/4,  # This was set to 45deg instead of 90 deg
+    signal_lp_angle=pi/4, # Eraser on
 )
 
 
@@ -486,6 +480,6 @@ demo_pair(
 prob, visibility = demo_pair(
     psi_vv, # Pump HWP was set to 45 => Pump @ 90/H => 0/V signals&idlers
     mzi_hwp_angle=pi/4,   # swap H/V in the upper arm
-    idler_lp_angle=pi/4 + idler_epsilon,  # This was set to 45deg instead of 90 deg
-    signal_lp_angle=0 + signal_epsilon, # Eraser off
+    idler_lp_angle=pi/4,  # This was set to 45deg instead of 90 deg
+    signal_lp_angle=0, # Eraser off
 )
