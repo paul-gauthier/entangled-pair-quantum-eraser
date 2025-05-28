@@ -1,0 +1,59 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for including images
+\usepackage{booktabs} % For professional looking tables
+\usepackage{amsmath}  % For math symbols if needed
+\usepackage{parskip}  % Add space between paragraphs
+\setlength{\parindent}{0pt} % Remove paragraph indentation
+\usepackage[margin=1in]{geometry} % Set margins to 1 inch
+
+\title{Tuesday Lab Session Results: Visibilities and Graphs}
+\author{Group 13} % Assuming the same group as lab-6-entangled.tex
+\date{\today}
+
+\begin{document}
+\maketitle
+\pagestyle{empty} % No page numbers for a single page doc
+
+\section*{Visibilities Obtained}
+
+The following visibilities were observed during Tuesday's lab session:
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{lc}
+\toprule
+\textbf{Condition} & \textbf{Visibility (V)} \\
+\midrule
+Eraser Off (Signal LP at $0^\circ$ or $90^\circ$) & 0.351 \\
+Eraser On (Signal LP at $45^\circ$)          & 0.526 \\
+\bottomrule
+\end{tabular}
+\caption{Observed visibilities for the quantum eraser experiment.}
+\end{table}
+
+\section*{Results Graphs}
+
+\subsection*{Eraser Off}
+
+Figure~\ref{fig:eraser_off} shows the counts versus phase delay when the quantum eraser is "off". In this configuration, which-way information is available, and interference is reduced.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.9\textwidth]{counts_vs_phase_delay_eraser_off.pdf}
+\caption{Counts vs Phase Delay with the eraser off.}
+\label{fig:eraser_off}
+\end{figure}
+
+\subsection*{Eraser On}
+
+Figure~\ref{fig:eraser_on} shows the counts versus phase delay when the quantum eraser is "on". By projecting the signal photon onto a diagonal basis, which-way information is erased, and interference is restored.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.9\textwidth]{counts_vs_phase_delay_eraser_on.pdf}
+\caption{Counts vs Phase Delay with the eraser on.}
+\label{fig:eraser_on}
+\end{figure}
+
+\end{document}
+
