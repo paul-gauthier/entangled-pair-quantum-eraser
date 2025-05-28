@@ -480,9 +480,9 @@ def plot_visibility_heatmap_xy(
     hwp_deg = math.degrees(base_mzi_hwp_angle)
     idler_deg = math.degrees(base_idler_lp_angle)
 
-    signal_str = f"Signal {signal_deg:.0f}°{'+e' if x_param == 'signal' or y_param == 'signal' else ''}"
-    hwp_str = f"HWP {hwp_deg:.0f}°{'+e' if x_param == 'hwp' or y_param == 'hwp' else ''}"
-    idler_str = f"Idler {idler_deg:.0f}°{'+e' if x_param == 'idler' or y_param == 'idler' else ''}"
+    signal_str = f"Signal {signal_deg:.0f}°{'+ε' if x_param == 'signal' or y_param == 'signal' else ''}"
+    hwp_str = f"HWP {hwp_deg:.0f}°{'+ε' if x_param == 'hwp' or y_param == 'hwp' else ''}"
+    idler_str = f"Idler {idler_deg:.0f}°{'+ε' if x_param == 'idler' or y_param == 'idler' else ''}"
     dynamic_title_part = f"{signal_str}, {hwp_str}, {idler_str}"
     final_title = dynamic_title_part
     ax.set_title(final_title)
