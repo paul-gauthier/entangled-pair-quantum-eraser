@@ -467,9 +467,20 @@ def plot_visibility_heatmap_xy(
     fig.colorbar(im, ax=ax, label="Visibility")
 
     nice = {"signal": "Signal LP", "idler": "Idler LP", "hwp": "MZI HWP"}
-    ax.set_xlabel(f'{nice[x_param]} ε (deg)')
-    ax.set_ylabel(f'{nice[y_param]} ε (deg)')
-    ax.set_title(plot_title)
+    title_param_names = {"signal": "Signal", "idler": "Idler", "hwp": "HWP"}
+
+    x_base_deg = math.degrees(base_angles[x_param])
+    y_base_deg = math.degrees(base_angles[y_param])
+
+    ax.set_xlabel(f'{nice[x_param]} {x_base_deg:.0f}+ε (deg)')
+    ax.set_ylabel(f'{nice[y_param]} {y_base_deg:.0f}+ε (deg)')
+
+    # Construct title: Prefix from input + dynamic part with base angles
+    # Assumes plot_title is like "User Prefix : Old Dynamic Part"
+    title_prefix = plot_title.split(' : ')[0]
+    dynamic_title_part = f'{title_param_names[y_param]} {y_base_deg:.0f}+ε vs {title_param_names[x_param]} {x_base_deg:.0f}+ε'
+    final_title = f'{title_prefix} : {dynamic_title_part}'
+    ax.set_title(final_title)
     ax.grid(True, linestyle="--", alpha=0.6)
 
 # Build phi+ state
