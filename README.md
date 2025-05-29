@@ -13,6 +13,7 @@ Mach–Zehnder–based entangled pair quantum-eraser experiment.
     angles (signal LP<sub>s</sub>, idler LP<sub>i</sub>, MZI HWP).
   - Uses the symbolic model of the experiment, computes visibility from the formula for expected coincidence counts versus phase delay.
   - Plots heatmaps showing variation in visibility as function of angle error.
+  - See `visibility_heatmaps_combined.pdf`
 - `plot_utils.py`   
   - Utilities for plotting signal, idler and coincidence counts from experimental data, 
   fitting counts to best-fit curve, computing visibility.
