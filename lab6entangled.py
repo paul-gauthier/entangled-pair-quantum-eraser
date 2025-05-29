@@ -338,23 +338,23 @@ phi_plus_state = (psi_hh + psi_vv) / sqrt(2)   # 16×1 column state
 assert phi_plus_state.norm() == 1
 
 ##############################################################
+# Model the entangled pair quantum eraser in various conditions
 
-
-# Proper settings, eraser on
+# Proper settings, eraser on at 45
 prob, visibility = demo_pair(
     phi_plus_state,
     mzi_hwp_angle=pi/4,  # swap H/V in the upper arm
     idler_lp_angle=pi/2, # 90 degree = H
     signal_lp_angle=pi/4,   # 45 = pi/4 = Eraser on
 )
-# Proper settings, eraser off
+# Proper settings, eraser off at 0
 demo_pair(
     phi_plus_state,
     mzi_hwp_angle=pi/4,  # swap H/V in the upper arm
     idler_lp_angle=pi/2, # 90 degree = H
     signal_lp_angle=0,   # 0 = Eraser off
 )
-# Proper settings, eraser off
+# Proper settings, eraser off at 90
 demo_pair(
     phi_plus_state,
     mzi_hwp_angle=pi/4,    # swap H/V in the upper arm

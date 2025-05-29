@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import math
 import numpy as np
 import matplotlib.pyplot as plt
@@ -213,4 +215,3 @@ if __name__ == "__main__":
     output_filename_combined = "visibility_heatmaps_combined.pdf"
     plt.savefig(output_filename_combined, dpi=300)
     print(f"Saved combined heatmap to {output_filename_combined}")
-
