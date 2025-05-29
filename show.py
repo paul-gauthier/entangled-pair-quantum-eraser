@@ -15,7 +15,6 @@ def title(var):
 
 
 def show(orig_exp, n=None):
-    return
     # http://docs.python.org/library/traceback.html
     stack= traceback.extract_stack()
     var= stack[-2][3]
@@ -113,4 +112,5 @@ def dump_png(expr, filename=None, D=150, padding=10):
             Path(temp_filename).rename(filename)
 
     # Display the image
+    # return
     imgcat(filename.read_bytes())
