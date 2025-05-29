@@ -5,12 +5,10 @@ from sys import exit
 from sympy import *
 from sympy.physics.quantum import TensorProduct
 import numpy as np
-import matplotlib.pyplot as plt
 import math
 
 from show import show
 from dump import dump
-from plot_heatmap import plot_visibility_heatmap_xy
 
 TP = TensorProduct
 
@@ -366,105 +364,6 @@ demo_pair(
 
 expected_prob = (1 - cos(delta)) / 8
 assert prob.equals(expected_prob), f"Probability {prob} != expected {expected_prob}"
-
-fig, axes = plt.subplots(3, 3, figsize=(24, 21))  # 3×3 grid: rows = base states, cols = param pairs
-
-# -----------------------------------------------------------------------------
-# Row 0 – Φ⁺, eraser ON (Signal 45°, Idler 90°)
-# -----------------------------------------------------------------------------
-plot_visibility_heatmap_xy(
-    fig, axes[0, 0],
-    initial_state=phi_plus_state,
-    base_mzi_hwp_angle=pi/4,
-    base_idler_lp_angle=pi/2,
-    base_signal_lp_angle=pi/4,
-    x_param="signal", y_param="idler",
-)
-
-plot_visibility_heatmap_xy(
-    fig, axes[0, 1],
-    initial_state=phi_plus_state,
-    base_mzi_hwp_angle=pi/4,
-    base_idler_lp_angle=pi/2,
-    base_signal_lp_angle=pi/4,
-    x_param="signal", y_param="hwp",
-)
-
-plot_visibility_heatmap_xy(
-    fig, axes[0, 2],
-    initial_state=phi_plus_state,
-    base_mzi_hwp_angle=pi/4,
-    base_idler_lp_angle=pi/2,
-    base_signal_lp_angle=pi/4,
-    x_param="idler", y_param="hwp",
-)
-
-# -----------------------------------------------------------------------------
-# Row 1 – Φ⁺, eraser OFF (Signal 0°, Idler 90°)
-# -----------------------------------------------------------------------------
-plot_visibility_heatmap_xy(
-    fig, axes[1, 0],
-    initial_state=phi_plus_state,
-    base_mzi_hwp_angle=pi/4,
-    base_idler_lp_angle=pi/2,
-    base_signal_lp_angle=0,
-    x_param="signal", y_param="idler",
-)
-
-plot_visibility_heatmap_xy(
-    fig, axes[1, 1],
-    initial_state=phi_plus_state,
-    base_mzi_hwp_angle=pi/4,
-    base_idler_lp_angle=pi/2,
-    base_signal_lp_angle=0,
-    x_param="signal", y_param="hwp",
-)
-
-plot_visibility_heatmap_xy(
-    fig, axes[1, 2],
-    initial_state=phi_plus_state,
-    base_mzi_hwp_angle=pi/4,
-    base_idler_lp_angle=pi/2,
-    base_signal_lp_angle=0,
-    x_param="idler", y_param="hwp",
-)
-
-# -----------------------------------------------------------------------------
-# Row 2 – |ψ_VV⟩ input (Signal 90°, Idler 90°)
-# -----------------------------------------------------------------------------
-plot_visibility_heatmap_xy(
-    fig, axes[2, 0],
-    initial_state=psi_vv,
-    base_mzi_hwp_angle=pi/4,
-    base_idler_lp_angle=pi/2,
-    base_signal_lp_angle=pi/2,
-    x_param="signal", y_param="idler",
-)
-
-plot_visibility_heatmap_xy(
-    fig, axes[2, 1],
-    initial_state=psi_vv,
-    base_mzi_hwp_angle=pi/4,
-    base_idler_lp_angle=pi/2,
-    base_signal_lp_angle=pi/2,
-    x_param="signal", y_param="hwp",
-)
-
-plot_visibility_heatmap_xy(
-    fig, axes[2, 2],
-    initial_state=psi_vv,
-    base_mzi_hwp_angle=pi/4,
-    base_idler_lp_angle=pi/2,
-    base_signal_lp_angle=pi/2,
-    x_param="idler", y_param="hwp",
-)
-
-plt.tight_layout()
-fig.subplots_adjust(left=0.05, right=0.95, top=0.95, bottom=0.05) # Add margin
-output_filename_combined = "visibility_heatmaps_combined.pdf"
-plt.savefig(output_filename_combined, dpi=300)
-print(f"Saved combined heatmap to {output_filename_combined}")
-
 
 
 def model_friday_lab_session():

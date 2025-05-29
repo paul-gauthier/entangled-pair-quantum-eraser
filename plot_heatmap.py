@@ -3,16 +3,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sympy import Matrix # For type hint initial_state: Matrix
 
-# This creates a circular dependency:
-# lab6entangled.py imports plot_visibility_heatmap_xy from this file.
+# This file imports from lab6entangled.py.
 # This file imports demo_pair, phi_plus_state, psi_vv from lab6entangled.py.
 # Python can handle this if imports are at the top level and definitions follow.
 from lab6entangled import demo_pair, phi_plus_state, psi_vv
 
-
 # ------------------------------------------------------------------------
 # Generic 2-parameter visibility heat-map
 # ------------------------------------------------------------------------
+VISIBILITY_PLOT_RANGE = 0.5  # Global constant for visibility plot range
 
 def plot_visibility_heatmap_xy(
     fig,
@@ -87,7 +86,6 @@ def plot_visibility_heatmap_xy(
             visibility_values[i, j] = float(vis_temp.evalf())
 
     mean_visibility = np.mean(visibility_values)
-    VISIBILITY_PLOT_RANGE = 0.35 # This was local in the original function
     vmin = mean_visibility - VISIBILITY_PLOT_RANGE / 2
     vmax = mean_visibility + VISIBILITY_PLOT_RANGE / 2
 
@@ -128,4 +126,91 @@ def plot_visibility_heatmap_xy(
     ax.set_title(final_title, fontsize=title_fontsize)
     ax.tick_params(axis='both', which='major', labelsize=tick_fontsize)
     ax.grid(True, linestyle="--", alpha=0.6)
+
+if __name__ == "__main__":
+    fig, axes = plt.subplots(3, 3, figsize=(24, 21))  # 3×3 grid: rows = base states, cols = param pairs
+
+    # Row 0 – Φ⁺, eraser ON (Signal 45°, Idler 90°)
+    plot_visibility_heatmap_xy(
+        fig, axes[0, 0],
+        initial_state=phi_plus_state,
+        base_mzi_hwp_angle=math.pi/4,
+        base_idler_lp_angle=math.pi/2,
+        base_signal_lp_angle=math.pi/4,
+        x_param="signal", y_param="idler",
+    )
+    plot_visibility_heatmap_xy(
+        fig, axes[0, 1],
+        initial_state=phi_plus_state,
+        base_mzi_hwp_angle=math.pi/4,
+        base_idler_lp_angle=math.pi/2,
+        base_signal_lp_angle=math.pi/4,
+        x_param="signal", y_param="hwp",
+    )
+    plot_visibility_heatmap_xy(
+        fig, axes[0, 2],
+        initial_state=phi_plus_state,
+        base_mzi_hwp_angle=math.pi/4,
+        base_idler_lp_angle=math.pi/2,
+        base_signal_lp_angle=math.pi/4,
+        x_param="idler", y_param="hwp",
+    )
+
+    # Row 1 – Φ⁺, eraser OFF (Signal 0°, Idler 90°)
+    plot_visibility_heatmap_xy(
+        fig, axes[1, 0],
+        initial_state=phi_plus_state,
+        base_mzi_hwp_angle=math.pi/4,
+        base_idler_lp_angle=math.pi/2,
+        base_signal_lp_angle=0,
+        x_param="signal", y_param="idler",
+    )
+    plot_visibility_heatmap_xy(
+        fig, axes[1, 1],
+        initial_state=phi_plus_state,
+        base_mzi_hwp_angle=math.pi/4,
+        base_idler_lp_angle=math.pi/2,
+        base_signal_lp_angle=0,
+        x_param="signal", y_param="hwp",
+    )
+    plot_visibility_heatmap_xy(
+        fig, axes[1, 2],
+        initial_state=phi_plus_state,
+        base_mzi_hwp_angle=math.pi/4,
+        base_idler_lp_angle=math.pi/2,
+        base_signal_lp_angle=0,
+        x_param="idler", y_param="hwp",
+    )
+
+    # Row 2 – |ψ_VV⟩ input (Signal 90°, Idler 90°)
+    plot_visibility_heatmap_xy(
+        fig, axes[2, 0],
+        initial_state=psi_vv,
+        base_mzi_hwp_angle=math.pi/4,
+        base_idler_lp_angle=math.pi/2,
+        base_signal_lp_angle=math.pi/2,
+        x_param="signal", y_param="idler",
+    )
+    plot_visibility_heatmap_xy(
+        fig, axes[2, 1],
+        initial_state=psi_vv,
+        base_mzi_hwp_angle=math.pi/4,
+        base_idler_lp_angle=math.pi/2,
+        base_signal_lp_angle=math.pi/2,
+        x_param="signal", y_param="hwp",
+    )
+    plot_visibility_heatmap_xy(
+        fig, axes[2, 2],
+        initial_state=psi_vv,
+        base_mzi_hwp_angle=math.pi/4,
+        base_idler_lp_angle=math.pi/2,
+        base_signal_lp_angle=math.pi/2,
+        x_param="idler", y_param="hwp",
+    )
+
+    plt.tight_layout()
+    fig.subplots_adjust(left=0.05, right=0.95, top=0.95, bottom=0.05) # Add margin
+    output_filename_combined = "visibility_heatmaps_combined.pdf"
+    plt.savefig(output_filename_combined, dpi=300)
+    print(f"Saved combined heatmap to {output_filename_combined}")
 
