@@ -602,28 +602,31 @@ plt.savefig(output_filename_combined, dpi=300)
 print(f"Saved combined heatmap to {output_filename_combined}")
 
 
-exit()
+
+def model_friday_lab_session():
+
+    ##############################################################
+    #
+    # This matches the collected data from Friday's lab session where the
+    # wrong Pump HWP and MZI/Idler LP settings were input into the
+    # apparatus.
+    #
+    # Both interfere, with N_c_eraser_on = 1/2 N_c_eraser_off
+    #
+
+    # Misconfigured on Friday, "eraser on"
+    demo_pair(
+        psi_vv, # Pump HWP was set to 45 => Pump @ 90/H => 0/V signals&idlers
+        mzi_hwp_angle=pi/4,   # swap H/V in the upper arm
+        idler_lp_angle=pi/4,  # This was set to 45deg instead of 90 deg
+        signal_lp_angle=pi/4, # Eraser on
+    )
 
 
-##############################################################
-#
-# This matches the collected data.
-# Both interfere, with N_c_eraser_on = 1/2 N_c_eraser_off
-#
-
-# Misconfigured on Friday, "eraser on"
-demo_pair(
-    psi_vv, # Pump HWP was set to 45 => Pump @ 90/H => 0/V signals&idlers
-    mzi_hwp_angle=pi/4,   # swap H/V in the upper arm
-    idler_lp_angle=pi/4,  # This was set to 45deg instead of 90 deg
-    signal_lp_angle=pi/4, # Eraser on
-)
-
-
-# Misconfigured on Friday, "eraser off"
-prob, visibility = demo_pair(
-    psi_vv, # Pump HWP was set to 45 => Pump @ 90/H => 0/V signals&idlers
-    mzi_hwp_angle=pi/4,   # swap H/V in the upper arm
-    idler_lp_angle=pi/4,  # This was set to 45deg instead of 90 deg
-    signal_lp_angle=0, # Eraser off
-)
+    # Misconfigured on Friday, "eraser off"
+    prob, visibility = demo_pair(
+        psi_vv, # Pump HWP was set to 45 => Pump @ 90/H => 0/V signals&idlers
+        mzi_hwp_angle=pi/4,   # swap H/V in the upper arm
+        idler_lp_angle=pi/4,  # This was set to 45deg instead of 90 deg
+        signal_lp_angle=0, # Eraser off
+    )
