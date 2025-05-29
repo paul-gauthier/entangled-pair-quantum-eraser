@@ -54,6 +54,14 @@ def nm_to_delta(nm: np.ndarray | float) -> np.ndarray | float:
 
 
 # ---------------------------------------------------------------------------
+# Model function for fitting
+# ---------------------------------------------------------------------------
+def _cos_model(d, A, C0, phi):
+    """Cosine model for fitting interference patterns."""
+    return C0 + A * (1 + np.cos(d + phi)) / 2
+
+
+# ---------------------------------------------------------------------------
 # Plotting
 # ---------------------------------------------------------------------------
 def plot_counts(
@@ -103,9 +111,6 @@ def plot_counts(
     # ------------------------------------------------------------------
     # Fit coincidence counts with ½(1+cos(δ+φ)) model
     # ------------------------------------------------------------------
-    def _cos_model(d, A, C0, phi):
-        return C0 + A * (1 + np.cos(d + phi)) / 2
-
     p0 = [np.ptp(Nc), np.min(Nc), 0.0]  # initial guesses
     popt, _ = curve_fit(
         _cos_model,
@@ -216,6 +221,121 @@ def plot_counts(
 
     # Layout & save ----------------------------------------------------------
     fig.tight_layout()
+    plt.savefig(output_filename)
+    if show:
+        plt.show()
+    plt.close(fig)
+
+    print(f"Plot saved as {output_filename}")
+    return output_filename
+
+
+def plot_coincidence_counts_only(
+    piezo_steps: np.ndarray,
+    Nc: np.ndarray,
+    *,
+    output_filename: str = "coincidence_counts_vs_phase_delay.pdf",
+    label_suffix: str = "",
+    show: bool = False,
+) -> str:
+    """
+    Plot Nc versus phase delay, fit with a cosine model, and save the figure.
+
+    Parameters
+    ----------
+    piezo_steps :
+        Array of piezo stage positions (integer steps).
+    Nc :
+        Array of coincidence counts (same length as ``piezo_steps``).
+    output_filename :
+        Path where the PDF/PNG will be written.
+    label_suffix :
+        Optional suffix appended to trace labels and included in the plot title.
+    show :
+        If ``True`` also display the figure interactively.
+
+    Returns
+    -------
+    str
+        The `output_filename` path for convenience.
+    """
+    print()
+
+    # Poisson (√N) uncertainties
+    Nc_err = np.sqrt(Nc)
+
+    # Phase delay for x-axis
+    delta = delta_from_steps(piezo_steps)
+
+    # Fit coincidence counts with ½(1+cos(δ+φ)) model
+    p0 = [np.ptp(Nc), np.min(Nc), 0.0]  # initial guesses
+    popt, _ = curve_fit(
+        _cos_model,
+        delta,
+        Nc,
+        p0=p0,
+        sigma=Nc_err,
+        absolute_sigma=True,
+    )
+
+    # Convert optimiser output to physically meaningful parameters
+    A_fit, C0_fit, phi_fit = popt
+    if A_fit < 0:  # enforce non-negative modulation depth
+        A_fit = -A_fit
+        phi_fit += np.pi  # keep model invariant
+    phi_fit = (phi_fit + np.pi) % (2 * np.pi) - np.pi  # Wrap phase into (−π, π]
+
+    delta_fine = np.linspace(delta.min(), delta.max(), 500)
+    Nc_fit_curve = _cos_model(delta_fine, A_fit, C0_fit, phi_fit)
+
+    # Print fitted parameters
+    print(f"Fit results for {output_filename}:")
+    print(f"  C0 = {C0_fit:.2f}")
+    print(f"  A = {A_fit:.2f}")
+    print(f"  phi = {phi_fit:.2f} rad")
+    V_vis = A_fit / (A_fit + 2 * C0_fit) if (A_fit + 2 * C0_fit) != 0 else 0
+    print(f"  Visibility V = {V_vis:.3f}")
+    print(f"  LaTeX: $C_0 = {C0_fit:.2f},  A = {A_fit:.2f},  \\phi = {phi_fit:.2f}\\," \
+          f"\\text{{rad}}$. and $V = {V_vis:.3f}$")
+
+    # Style
+    plt.rcParams.update({"font.size": 16})
+    color_nc = "tab:red"
+
+    # Figure & axes
+    fig, ax = plt.subplots(1, 1, figsize=(10, 5))
+
+    title = "Coincidence Counts vs Phase Delay"
+    if label_suffix:
+        title += f": {label_suffix}"
+    fig.suptitle(title, fontsize=20)
+
+    # Plot Nc
+    ax.set_ylabel(r"Coincidence Counts/sec", fontsize=18)
+    ax.errorbar(
+        delta,
+        Nc,
+        yerr=Nc_err,
+        fmt="x",
+        color=color_nc,
+        label=fr"Coincidence ($N_{{c,{label_suffix}}})$, $V={V_vis:.3f}$) with fit",
+        capsize=3,
+    )
+    ax.plot(delta_fine, Nc_fit_curve, linestyle="--", color=color_nc, lw=1)
+    ax.grid(True, linestyle=":", alpha=0.7)
+    ax.set_xlabel(r"Phase Delay $\delta$ (rad)", fontsize=18)
+    ax.legend(loc='upper right')
+
+    xticks = np.arange(0, np.max(delta) + np.pi / 2, np.pi)
+    xticklabels = ["0"] + [f"{i}$\\pi$" for i in range(1, len(xticks))]
+    xticklabels = [s.replace("1$\\pi$", "$\\pi$") for s in xticklabels]
+    ax.set_xticks(xticks)
+    ax.set_xticklabels(xticklabels)
+
+    ax_nm = ax.secondary_xaxis("top", functions=(delta_to_nm, nm_to_delta))
+    ax_nm.set_xlabel("Piezo Displacement (nm)", fontsize=16)
+
+    fig.tight_layout(rect=[0, 0, 1, 0.96]) # Adjust rect for suptitle
     plt.savefig(output_filename)
     if show:
         plt.show()
