@@ -13,7 +13,6 @@ from lab6entangled import demo_pair, phi_plus_state, psi_vv
 # ------------------------------------------------------------------------
 # Generic 2-parameter visibility heat-map
 # ------------------------------------------------------------------------
-VISIBILITY_PLOT_RANGE = 0.5  # Global constant for visibility plot range
 
 def plot_visibility_heatmap_xy(
     fig,
@@ -87,18 +86,7 @@ def plot_visibility_heatmap_xy(
             )
             visibility_values[i, j] = float(vis_temp.evalf())
 
-    mean_visibility = np.mean(visibility_values)
-    vmin = mean_visibility - VISIBILITY_PLOT_RANGE / 2
-    vmax = mean_visibility + VISIBILITY_PLOT_RANGE / 2
-
-    if vmin < 0:
-        vmax = VISIBILITY_PLOT_RANGE
-        vmin = 0
-    if vmax > 1:
-        vmin = 1 - VISIBILITY_PLOT_RANGE
-        vmax = 1
-
-    im = ax.imshow(visibility_values, origin="lower", extent=[eps_range_deg.min(), eps_range_deg.max()] * 2, aspect="auto", cmap="viridis", vmin=vmin, vmax=vmax)
+    im = ax.imshow(visibility_values, origin="lower", extent=[eps_range_deg.min(), eps_range_deg.max()] * 2, aspect="auto", cmap="viridis")
 
     title_fontsize, label_fontsize, tick_fontsize = 24, 20, 18
     cb = fig.colorbar(im, ax=ax)
