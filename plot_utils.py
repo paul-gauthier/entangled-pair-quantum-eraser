@@ -128,6 +128,7 @@ def plot_counts(
     if A_fit < 0:               # enforce non-negative modulation depth
         A_fit = -A_fit
         phi_fit += np.pi        # keep model invariant
+        C0_fit -= A_fit         # compensate offset to preserve model
     # Wrap phase into (−π, π]
     phi_fit = (phi_fit + np.pi) % (2 * np.pi) - np.pi
 
@@ -283,6 +284,7 @@ def plot_coincidence_counts_only(
     if A_fit < 0:  # enforce non-negative modulation depth
         A_fit = -A_fit
         phi_fit += np.pi  # keep model invariant
+        C0_fit -= A_fit  # compensate offset to preserve model
     phi_fit = (phi_fit + np.pi) % (2 * np.pi) - np.pi  # Wrap phase into (−π, π]
 
     delta_fine = np.linspace(delta.min(), delta.max(), 500)
