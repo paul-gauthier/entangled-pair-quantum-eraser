@@ -335,6 +335,8 @@ def demo_pair(initial_state, mzi_hwp_angle, idler_lp_angle, signal_lp_angle):
 # ------------------------------------------------------------------------
 # Generic 2-parameter visibility heat-map
 # ------------------------------------------------------------------------
+VISIBILITY_PLOT_RANGE = 0.5
+
 def plot_visibility_heatmap_xy(
     fig,
     ax,
@@ -405,9 +407,17 @@ def plot_visibility_heatmap_xy(
             visibility_values[i, j] = float(vis_temp.evalf())
 
     # Calculate vmin and vmax for a 0.5 range centered on the mean visibility
+    # Ensure vmin and vmax are within [0, 1]
     mean_visibility = np.mean(visibility_values)
-    vmin = mean_visibility - 0.25
-    vmax = mean_visibility + 0.25
+    vmin = mean_visibility - VISIBILITY_PLOT_RANGE / 2
+    vmax = mean_visibility + VISIBILITY_PLOT_RANGE / 2
+
+    if vmin < 0:
+        vmax = VISIBILITY_PLOT_RANGE
+        vmin = 0
+    if vmax > 1:
+        vmin = 1 - VISIBILITY_PLOT_RANGE
+        vmax = 1
 
     im = ax.imshow(
         visibility_values,
