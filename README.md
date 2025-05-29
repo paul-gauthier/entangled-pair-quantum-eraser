@@ -20,5 +20,7 @@ Mach–Zehnder–based entangled pair quantum-eraser experiment.
 - `plots.py` 
   - Parses experimental data and creates plots. 
 - `lab-6-entangled.tex` and `lab-6-entangled.pdf` 
-  - Report that explains the theory, derivations and experimental procedure. |
+  - Report that explains the theory, derivations and experimental procedure.
+
+![fig.png](fig.png)
 
