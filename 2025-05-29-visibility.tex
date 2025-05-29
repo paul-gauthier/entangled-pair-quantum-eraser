@@ -1,0 +1,48 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for including images
+\usepackage{booktabs} % For professional looking tables
+\usepackage{amsmath}  % For math symbols if needed
+\usepackage{parskip}  % Add space between paragraphs
+\setlength{\parindent}{0pt} % Remove paragraph indentation
+\usepackage[margin=1in]{geometry} % Set margins to 1 inch
+
+\title{Quantum Eraser Experiment Results: Visibilities and Graphs (2025-05-29)}
+\author{Group 13} % Assuming the same group as lab-6-entangled.tex
+\date{\today}
+
+\begin{document}
+\pagestyle{empty} % No page numbers for a single page doc
+
+% The visibility values V_ON and V_OFF below are placeholders.
+% Please replace them with the actual values obtained by running the coincidences.py script.
+% The script will print lines like:
+% Coincidence Visibility (eraser-on): X.XXX
+% Coincidence Visibility (eraser-off): Y.YYY
+\begin{table}[h!]
+\centering
+\begin{tabular}{lc}
+\toprule
+\textbf{Condition} & \textbf{Visibility (V)} \\
+\midrule
+Eraser On   & V\_ON  \\ % Placeholder, e.g., 0.579 (estimated)
+Eraser Off  & V\_OFF \\ % Placeholder, e.g., 0.250 (estimated)
+\bottomrule
+\end{tabular}
+\caption{Observed visibilities for the entangled quantum eraser experiment. (Values V\_ON, V\_OFF are placeholders)}
+\end{table}
+
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.6\textwidth]{coincidence_counts_eraser_on.pdf}
+\caption{Coincidence counts vs Phase Delay with the eraser on.}
+\end{figure}
+
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.6\textwidth]{coincidence_counts_eraser_off.pdf}
+\caption{Coincidence counts vs Phase Delay with the eraser off.}
+\end{figure}
+
+\end{document}
