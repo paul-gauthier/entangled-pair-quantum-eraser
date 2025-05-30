@@ -337,6 +337,27 @@ psi_vv = TP(psi_b_V, psi_b_V)
 phi_plus_state = (psi_hh + psi_vv) / sqrt(2)   # 16×1 column state
 assert phi_plus_state.norm() == 1
 
+# ------------------------------------------------------------------
+# Rotated −π/8 (−22.5°) φ⁺ initial state
+#   • Original V (0°) → −22.5°
+#   • Original H (90°) →  67.5°
+# ------------------------------------------------------------------
+alpha = -pi/8  # rotation angle
+
+# Single-photon polarisation basis rotated by −π/8
+H_rot_basis = cos(alpha) * H + sin(alpha) * V   # |H⟩ → 67.5°
+V_rot_basis = -sin(alpha) * H + cos(alpha) * V  # |V⟩ → −22.5°
+
+# Tensor-product basis vectors (b-path, rotated polarisation)
+psi_b_H_rot = TP(psi_b, H_rot_basis)
+psi_b_V_rot = TP(psi_b, V_rot_basis)
+
+# φ⁺ state in the rotated basis
+phi_plus_rotated_neg_pi_8 = (
+    TP(psi_b_H_rot, psi_b_H_rot) + TP(psi_b_V_rot, psi_b_V_rot)
+) / sqrt(2)
+assert simplify(phi_plus_rotated_neg_pi_8.norm()) == 1
+
 
 
 def model_nominal_setup():
