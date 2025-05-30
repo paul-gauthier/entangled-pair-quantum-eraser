@@ -337,99 +337,39 @@ psi_vv = TP(psi_b_V, psi_b_V)
 phi_plus_state = (psi_hh + psi_vv) / sqrt(2)   # 16×1 column state
 assert phi_plus_state.norm() == 1
 
-##############################################################
-# Psi+ state with basis rotated by -pi/8
-# H_rot_basis is polarized at -pi/8.
-# V_rot_basis is polarized at pi/2 - pi/8 = 3pi/8.
-
-rot_angle_psi_plus = -pi/8
-
-H_rot_basis = Matrix([cos(rot_angle_psi_plus), sin(rot_angle_psi_plus)])
-V_rot_basis = Matrix([-sin(rot_angle_psi_plus), cos(rot_angle_psi_plus)]) # This is original V=[0,1] rotated by rot_angle_psi_plus, resulting in polarization at rot_angle_psi_plus + pi/2
-
-# Components for the Psi+ state in the rotated basis
-# Both photons are in spatial mode psi_b, similar to phi_plus_state.
-psi_b_H_rot = TP(psi_b, H_rot_basis)
-psi_b_V_rot = TP(psi_b, V_rot_basis)
-
-term_hv_rot = TP(psi_b_H_rot, psi_b_V_rot)
-term_vh_rot = TP(psi_b_V_rot, psi_b_H_rot)
-
-psi_plus_rotated_neg_pi_8 = (term_hv_rot + term_vh_rot) / sqrt(2)
-assert simplify(psi_plus_rotated_neg_pi_8.norm()**2) == 1 # Optional: verify normalization
-
-# Sanity check: psi_plus_rotated_neg_pi_8 should be the standard Psi+ state
-# where the polarization of each photon has been rotated by rot_angle_psi_plus.
-# Standard Psi+ state: psi_plus_unrotated = (TP(psi_b_H, psi_b_V) + TP(psi_b_V, psi_b_H)) / sqrt(2)
-
-# Define the rotation operator for a single photon's polarization state
-R_pol = Matrix([
-    [cos(rot_angle_psi_plus), -sin(rot_angle_psi_plus)],
-    [sin(rot_angle_psi_plus), cos(rot_angle_psi_plus)]
-])
-# Define the operator that rotates only the polarization part of a single photon (4D state)
-U_rot_single_photon = TP(I22, R_pol)  # I22 is eye(2) for the spatial part
-# Define the operator that rotates the polarization of both photons independently
-U_rot_two_photons = TP(U_rot_single_photon, U_rot_single_photon)
-
-psi_plus_state_unrotated = (TP(psi_b_H, psi_b_V) + TP(psi_b_V, psi_b_H)) / sqrt(2)
-expected_rotated_state = U_rot_two_photons * psi_plus_state_unrotated
-assert simplify((psi_plus_rotated_neg_pi_8 - expected_rotated_state).norm()**2) == 0, \
-    "Definition of psi_plus_rotated_neg_pi_8 does not match a rotated Psi+ state."
 
 
-from math import radians
+def model_nominal_setup():
+    ##############################################################
+    # Model the entangled pair quantum eraser in various conditions
 
-assert (pi/4).evalf() == radians(45)
-assert (pi/2).evalf() == radians(90)
+    # Proper settings, eraser on at 45
+    prob, visibility = demo_pair(
+        phi_plus_state,
+        mzi_hwp_angle=pi/4,  # swap H/V in the upper arm
+        idler_lp_angle=pi/2, # 90 degree = H
+        signal_lp_angle=pi/4,   # 45 = pi/4 = Eraser on
+    )
+    # Proper settings, eraser off at 0
+    demo_pair(
+        phi_plus_state,
+        mzi_hwp_angle=pi/4,  # swap H/V in the upper arm
+        idler_lp_angle=pi/2, # 90 degree = H
+        signal_lp_angle=0,   # 0 = Eraser off
+    )
+    # Proper settings, eraser off at 90
+    demo_pair(
+        phi_plus_state,
+        mzi_hwp_angle=pi/4,    # swap H/V in the upper arm
+        idler_lp_angle=pi/2,   # 90 degree = H
+        signal_lp_angle=pi/2,  # 90 = Eraser off
+    )
 
-# Proper settings, eraser on at 45
-prob, visibility = demo_pair(
-    psi_plus_rotated_neg_pi_8,
-    mzi_hwp_angle=pi/4,     # swap H/V in the upper arm
-    idler_lp_angle=pi/2,    # 90 degree = H
-    signal_lp_angle=pi/4,   # 45 = pi/4 = Eraser on
-)
-# Proper settings, eraser off at 0
-demo_pair(
-    psi_plus_rotated_neg_pi_8,
-    mzi_hwp_angle=pi/4,  # swap H/V in the upper arm
-    idler_lp_angle=pi/2, # 90 degree = H
-    signal_lp_angle=0,   # 0 = Eraser off
-)
-
-exit()
-
-##############################################################
-# Model the entangled pair quantum eraser in various conditions
-
-# Proper settings, eraser on at 45
-prob, visibility = demo_pair(
-    phi_plus_state,
-    mzi_hwp_angle=pi/4,  # swap H/V in the upper arm
-    idler_lp_angle=pi/2, # 90 degree = H
-    signal_lp_angle=pi/4,   # 45 = pi/4 = Eraser on
-)
-# Proper settings, eraser off at 0
-demo_pair(
-    phi_plus_state,
-    mzi_hwp_angle=pi/4,  # swap H/V in the upper arm
-    idler_lp_angle=pi/2, # 90 degree = H
-    signal_lp_angle=0,   # 0 = Eraser off
-)
-# Proper settings, eraser off at 90
-demo_pair(
-    phi_plus_state,
-    mzi_hwp_angle=pi/4,    # swap H/V in the upper arm
-    idler_lp_angle=pi/2,   # 90 degree = H
-    signal_lp_angle=pi/2,  # 90 = Eraser off
-)
-
-expected_prob = (1 - cos(delta)) / 8
-assert prob.equals(expected_prob), f"Probability {prob} != expected {expected_prob}"
+    expected_prob = (1 - cos(delta)) / 8
+    assert prob.equals(expected_prob), f"Probability {prob} != expected {expected_prob}"
 
 
-def model_friday_lab_session():
+def model_2025_05_23_lab_session():
 
     ##############################################################
     #
@@ -456,3 +396,73 @@ def model_friday_lab_session():
         idler_lp_angle=pi/4,  # This was set to 45deg instead of 90 deg
         signal_lp_angle=0, # Eraser off
     )
+
+def model_2025_05_23_lab_session():
+
+    ##############################################################
+    # Psi+ state with basis rotated by -pi/8
+    # H_rot_basis is polarized at -pi/8.
+    # V_rot_basis is polarized at pi/2 - pi/8 = 3pi/8.
+
+    rot_angle_psi_plus = -pi/8
+
+    assert rot_angle_psi_plus.evalf() == math.radians(-22.5)
+
+    H_rot_basis = Matrix([cos(rot_angle_psi_plus), sin(rot_angle_psi_plus)])
+    V_rot_basis = Matrix([-sin(rot_angle_psi_plus), cos(rot_angle_psi_plus)]) # This is original V=[0,1] rotated by rot_angle_psi_plus, resulting in polarization at rot_angle_psi_plus + pi/2
+
+    # Components for the Psi+ state in the rotated basis
+    # Both photons are in spatial mode psi_b, similar to phi_plus_state.
+    psi_b_H_rot = TP(psi_b, H_rot_basis)
+    psi_b_V_rot = TP(psi_b, V_rot_basis)
+
+    term_hv_rot = TP(psi_b_H_rot, psi_b_V_rot)
+    term_vh_rot = TP(psi_b_V_rot, psi_b_H_rot)
+
+    psi_plus_rotated_neg_pi_8 = (term_hv_rot + term_vh_rot) / sqrt(2)
+    assert simplify(psi_plus_rotated_neg_pi_8.norm()**2) == 1 # Optional: verify normalization
+
+    # Sanity check: psi_plus_rotated_neg_pi_8 should be the standard Psi+ state
+    # where the polarization of each photon has been rotated by rot_angle_psi_plus.
+    # Standard Psi+ state: psi_plus_unrotated = (TP(psi_b_H, psi_b_V) + TP(psi_b_V, psi_b_H)) / sqrt(2)
+
+    # Define the rotation operator for a single photon's polarization state
+    R_pol = Matrix([
+        [cos(rot_angle_psi_plus), -sin(rot_angle_psi_plus)],
+        [sin(rot_angle_psi_plus), cos(rot_angle_psi_plus)]
+    ])
+    # Define the operator that rotates only the polarization part of a single photon (4D state)
+    U_rot_single_photon = TP(I22, R_pol)  # I22 is eye(2) for the spatial part
+    # Define the operator that rotates the polarization of both photons independently
+    U_rot_two_photons = TP(U_rot_single_photon, U_rot_single_photon)
+
+    psi_plus_state_unrotated = (TP(psi_b_H, psi_b_V) + TP(psi_b_V, psi_b_H)) / sqrt(2)
+    expected_rotated_state = U_rot_two_photons * psi_plus_state_unrotated
+    assert simplify((psi_plus_rotated_neg_pi_8 - expected_rotated_state).norm()**2) == 0, \
+        "Definition of psi_plus_rotated_neg_pi_8 does not match a rotated Psi+ state."
+
+    deg_45 = pi/4
+    deg_90 = pi/2
+    assert deg_45.evalf() == math.radians(45)
+    assert deg_90.evalf() == math.radians(90)
+
+    # Proper settings, eraser on at 45
+    prob, visibility = demo_pair(
+        psi_plus_rotated_neg_pi_8,
+        mzi_hwp_angle=deg_45,
+        idler_lp_angle=deg_90,
+        signal_lp_angle=deg_45,
+    )
+    # Proper settings, eraser off at 0
+    demo_pair(
+        psi_plus_rotated_neg_pi_8,
+        mzi_hwp_angle=deg_45,
+        idler_lp_angle=deg_90,
+        signal_lp_angle=0,
+    )
+
+###
+
+
+#model_2025_05_23_lab_session()
+model_nominal_setup()
