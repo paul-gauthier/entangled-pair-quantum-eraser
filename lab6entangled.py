@@ -356,7 +356,30 @@ term_hv_rot = TP(psi_b_H_rot, psi_b_V_rot)
 term_vh_rot = TP(psi_b_V_rot, psi_b_H_rot)
 
 psi_plus_rotated_neg_pi_8 = (term_hv_rot + term_vh_rot) / sqrt(2)
-# assert simplify(psi_plus_rotated_neg_pi_8.norm()**2) == 1 # Optional: verify normalization
+assert simplify(psi_plus_rotated_neg_pi_8.norm()**2) == 1 # Optional: verify normalization
+
+
+from math import radians
+
+assert (pi/4).evalf() == radians(45)
+assert (pi/2).evalf() == radians(90)
+
+# Proper settings, eraser on at 45
+prob, visibility = demo_pair(
+    psi_plus_rotated_neg_pi_8,
+    mzi_hwp_angle=pi/4,     # swap H/V in the upper arm
+    idler_lp_angle=pi/2,    # 90 degree = H
+    signal_lp_angle=pi/4,   # 45 = pi/4 = Eraser on
+)
+# Proper settings, eraser off at 0
+demo_pair(
+    psi_plus_rotated_neg_pi_8,
+    mzi_hwp_angle=pi/4,  # swap H/V in the upper arm
+    idler_lp_angle=pi/2, # 90 degree = H
+    signal_lp_angle=0,   # 0 = Eraser off
+)
+
+exit()
 
 ##############################################################
 # Model the entangled pair quantum eraser in various conditions
