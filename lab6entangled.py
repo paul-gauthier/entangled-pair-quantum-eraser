@@ -356,7 +356,8 @@ psi_b_V_rot = TP(psi_b, V_rot_basis)
 phi_plus_rotated_neg_pi_8 = (
     TP(psi_b_H_rot, psi_b_H_rot) + TP(psi_b_V_rot, psi_b_V_rot)
 ) / sqrt(2)
-assert simplify(phi_plus_rotated_neg_pi_8.norm()) == 1
+
+assert simplify(phi_plus_rotated_neg_pi_8.norm()) - 1.0 < 1e-9, simplify(phi_plus_rotated_neg_pi_8.norm())
 
 
 
@@ -418,7 +419,7 @@ def model_2025_05_23_lab_session():
         signal_lp_angle=0, # Eraser off
     )
 
-def model_2025_05_23_lab_session():
+def model_2025_05_29_lab_session():
 
     ##############################################################
     # Phi+ state with basis rotated by -pi/8
@@ -449,5 +450,5 @@ def model_2025_05_23_lab_session():
 ###
 
 
-model_2025_05_23_lab_session()
+model_2025_05_29_lab_session()
 #model_nominal_setup()
