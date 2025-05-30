@@ -337,29 +337,6 @@ psi_vv = TP(psi_b_V, psi_b_V)
 phi_plus_state = (psi_hh + psi_vv) / sqrt(2)   # 16×1 column state
 assert phi_plus_state.norm() == 1
 
-# ------------------------------------------------------------------
-# Rotated −π/8 (−22.5°) φ⁺ initial state
-#   • Original V (0°) → −22.5°
-#   • Original H (90°) →  67.5°
-# ------------------------------------------------------------------
-alpha = -pi/8  # rotation angle
-
-# Single-photon polarisation basis rotated by −π/8
-H_rot_basis = cos(alpha) * H + sin(alpha) * V   # |H⟩ → 67.5°
-V_rot_basis = -sin(alpha) * H + cos(alpha) * V  # |V⟩ → −22.5°
-
-# Tensor-product basis vectors (b-path, rotated polarisation)
-psi_b_H_rot = TP(psi_b, H_rot_basis)
-psi_b_V_rot = TP(psi_b, V_rot_basis)
-
-# φ⁺ state in the rotated basis
-phi_plus_rotated_neg_pi_8 = (
-    TP(psi_b_H_rot, psi_b_H_rot) + TP(psi_b_V_rot, psi_b_V_rot)
-) / sqrt(2)
-
-assert simplify(phi_plus_rotated_neg_pi_8.norm()) - 1.0 < 1e-9, simplify(phi_plus_rotated_neg_pi_8.norm())
-
-
 
 def model_nominal_setup():
     ##############################################################
@@ -419,25 +396,59 @@ def model_2025_05_23_lab_session():
         signal_lp_angle=0, # Eraser off
     )
 
-def model_2025_05_29_lab_session():
+def model_rotated_pairs():
 
-    ##############################################################
-    # Phi+ state with basis rotated by -pi/8
-    # H_rot_basis is polarized at -pi/8.
-    # V_rot_basis is polarized at pi/2 - pi/8 = 3pi/8.
+    # Model what happens if pairs are rotated by -22.5 at their source.
+
+    # This does NOT match the 2025-05-29 results, where
+    # Signal LP @ -22.5 got V=0   on 2025-05-29, model says V=0.7 <= wrong
+    # Signal LP @ +22.5 got V=0.5 on 2025-05-29, model says V=0.7 <= wrong
+
+    # Nor the 2025-05-23 results
+    # Signal LP angle @ 45 got V>0.5  on 2025-05-23 with that setting, model says V=1
+    # Signal LP angle @  0 got V=0.48 on 2025-05-23 with that setting, model says V=0 <= wrong
+
+    # The model is immune to rotating the pairs' polarizations. Regardless of pair rotation:
+    # LP @ 45 model always gives V=1
+    # LP @  0 model always gives V=0
+
+    # ------------------------------------------------------------------
+    # Rotated −π/8 (−22.5°) φ⁺ initial state
+    #   • Original V (0°) → −22.5°
+    #   • Original H (90°) →  67.5°
+    # ------------------------------------------------------------------
+    alpha = -pi/8  # rotation angle
+
+    # Single-photon polarisation basis rotated by −π/8
+    H_rot_basis = cos(alpha) * H + sin(alpha) * V   # |H⟩ → 67.5°
+    V_rot_basis = -sin(alpha) * H + cos(alpha) * V  # |V⟩ → −22.5°
+
+    # Tensor-product basis vectors (b-path, rotated polarisation)
+    psi_b_H_rot = TP(psi_b, H_rot_basis)
+    psi_b_V_rot = TP(psi_b, V_rot_basis)
+
+    # φ⁺ state in the rotated basis
+    phi_plus_rotated_neg_pi_8 = (
+        TP(psi_b_H_rot, psi_b_H_rot) + TP(psi_b_V_rot, psi_b_V_rot)
+    ) / sqrt(2)
+
+    assert simplify(phi_plus_rotated_neg_pi_8.norm()) - 1.0 < 1e-9, simplify(phi_plus_rotated_neg_pi_8.norm())
+
 
 
     deg_45 = pi/4
     deg_90 = pi/2
+    deg_22_5 = pi/8
     assert deg_45.evalf() == math.radians(45)
     assert deg_90.evalf() == math.radians(90)
+    assert deg_22_5.evalf() == math.radians(22.5)
 
     # Proper settings, eraser on at 45
     prob, visibility = demo_pair(
         phi_plus_rotated_neg_pi_8,
         mzi_hwp_angle=deg_45,
         idler_lp_angle=deg_90,
-        signal_lp_angle=deg_45,
+        signal_lp_angle=-deg_45,
     )
     # Proper settings, eraser off at 0
     demo_pair(
@@ -450,5 +461,5 @@ def model_2025_05_29_lab_session():
 ###
 
 
-model_2025_05_29_lab_session()
+model_rotated_pairs()
 #model_nominal_setup()
