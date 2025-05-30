@@ -358,6 +358,25 @@ term_vh_rot = TP(psi_b_V_rot, psi_b_H_rot)
 psi_plus_rotated_neg_pi_8 = (term_hv_rot + term_vh_rot) / sqrt(2)
 assert simplify(psi_plus_rotated_neg_pi_8.norm()**2) == 1 # Optional: verify normalization
 
+# Sanity check: psi_plus_rotated_neg_pi_8 should be the standard Psi+ state
+# where the polarization of each photon has been rotated by rot_angle_psi_plus.
+# Standard Psi+ state: psi_plus_unrotated = (TP(psi_b_H, psi_b_V) + TP(psi_b_V, psi_b_H)) / sqrt(2)
+
+# Define the rotation operator for a single photon's polarization state
+R_pol = Matrix([
+    [cos(rot_angle_psi_plus), -sin(rot_angle_psi_plus)],
+    [sin(rot_angle_psi_plus), cos(rot_angle_psi_plus)]
+])
+# Define the operator that rotates only the polarization part of a single photon (4D state)
+U_rot_single_photon = TP(I22, R_pol)  # I22 is eye(2) for the spatial part
+# Define the operator that rotates the polarization of both photons independently
+U_rot_two_photons = TP(U_rot_single_photon, U_rot_single_photon)
+
+psi_plus_state_unrotated = (TP(psi_b_H, psi_b_V) + TP(psi_b_V, psi_b_H)) / sqrt(2)
+expected_rotated_state = U_rot_two_photons * psi_plus_state_unrotated
+assert simplify((psi_plus_rotated_neg_pi_8 - expected_rotated_state).norm()**2) == 0, \
+    "Definition of psi_plus_rotated_neg_pi_8 does not match a rotated Psi+ state."
+
 
 from math import radians
 
