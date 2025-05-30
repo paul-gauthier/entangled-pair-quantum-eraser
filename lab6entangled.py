@@ -338,6 +338,27 @@ phi_plus_state = (psi_hh + psi_vv) / sqrt(2)   # 16×1 column state
 assert phi_plus_state.norm() == 1
 
 ##############################################################
+# Psi+ state with basis rotated by -pi/8
+# H_rot_basis is polarized at -pi/8.
+# V_rot_basis is polarized at pi/2 - pi/8 = 3pi/8.
+
+rot_angle_psi_plus = -pi/8
+
+H_rot_basis = Matrix([cos(rot_angle_psi_plus), sin(rot_angle_psi_plus)])
+V_rot_basis = Matrix([-sin(rot_angle_psi_plus), cos(rot_angle_psi_plus)]) # This is original V=[0,1] rotated by rot_angle_psi_plus, resulting in polarization at rot_angle_psi_plus + pi/2
+
+# Components for the Psi+ state in the rotated basis
+# Both photons are in spatial mode psi_b, similar to phi_plus_state.
+psi_b_H_rot = TP(psi_b, H_rot_basis)
+psi_b_V_rot = TP(psi_b, V_rot_basis)
+
+term_hv_rot = TP(psi_b_H_rot, psi_b_V_rot)
+term_vh_rot = TP(psi_b_V_rot, psi_b_H_rot)
+
+psi_plus_rotated_neg_pi_8 = (term_hv_rot + term_vh_rot) / sqrt(2)
+# assert simplify(psi_plus_rotated_neg_pi_8.norm()**2) == 1 # Optional: verify normalization
+
+##############################################################
 # Model the entangled pair quantum eraser in various conditions
 
 # Proper settings, eraser on at 45
