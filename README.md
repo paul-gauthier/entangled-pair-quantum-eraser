@@ -36,7 +36,7 @@ erasing which-way information from the signal photon (or not) in the
 entangled quantum eraser experiment.
 
 <figure>
-<embed src="coincidence_counts_eraser_on.pdf" style="width:60.0%" />
+<embed src="coincidence_counts_eraser_on.png" style="width:60.0%" />
 <figcaption> Erasing which-way information from the signal photons
 produced high visibility (<span
 class="math inline"><em>V</em> = 0.481</span>) self-interference of the
@@ -45,7 +45,7 @@ idlers in the MZI. Coincidence counts vs Phase Delay with the eraser on.
 </figure>
 
 <figure>
-<embed src="coincidence_counts_eraser_off.pdf" style="width:60.0%" />
+<embed src="coincidence_counts_eraser_off.png" style="width:60.0%" />
 <figcaption> Not erasing which-way information from the signal photons
 prevented self-interference of the idlers in the MZI, resulting in low
 visibility (<span class="math inline"><em>V</em> = 0.055</span>).
