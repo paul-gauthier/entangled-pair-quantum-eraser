@@ -466,7 +466,7 @@ def model_unbalanced_pairs(percent_HH=80):
     Model entangled pairs with unequal amplitudes: alpha|HH> + beta|VV>
     where alpha and beta are calculated based on the percentage of |HH> component
     to ensure the state is normalized.
-    
+
     Parameters
     ----------
     percent_HH : float
@@ -515,5 +515,5 @@ def model_unbalanced_pairs(percent_HH=80):
     )
 
 #model_rotated_pairs()
-#model_nominal_setup()
-model_unbalanced_pairs(80)  # Try with 80% |HH> component
+model_nominal_setup()
+#model_unbalanced_pairs(80)  # Try with 80% |HH> component
