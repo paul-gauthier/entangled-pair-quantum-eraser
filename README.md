@@ -19,8 +19,10 @@ Mach–Zehnder–based entangled pair quantum-eraser experiment.
   fitting counts to best-fit curve, computing visibility.
 - [plots.py](plots.py) 
   - Parses experimental data and creates plots. 
-- [lab-6-entangled.tex](lab-6-entangled.tex) and [lab-6-entangled.pdf](lab-6-entangled.pdf) 
+- [lab-6-entangled.tex](lab-6-entangled.tex) and [lab-6-entangled.pdf](render/lab-6-entangled.pdf) 
   - Report that explains the theory, derivations and experimental procedure.
+- [Results](render/2025-05-29-visibility.pdf) where erasing which-way information marked on the signal photon (by changing the signal linear polarizer angle) controls self-interference of the idler in the MZI.
+
 
 ![fig.png](fig.png)
 
