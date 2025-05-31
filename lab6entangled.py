@@ -461,5 +461,55 @@ def model_rotated_pairs():
 ###
 
 
+def model_unbalanced_pairs(alpha=0.8):
+    """
+    Model entangled pairs with unequal amplitudes: alpha|HH> + beta|VV>
+    where beta is calculated to ensure the state is normalized.
+    
+    Parameters
+    ----------
+    alpha : float
+        Amplitude for the |HH> component (0 < alpha < 1)
+    """
+    # Calculate beta to ensure normalization: |alpha|^2 + |beta|^2 = 1
+    beta = sqrt(1 - alpha**2)
+    
+    # Build unbalanced state
+    psi_hh = TP(psi_b_H, psi_b_H)
+    psi_vv = TP(psi_b_V, psi_b_V)
+    unbalanced_state = (alpha * psi_hh + beta * psi_vv)
+    
+    # Verify normalization
+    assert abs(unbalanced_state.norm() - 1) < 1e-9, f"State not normalized: {unbalanced_state.norm()}"
+    
+    print("#" * 80)
+    print(f"Testing unbalanced state with alpha={alpha}, beta={beta}")
+    print("#" * 80)
+    
+    # Proper settings, eraser on at 45
+    prob, visibility = demo_pair(
+        unbalanced_state,
+        mzi_hwp_angle=pi/4,  # swap H/V in the upper arm
+        idler_lp_angle=pi/2, # 90 degree = H
+        signal_lp_angle=pi/4,   # 45 = pi/4 = Eraser on
+    )
+    
+    # Proper settings, eraser off at 0
+    demo_pair(
+        unbalanced_state,
+        mzi_hwp_angle=pi/4,  # swap H/V in the upper arm
+        idler_lp_angle=pi/2, # 90 degree = H
+        signal_lp_angle=0,   # 0 = Eraser off
+    )
+    
+    # Proper settings, eraser off at 90
+    demo_pair(
+        unbalanced_state,
+        mzi_hwp_angle=pi/4,    # swap H/V in the upper arm
+        idler_lp_angle=pi/2,   # 90 degree = H
+        signal_lp_angle=pi/2,  # 90 = Eraser off
+    )
+
 model_rotated_pairs()
 #model_nominal_setup()
+#model_unbalanced_pairs(0.8)  # Try with alpha=0.8
