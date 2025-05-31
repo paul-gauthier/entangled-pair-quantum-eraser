@@ -26,12 +26,3 @@ Mach–Zehnder–based entangled pair quantum-eraser experiment.
 
 ![fig.png](fig.png)
 
-| **Condition** | **Signal LP angle** | **Visibility (V)** |
-|:--------------|:-------------------:|:------------------:|
-| Eraser On     |   22.5°    |       0.481        |
-| Eraser Off    |   -22.5°   |       0.055        |
-
-Observed visibilities for idler self-interference in the MZI, when
-erasing which-way information from the signal photon (or not) in the
-entangled quantum eraser experiment.
-
