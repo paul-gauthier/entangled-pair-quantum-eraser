@@ -1,10 +1,21 @@
-\documentclass[tikz,border=10pt]{standalone}
+\documentclass{article}
+\usepackage{amsmath} % For math symbols and environments
+\usepackage{graphicx} % Required for including images
+\usepackage{amssymb} % For checkmark symbol if needed, and other symbols
+\usepackage{makecell} % For multi-line table cells
 \usepackage{tikz}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.17}
+\usepackage{standalone}
+\usepackage{booktabs}
+\usepackage{parskip} % Add space between paragraphs
 \usetikzlibrary{positioning,arrows.meta,calc,decorations.pathmorphing,fit,shapes.geometric}
+\setlength{\parindent}{0pt} % Remove paragraph indentation
+
+\begin{document}
+\pagestyle{empty}
 
 \input{fig.tex}
 
-\begin{document}
-\end{document}
+\end{document}  
+
