@@ -338,7 +338,7 @@ assert phi_plus_state.norm() == 1
 
 def model_nominal_setup():
     ##############################################################
-    # Model the entangled pair quantum eraser in various conditions
+    # Model the entangled pair quantum eraser in the nominal eraser on & off conditions
 
     # Proper settings, eraser on at 45
     prob, visibility = demo_pair(
@@ -353,13 +353,6 @@ def model_nominal_setup():
         mzi_hwp_angle=pi/4,  # swap H/V in the upper arm
         idler_lp_angle=pi/2, # 90 degree = H
         signal_lp_angle=0,   # 0 = Eraser off
-    )
-    # Proper settings, eraser off at 90
-    demo_pair(
-        phi_plus_state,
-        mzi_hwp_angle=pi/4,    # swap H/V in the upper arm
-        idler_lp_angle=pi/2,   # 90 degree = H
-        signal_lp_angle=pi/2,  # 90 = Eraser off
     )
 
     expected_prob = (1 - cos(delta)) / 8
@@ -398,7 +391,7 @@ def model_rotated_pairs():
 
     # Model what happens if pairs are rotated by -22.5 at their source.
 
-    # This does NOT match the 2025-05-29 results, where
+    # This does NOT match the data collected on 2025-05-29, where
     # Signal LP @ -22.5 got V=0   on 2025-05-29, model says V=0.7 <= wrong
     # Signal LP @ +22.5 got V=0.5 on 2025-05-29, model says V=0.7 <= wrong
 
