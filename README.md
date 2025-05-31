@@ -28,26 +28,10 @@ Mach–Zehnder–based entangled pair quantum-eraser experiment.
 
 | **Condition** | **Signal LP angle** | **Visibility (V)** |
 |:--------------|:-------------------:|:------------------:|
-| Eraser On     |   $`22.5^\circ`$    |       0.481        |
-| Eraser Off    |   $`-22.5^\circ`$   |       0.055        |
+| Eraser On     |   22.5°    |       0.481        |
+| Eraser Off    |   -22.5°   |       0.055        |
 
 Observed visibilities for idler self-interference in the MZI, when
 erasing which-way information from the signal photon (or not) in the
 entangled quantum eraser experiment.
 
-<figure>
-<embed src="coincidence_counts_eraser_on.png" style="width:60.0%" />
-<figcaption> Erasing which-way information from the signal photons
-produced high visibility (<span
-class="math inline"><em>V</em> = 0.481</span>) self-interference of the
-idlers in the MZI. Coincidence counts vs Phase Delay with the eraser on.
-</figcaption>
-</figure>
-
-<figure>
-<embed src="coincidence_counts_eraser_off.png" style="width:60.0%" />
-<figcaption> Not erasing which-way information from the signal photons
-prevented self-interference of the idlers in the MZI, resulting in low
-visibility (<span class="math inline"><em>V</em> = 0.055</span>).
-Coincidence counts vs Phase Delay with the eraser off. </figcaption>
-</figure>
