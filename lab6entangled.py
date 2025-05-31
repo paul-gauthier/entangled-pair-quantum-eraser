@@ -26,8 +26,6 @@ V = Matrix([0, 1])
 #show(H)
 #show(V)
 
-# Q1
-
 psi_b_H = TP(psi_b, H)
 psi_b_V = TP(psi_b, V)
 psi_t_H = TP(psi_t, H)
@@ -81,7 +79,7 @@ A_hat_prime = TP(A_hat, I22)
 
 ##############################################################
 # HWP with adjustable angle in upper arm, HWP @ 0 degrees in lower arm
-# Q5
+
 vartheta = symbols("vartheta", real=True)
 
 W_hat_prime = Matrix([
