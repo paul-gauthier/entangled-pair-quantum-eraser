@@ -461,18 +461,21 @@ def model_rotated_pairs():
 ###
 
 
-def model_unbalanced_pairs(alpha=0.8):
+def model_unbalanced_pairs(percent_HH=80):
     """
     Model entangled pairs with unequal amplitudes: alpha|HH> + beta|VV>
-    where beta is calculated to ensure the state is normalized.
-
+    where alpha and beta are calculated based on the percentage of |HH> component
+    to ensure the state is normalized.
+    
     Parameters
     ----------
-    alpha : float
-        Amplitude for the |HH> component (0 < alpha < 1)
+    percent_HH : float
+        Percentage of the |HH> component (0 to 100)
     """
-    # Calculate beta to ensure normalization: |alpha|^2 + |beta|^2 = 1
-    beta = sqrt(1 - alpha**2)
+    # Calculate alpha and beta to ensure normalization: |alpha|^2 + |beta|^2 = 1
+    # where |alpha|^2 = percent_HH/100
+    alpha = sqrt(percent_HH/100)
+    beta = sqrt(1 - alpha**2)  # = sqrt((100-percent_HH)/100)
 
     # Build unbalanced state
     psi_hh = TP(psi_b_H, psi_b_H)
@@ -483,7 +486,8 @@ def model_unbalanced_pairs(alpha=0.8):
     assert abs(unbalanced_state.norm() - 1) < 1e-9, f"State not normalized: {unbalanced_state.norm()}"
 
     print("#" * 80)
-    print(f"Testing unbalanced state with alpha={alpha}, beta={beta}")
+    print(f"Testing unbalanced state with {percent_HH}% |HH>")
+    print(f"alpha={alpha:.4f}, beta={beta:.4f}")
     print("#" * 80)
 
     # Proper settings, eraser on at 45
@@ -512,4 +516,4 @@ def model_unbalanced_pairs(alpha=0.8):
 
 #model_rotated_pairs()
 #model_nominal_setup()
-model_unbalanced_pairs(0.9)  # Try with alpha=0.8
+model_unbalanced_pairs(80)  # Try with 80% |HH> component
