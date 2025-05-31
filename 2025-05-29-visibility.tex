@@ -5,6 +5,11 @@
 \usepackage{parskip}  % Add space between paragraphs
 \setlength{\parindent}{0pt} % Remove paragraph indentation
 \usepackage[margin=1in]{geometry} % Set margins to 1 inch
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
+\usepackage{standalone}
+\usetikzlibrary{positioning,arrows.meta,calc,decorations.pathmorphing,fit,shapes.geometric}
 
 \title{Quantum Eraser Experiment Results: Visibilities and Graphs (2025-05-29)}
 \author{Group 13} % Assuming the same group as lab-6-entangled.tex
@@ -12,6 +17,8 @@
 
 \begin{document}
 \pagestyle{empty} % No page numbers for a single page doc
+
+\input{fig.tex}
 
 % The visibility values V_ON and V_OFF below are placeholders.
 % Please replace them with the actual values obtained by running the coincidences.py script.
