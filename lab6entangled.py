@@ -21,60 +21,66 @@ psi_y = psi_t = Matrix([0, 1])
 H = Matrix([1, 0])
 V = Matrix([0, 1])
 
-#show(psi_b)
-#show(psi_t)
-#show(H)
-#show(V)
+# show(psi_b)
+# show(psi_t)
+# show(H)
+# show(V)
 
 psi_b_H = TP(psi_b, H)
 psi_b_V = TP(psi_b, V)
 psi_t_H = TP(psi_t, H)
 psi_t_V = TP(psi_t, V)
-#show(psi_b_H)
-#show(psi_b_V)
-#show(psi_t_H)
-#show(psi_t_V)
+# show(psi_b_H)
+# show(psi_b_V)
+# show(psi_t_H)
+# show(psi_t_V)
 
 ##############################################################
 # Beamsplitter
-B_hat = Matrix([
-    [1, I],
-    [I, 1],
-]) / sqrt(2)
-#show(B_hat, sqrt(2))
+B_hat = Matrix(
+    [
+        [1, I],
+        [I, 1],
+    ]
+) / sqrt(2)
+# show(B_hat, sqrt(2))
 
-I22 = eye(2,2)
-#show(I22)
+I22 = eye(2, 2)
+# show(I22)
 
 B_hat_prime = TP(B_hat, I22)
-#show(B_hat_prime, sqrt(2))
+# show(B_hat_prime, sqrt(2))
 
 ##############################################################
 # Mirror
-M_hat = Matrix([
-    [0, 1],
-    [1, 0],
-])
+M_hat = Matrix(
+    [
+        [0, 1],
+        [1, 0],
+    ]
+)
 
-#show(M_hat)
+# show(M_hat)
 
 M_hat_prime = TP(M_hat, I22)
-#show(M_hat_prime)
+# show(M_hat_prime)
 
 
 ##############################################################
 # Phase delay (mirror on piezo stage)
 delta = symbols("delta", real=True)
 
-A_hat = Matrix([
-    [1, 0],
-    [0, exp(I*delta)],
-])
+A_hat = Matrix(
+    [
+        [1, 0],
+        [0, exp(I * delta)],
+    ]
+)
 
-#show(A_hat)
+# show(A_hat)
 
 A_hat_prime = TP(A_hat, I22)
-#show(A_hat_prime)
+# show(A_hat_prime)
 
 
 ##############################################################
@@ -82,12 +88,14 @@ A_hat_prime = TP(A_hat, I22)
 
 vartheta = symbols("vartheta", real=True)
 
-W_hat_prime = Matrix([
-    [cos(2*vartheta), sin(2*vartheta), 0, 0],
-    [sin(2*vartheta), -cos(2*vartheta), 0, 0],
-    [0, 0, 1, 0],
-    [0, 0, 0, -1]
-])
+W_hat_prime = Matrix(
+    [
+        [cos(2 * vartheta), sin(2 * vartheta), 0, 0],
+        [sin(2 * vartheta), -cos(2 * vartheta), 0, 0],
+        [0, 0, 1, 0],
+        [0, 0, 0, -1],
+    ]
+)
 
 ##############################################################
 # Compose an MZI with:
@@ -95,14 +103,14 @@ W_hat_prime = Matrix([
 # - Fixed HWP @ 0deg in lower arm
 # - Adjustable phase delay in lower arm
 #
-#show(W_hat_prime)
-#show(M_hat_prime * B_hat_prime, 2/sqrt(2))
-#show(A_hat_prime * M_hat_prime * B_hat_prime, 2/sqrt(2))
-#show(W_hat_prime * A_hat_prime * M_hat_prime * B_hat_prime, 2/sqrt(2))
+# show(W_hat_prime)
+# show(M_hat_prime * B_hat_prime, 2/sqrt(2))
+# show(A_hat_prime * M_hat_prime * B_hat_prime, 2/sqrt(2))
+# show(W_hat_prime * A_hat_prime * M_hat_prime * B_hat_prime, 2/sqrt(2))
 
 Z_hat_prime = B_hat_prime * W_hat_prime * A_hat_prime * M_hat_prime * B_hat_prime
 
-#show(Z_hat_prime, 2)
+# show(Z_hat_prime, 2)
 
 psi_b_D = (psi_b_H + psi_b_V) / sqrt(2)
 psi_t_D = (psi_t_H + psi_t_V) / sqrt(2)
@@ -113,65 +121,68 @@ psi_t_D = (psi_t_H + psi_t_V) / sqrt(2)
 theta = symbols("theta", real=True)
 
 # This is for V=90, H=0
-P_hat_standard = Matrix([
-    [cos(theta)**2, cos(theta)*sin(theta)],
-    [cos(theta)*sin(theta), sin(theta)**2]
-])
+P_hat_standard = Matrix(
+    [
+        [cos(theta) ** 2, cos(theta) * sin(theta)],
+        [cos(theta) * sin(theta), sin(theta) ** 2],
+    ]
+)
 
 # Convert to V=0, H=90 which we use in our lab
-P_hat = P_hat_standard.subs(theta, theta + pi/2)
+P_hat = P_hat_standard.subs(theta, theta + pi / 2)
 
-Diag_hat = P_hat.subs(theta, pi/4)
+Diag_hat = P_hat.subs(theta, pi / 4)
 H_out = Diag_hat * H
 V_out = Diag_hat * V
 
-D = (H+V)/sqrt(2)
-#show(D, sqrt(2))
-#show(D/sqrt(2), 2)
+D = (H + V) / sqrt(2)
+# show(D, sqrt(2))
+# show(D/sqrt(2), 2)
 
 # We should lost half the photons
-assert H_out.norm()**2 == H.norm()**2/2
-assert V_out.norm()**2 == V.norm()**2/2
+assert H_out.norm() ** 2 == H.norm() ** 2 / 2
+assert V_out.norm() ** 2 == V.norm() ** 2 / 2
 
-#dump(H_out.norm()**2, H.norm()**2)
+# dump(H_out.norm()**2, H.norm()**2)
 
 ##############################################################
 # An adjustable polarizer for the x/horizontal exit of the MZI
 P_hat_prime = TP(psi_x * psi_x.T, P_hat) + TP(psi_y * psi_y.T, I22)
 
-#show(P_hat)
-#show(P_hat_prime)
+# show(P_hat)
+# show(P_hat_prime)
 
-#show(P_hat_prime.subs(theta, pi/4))
+# show(P_hat_prime.subs(theta, pi/4))
 
-#show(P_hat_prime.subs(theta, pi/4) * psi_b_H, 2)
-#show(P_hat_prime.subs(theta, pi/4) * psi_b_V, 2)
-#show(psi_b_D, sqrt(2))
-#show(psi_b_D/sqrt(2), 2)
+# show(P_hat_prime.subs(theta, pi/4) * psi_b_H, 2)
+# show(P_hat_prime.subs(theta, pi/4) * psi_b_V, 2)
+# show(psi_b_D, sqrt(2))
+# show(psi_b_D/sqrt(2), 2)
 
-#show(P_hat_prime.subs(theta, pi/4) * psi_t_H)
-#show(P_hat_prime.subs(theta, pi/4) * psi_t_V)
+# show(P_hat_prime.subs(theta, pi/4) * psi_t_H)
+# show(P_hat_prime.subs(theta, pi/4) * psi_t_V)
 
 ##############################################################
 # An operator for the MZI with adjustable polarizer for the x/horizontal exit
 E_hat_prime = P_hat_prime * Z_hat_prime
-#show(E_hat_prime, 2)
+# show(E_hat_prime, 2)
 
 ##############################################################
 # An instance of the MZI+LP at specific settings
 #
 # HWP_u at vartheta=45, theta=LP_i at 90
-E_hat_prime_45_90 = E_hat_prime.subs(vartheta, pi/4).subs(theta, pi/2)
-#show(E_hat_prime_45_90, 4)
+E_hat_prime_45_90 = E_hat_prime.subs(vartheta, pi / 4).subs(theta, pi / 2)
+# show(E_hat_prime_45_90, 4)
+
 
 def test_E_hat_prime_45_90():
     # Send in D light
-    psi_eraser = (E_hat_prime_45_90 * psi_b_D)
+    psi_eraser = E_hat_prime_45_90 * psi_b_D
     show(psi_eraser, 2)
 
     psi_x_H_final = psi_b_H.dot(psi_eraser)
     show(psi_x_H_final, 4)
-    prob_psi_x_H_final = abs(psi_x_H_final)**2
+    prob_psi_x_H_final = abs(psi_x_H_final) ** 2
     prob_psi_x_H_final = simplify(prob_psi_x_H_final.rewrite(cos))
     show(prob_psi_x_H_final)
     min_final = minimum(prob_psi_x_H_final, delta)
@@ -180,22 +191,21 @@ def test_E_hat_prime_45_90():
     show(max_final)
     dump(min_final.evalf(3))
     dump(max_final.evalf(3))
-    dump(max_final.evalf(3)-min_final.evalf(3))
-
+    dump(max_final.evalf(3) - min_final.evalf(3))
 
     # Projector onto the 'b' spatial state, identity in polarization space
     # psi_b is Matrix([1, 0])
     # I22 is eye(2,2)
     projector_b_spatial = TP(psi_b * psi_b.T, I22)
-    show(projector_b_spatial) # Optional: to see the projector matrix
+    show(projector_b_spatial)  # Optional: to see the projector matrix
 
     # Probability = <psi_eraser | P_b_spatial | psi_eraser>
     # .H gives the Hermitian conjugate (bra)
     # The result of the product is a 1x1 matrix, so access its element [0,0]
-    prob_b_spatial_qm = (psi_eraser.H * projector_b_spatial * psi_eraser)[0,0]
-    show(prob_b_spatial_qm) # To display the symbolic probability
+    prob_b_spatial_qm = (psi_eraser.H * projector_b_spatial * psi_eraser)[0, 0]
+    show(prob_b_spatial_qm)  # To display the symbolic probability
     prob_b_spatial_qm_simplified = simplify(prob_b_spatial_qm.rewrite(cos))
-    show(prob_b_spatial_qm_simplified) # To display the simplified symbolic probability
+    show(prob_b_spatial_qm_simplified)  # To display the simplified symbolic probability
 
     min_prob_b = minimum(prob_b_spatial_qm_simplified, delta)
     max_prob_b = maximum(prob_b_spatial_qm_simplified, delta)
@@ -205,7 +215,8 @@ def test_E_hat_prime_45_90():
     dump(max_prob_b.evalf(3))
     dump((max_prob_b - min_prob_b).evalf(3))
 
-#test_E_hat_prime_45_90()
+
+# test_E_hat_prime_45_90()
 
 ##############################################################
 # Extension: two-photon (signal & idler) processing
@@ -306,7 +317,9 @@ def demo_pair(initial_state, mzi_hwp_angle, idler_lp_angle, signal_lp_angle):
     """
 
     # HWP_u at vartheta = mzi_hwp_angle, LP_i at theta = idler_lp_angle
-    E_hat_prime_current = E_hat_prime.subs(vartheta, mzi_hwp_angle).subs(theta, idler_lp_angle)
+    E_hat_prime_current = E_hat_prime.subs(vartheta, mzi_hwp_angle).subs(
+        theta, idler_lp_angle
+    )
 
     # Probability for coincident detection
     prob = coincident_probability(initial_state, signal_lp_angle, E_hat_prime_current)
@@ -332,7 +345,7 @@ def demo_pair(initial_state, mzi_hwp_angle, idler_lp_angle, signal_lp_angle):
 # Build phi+ state
 psi_hh = TP(psi_b_H, psi_b_H)
 psi_vv = TP(psi_b_V, psi_b_V)
-phi_plus_state = (psi_hh + psi_vv) / sqrt(2)   # 16×1 column state
+phi_plus_state = (psi_hh + psi_vv) / sqrt(2)  # 16×1 column state
 assert phi_plus_state.norm() == 1
 
 
@@ -343,16 +356,16 @@ def model_nominal_setup():
     # Proper settings, eraser on at 45
     prob, visibility = demo_pair(
         phi_plus_state,
-        mzi_hwp_angle=pi/4,  # swap H/V in the upper arm
-        idler_lp_angle=pi/2, # 90 degree = H
-        signal_lp_angle=pi/4,   # 45 = pi/4 = Eraser on
+        mzi_hwp_angle=pi / 4,  # swap H/V in the upper arm
+        idler_lp_angle=pi / 2,  # 90 degree = H
+        signal_lp_angle=pi / 4,  # 45 = pi/4 = Eraser on
     )
     # Proper settings, eraser off at 0
     demo_pair(
         phi_plus_state,
-        mzi_hwp_angle=pi/4,  # swap H/V in the upper arm
-        idler_lp_angle=pi/2, # 90 degree = H
-        signal_lp_angle=0,   # 0 = Eraser off
+        mzi_hwp_angle=pi / 4,  # swap H/V in the upper arm
+        idler_lp_angle=pi / 2,  # 90 degree = H
+        signal_lp_angle=0,  # 0 = Eraser off
     )
 
     expected_prob = (1 - cos(delta)) / 8
@@ -372,20 +385,20 @@ def model_2025_05_23_lab_session():
 
     # Misconfigured on Friday, "eraser on"
     demo_pair(
-        psi_vv, # Pump HWP was set to 45 => Pump @ 90/H => 0/V signals&idlers
-        mzi_hwp_angle=pi/4,   # swap H/V in the upper arm
-        idler_lp_angle=pi/4,  # This was set to 45deg instead of 90 deg
-        signal_lp_angle=pi/4, # Eraser on
+        psi_vv,  # Pump HWP was set to 45 => Pump @ 90/H => 0/V signals&idlers
+        mzi_hwp_angle=pi / 4,  # swap H/V in the upper arm
+        idler_lp_angle=pi / 4,  # This was set to 45deg instead of 90 deg
+        signal_lp_angle=pi / 4,  # Eraser on
     )
-
 
     # Misconfigured on Friday, "eraser off"
     prob, visibility = demo_pair(
-        psi_vv, # Pump HWP was set to 45 => Pump @ 90/H => 0/V signals&idlers
-        mzi_hwp_angle=pi/4,   # swap H/V in the upper arm
-        idler_lp_angle=pi/4,  # This was set to 45deg instead of 90 deg
-        signal_lp_angle=0, # Eraser off
+        psi_vv,  # Pump HWP was set to 45 => Pump @ 90/H => 0/V signals&idlers
+        mzi_hwp_angle=pi / 4,  # swap H/V in the upper arm
+        idler_lp_angle=pi / 4,  # This was set to 45deg instead of 90 deg
+        signal_lp_angle=0,  # Eraser off
     )
+
 
 def model_rotated_pairs():
 
@@ -408,10 +421,10 @@ def model_rotated_pairs():
     #   • Original V (0°) → −22.5°
     #   • Original H (90°) →  67.5°
     # ------------------------------------------------------------------
-    alpha = -pi/8  # rotation angle
+    alpha = -pi / 8  # rotation angle
 
     # Single-photon polarisation basis rotated by −π/8
-    H_rot_basis = cos(alpha) * H + sin(alpha) * V   # |H⟩ → 67.5°
+    H_rot_basis = cos(alpha) * H + sin(alpha) * V  # |H⟩ → 67.5°
     V_rot_basis = -sin(alpha) * H + cos(alpha) * V  # |V⟩ → −22.5°
 
     # Tensor-product basis vectors (b-path, rotated polarisation)
@@ -423,13 +436,13 @@ def model_rotated_pairs():
         TP(psi_b_H_rot, psi_b_H_rot) + TP(psi_b_V_rot, psi_b_V_rot)
     ) / sqrt(2)
 
-    assert simplify(phi_plus_rotated_neg_pi_8.norm()) - 1.0 < 1e-9, simplify(phi_plus_rotated_neg_pi_8.norm())
+    assert simplify(phi_plus_rotated_neg_pi_8.norm()) - 1.0 < 1e-9, simplify(
+        phi_plus_rotated_neg_pi_8.norm()
+    )
 
-
-
-    deg_45 = pi/4
-    deg_90 = pi/2
-    deg_22_5 = pi/8
+    deg_45 = pi / 4
+    deg_90 = pi / 2
+    deg_22_5 = pi / 8
     assert deg_45.evalf() == math.radians(45)
     assert deg_90.evalf() == math.radians(90)
     assert deg_22_5.evalf() == math.radians(22.5)
@@ -449,6 +462,7 @@ def model_rotated_pairs():
         signal_lp_angle=0,
     )
 
+
 ###
 
 
@@ -465,16 +479,18 @@ def model_unbalanced_pairs(percent_HH=80):
     """
     # Calculate alpha and beta to ensure normalization: |alpha|^2 + |beta|^2 = 1
     # where |alpha|^2 = percent_HH/100
-    alpha = sqrt(percent_HH/100)
+    alpha = sqrt(percent_HH / 100)
     beta = sqrt(1 - alpha**2)  # = sqrt((100-percent_HH)/100)
 
     # Build unbalanced state
     psi_hh = TP(psi_b_H, psi_b_H)
     psi_vv = TP(psi_b_V, psi_b_V)
-    unbalanced_state = (alpha * psi_hh + beta * psi_vv)
+    unbalanced_state = alpha * psi_hh + beta * psi_vv
 
     # Verify normalization
-    assert abs(unbalanced_state.norm() - 1) < 1e-9, f"State not normalized: {unbalanced_state.norm()}"
+    assert (
+        abs(unbalanced_state.norm() - 1) < 1e-9
+    ), f"State not normalized: {unbalanced_state.norm()}"
 
     print("#" * 80)
     print(f"Testing unbalanced state with {percent_HH}% |HH>")
@@ -484,27 +500,28 @@ def model_unbalanced_pairs(percent_HH=80):
     # Proper settings, eraser on at 45
     prob, visibility = demo_pair(
         unbalanced_state,
-        mzi_hwp_angle=pi/4,  # swap H/V in the upper arm
-        idler_lp_angle=pi/2, # 90 degree = H
-        signal_lp_angle=pi/4,   # 45 = pi/4 = Eraser on
+        mzi_hwp_angle=pi / 4,  # swap H/V in the upper arm
+        idler_lp_angle=pi / 2,  # 90 degree = H
+        signal_lp_angle=pi / 4,  # 45 = pi/4 = Eraser on
     )
 
     # Proper settings, eraser off at 0
     demo_pair(
         unbalanced_state,
-        mzi_hwp_angle=pi/4,  # swap H/V in the upper arm
-        idler_lp_angle=pi/2, # 90 degree = H
-        signal_lp_angle=0,   # 0 = Eraser off
+        mzi_hwp_angle=pi / 4,  # swap H/V in the upper arm
+        idler_lp_angle=pi / 2,  # 90 degree = H
+        signal_lp_angle=0,  # 0 = Eraser off
     )
 
     # Proper settings, eraser off at 90
     demo_pair(
         unbalanced_state,
-        mzi_hwp_angle=pi/4,    # swap H/V in the upper arm
-        idler_lp_angle=pi/2,   # 90 degree = H
-        signal_lp_angle=pi/2,  # 90 = Eraser off
+        mzi_hwp_angle=pi / 4,  # swap H/V in the upper arm
+        idler_lp_angle=pi / 2,  # 90 degree = H
+        signal_lp_angle=pi / 2,  # 90 = Eraser off
     )
 
-#model_rotated_pairs()
+
+# model_rotated_pairs()
 model_nominal_setup()
-#model_unbalanced_pairs(80)  # Try with 80% |HH> component
+# model_unbalanced_pairs(80)  # Try with 80% |HH> component
