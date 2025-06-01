@@ -1,6 +1,7 @@
 \documentclass{article}
 \usepackage{graphicx} % Required for including images
 \usepackage{booktabs} % For professional looking tables
+\usepackage{makecell} % For line breaks in table cells
 \usepackage{amsmath}  % For math symbols if needed
 \usepackage{parskip}  % Add space between paragraphs
 \setlength{\parindent}{0pt} % Remove paragraph indentation
@@ -29,7 +30,7 @@
 \centering
 \begin{tabular}{lcc}
 \toprule
-\textbf{Condition} & \textbf{Signal LP angle} & \textbf{Visibility (V)} \\
+Condition & \makecell{Signal \\ LP angle} & \makecell{Idler \\ Self-Interference \\ Visibility (V)} \\
 \midrule
 Eraser On          & $22.5^\circ$  & 0.481 \\
 Eraser Off         & $-22.5^\circ (337.5^\circ)$ & 0.055 \\
