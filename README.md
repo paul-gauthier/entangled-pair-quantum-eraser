@@ -13,9 +13,8 @@ Mach–Zehnder–based entangled pair quantum-eraser experiment.
 
 ## SymPy model of experiment as quantum operator
 
-- [lab6entangled.py](lab6entangled.py) 
-- Symbolic model of the apparatus as a quantum operator.
-- Function to apply the operator to an initial state vector (|Phi+>, |VV>, etc) and obtain the symbolic formula for expected coincidence counts versus phase delay.
+- [Symbolic model of the apparatus](lab6entangled.py) as a quantum operator.
+- Includes a function to apply the operator to an initial state vector (|Phi+>, |VV>, etc) and obtain the symbolic formula for expected coincidence counts versus phase delay, and expected visibility.
 
 ## Utilities
 
@@ -30,6 +29,8 @@ Mach–Zehnder–based entangled pair quantum-eraser experiment.
   - Utilities for plotting signal, idler and coincidence counts from experimental data, 
   fitting counts to best-fit curve, computing visibility.
 - [plots.py](plots.py) 
-  - Parses experimental data and creates plots. 
+  - Parses experimental data and creates plots for signal, idler, coincidence data.
+- [coincidences.py](coincidences.py)
+  - Parses experimental data and creates plots for coincidence data only.
 
 
