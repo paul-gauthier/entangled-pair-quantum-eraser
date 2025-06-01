@@ -325,14 +325,15 @@ def demo_pair(initial_state, mzi_hwp_angle, idler_lp_angle, signal_lp_angle, *, 
     idler_rot_angle=0
 
     # Optional polarisation rotations applied to the input state
-    R_pol_signal = Matrix([[cos(signal_rot_angle), -sin(signal_rot_angle)],
-                           [sin(signal_rot_angle),  cos(signal_rot_angle)]])
-    R_pol_idler = Matrix([[cos(idler_rot_angle), -sin(idler_rot_angle)],
-                          [sin(idler_rot_angle),  cos(idler_rot_angle)]])
-    rot_op_signal = TP(I22, R_pol_signal)   # 4×4 acting on signal photon
-    rot_op_idler = TP(I22, R_pol_idler)     # 4×4 acting on idler photon
-    rotation_operator = TP(rot_op_signal, rot_op_idler)  # 16×16
-    initial_state = rotation_operator * initial_state
+    if signal_rot_angle != 0 or idler_rot_angle != 0:
+        R_pol_signal = Matrix([[cos(signal_rot_angle), -sin(signal_rot_angle)],
+                               [sin(signal_rot_angle),  cos(signal_rot_angle)]])
+        R_pol_idler = Matrix([[cos(idler_rot_angle), -sin(idler_rot_angle)],
+                              [sin(idler_rot_angle),  cos(idler_rot_angle)]])
+        rot_op_signal = TP(I22, R_pol_signal)   # 4×4 acting on signal photon
+        rot_op_idler = TP(I22, R_pol_idler)     # 4×4 acting on idler photon
+        rotation_operator = TP(rot_op_signal, rot_op_idler)  # 16×16
+        initial_state = rotation_operator * initial_state
 
     # HWP_u at vartheta = mzi_hwp_angle, LP_i at theta = idler_lp_angle
     E_hat_prime_current = E_hat_prime.subs(vartheta, mzi_hwp_angle).subs(
@@ -370,8 +371,8 @@ assert phi_plus_state.norm() == 1
 # pi/8 for both seems to reproduce all the experimental data, except Lab 6 eraser off
 # But this doesn't account for HWP(0) in the lower arm.
 # Actually rotating the signals/idlers would, but doesn't match the data.
-hwp_ep = pi/8
-lpi_ep = hwp_ep
+hwp_err = 0 # pi/8
+lpi_err = hwp_err
 
 
 def model_nominal_setup():
@@ -384,8 +385,8 @@ def model_nominal_setup():
 
     # Common parameters
     initial_state = phi_plus_state
-    mzi_hwp_angle = pi / 4 + hwp_ep  # swap H/V in the upper arm
-    idler_lp_angle = pi / 2 + lpi_ep  # 90 degree = H
+    mzi_hwp_angle = pi / 4 + hwp_err  # swap H/V in the upper arm
+    idler_lp_angle = pi / 2 + lpi_err  # 90 degree = H
 
     # Proper settings, eraser on at 45
     prob, visibility = demo_pair(
@@ -415,8 +416,8 @@ def model_2025_05_29_lab_session():
 
     # Common parameters
     initial_state = phi_plus_state
-    mzi_hwp_angle = pi / 4 + hwp_ep  # swap H/V in the upper arm
-    idler_lp_angle = pi / 2 + lpi_ep  # 90 degree = H
+    mzi_hwp_angle = pi / 4 + hwp_err  # swap H/V in the upper arm
+    idler_lp_angle = pi / 2 + lpi_err  # 90 degree = H
 
     # Proper settings, eraser on at 45
     prob, visibility = demo_pair(
@@ -551,13 +552,13 @@ def model_lab6():
 
     # Common parameters
     initial_state = psi_hh
-    mzi_hwp_angle = pi / 4 + hwp_ep # swap H/V in the upper arm
+    mzi_hwp_angle = pi / 4 + hwp_err # swap H/V in the upper arm
 
     # Proper settings, eraser on at 45
     prob, visibility = demo_pair(
         initial_state,
         mzi_hwp_angle=mzi_hwp_angle,
-        idler_lp_angle=pi/4 + lpi_ep,   # 45 = pi/4 = Eraser on
+        idler_lp_angle=pi/4 + lpi_err,   # 45 = pi/4 = Eraser on
         signal_lp_angle=pi / 2,
     )
 
@@ -565,7 +566,7 @@ def model_lab6():
     demo_pair(
         initial_state,
         mzi_hwp_angle=mzi_hwp_angle,
-        idler_lp_angle=pi/2 + lpi_ep,   # 90 = pi/2 = Eraser off
+        idler_lp_angle=pi/2 + lpi_err,   # 90 = pi/2 = Eraser off
         signal_lp_angle=pi / 2,
     )
 
@@ -607,8 +608,8 @@ def model_unbalanced_pairs(percent_HH=80):
 
     # Common parameters
     initial_state = unbalanced_state
-    mzi_hwp_angle = pi / 4 + hwp_ep # swap H/V in the upper arm
-    idler_lp_angle = pi / 2 + lpi_ep # 90 degree = H
+    mzi_hwp_angle = pi / 4 + hwp_err # swap H/V in the upper arm
+    idler_lp_angle = pi / 2 + lpi_err # 90 degree = H
 
     # Proper settings, eraser on at 45
     prob, visibility = demo_pair(
@@ -664,8 +665,8 @@ def model_mixed_idler_signals_V():
 
     # ──────────────────────────────────────────────────────────
     # Optical settings (nominal quantum-eraser configuration)
-    mzi_hwp_angle = pi / 4 + hwp_ep      # HWP_u swaps H/V
-    idler_lp_angle = pi / 2 + lpi_ep     # LP_i at 90° (H)
+    mzi_hwp_angle = pi / 4 + hwp_err      # HWP_u swaps H/V
+    idler_lp_angle = pi / 2 + lpi_err     # LP_i at 90° (H)
     signal_lp_angle = 0         # Signal LP transmits V (0°)
 
     # Operators acting on the two photons
