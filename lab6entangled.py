@@ -566,6 +566,6 @@ def model_mixed_idler_signals_V():
 
 
 # model_rotated_pairs()
-model_nominal_setup()
+#model_nominal_setup()
 model_mixed_idler_signals_V()
 # model_unbalanced_pairs(80)  # Try with 80% |HH> component
