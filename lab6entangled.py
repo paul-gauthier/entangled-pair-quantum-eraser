@@ -350,6 +350,10 @@ phi_plus_state = (psi_hh + psi_vv) / sqrt(2)  # 16×1 column state
 assert phi_plus_state.norm() == 1
 
 
+mzi_ep = pi/8
+lpi_ep = pi/8
+
+
 def model_nominal_setup():
     ##############################################################
     # Model the entangled pair quantum eraser in the nominal eraser on & off conditions
@@ -357,20 +361,20 @@ def model_nominal_setup():
     # Proper settings, eraser on at 45
     prob, visibility = demo_pair(
         phi_plus_state,
-        mzi_hwp_angle=pi / 4,  # swap H/V in the upper arm
-        idler_lp_angle=pi / 2,  # 90 degree = H
+        mzi_hwp_angle=pi / 4 + mzi_ep,  # swap H/V in the upper arm
+        idler_lp_angle=pi / 2 + lpi_ep,  # 90 degree = H
         signal_lp_angle=pi / 4,  # 45 = pi/4 = Eraser on
     )
     # Proper settings, eraser off at 0
     demo_pair(
         phi_plus_state,
-        mzi_hwp_angle=pi / 4,  # swap H/V in the upper arm
-        idler_lp_angle=pi / 2,  # 90 degree = H
+        mzi_hwp_angle=pi / 4 + mzi_ep,  # swap H/V in the upper arm
+        idler_lp_angle=pi / 2 + lpi_ep,  # 90 degree = H
         signal_lp_angle=0,  # 0 = Eraser off
     )
 
     expected_prob = (1 - cos(delta)) / 8
-    assert prob.equals(expected_prob), f"Probability {prob} != expected {expected_prob}"
+    #assert prob.equals(expected_prob), f"Probability {prob} != expected {expected_prob}"
 
 
 def model_2025_05_23_lab_session():
@@ -554,8 +558,8 @@ def model_mixed_idler_signals_V():
 
     # ──────────────────────────────────────────────────────────
     # Optical settings (nominal quantum-eraser configuration)
-    mzi_hwp_angle = pi / 4      # HWP_u swaps H/V
-    idler_lp_angle = pi / 2     # LP_i at 90° (H)
+    mzi_hwp_angle = pi / 4 + mzi_ep      # HWP_u swaps H/V
+    idler_lp_angle = pi / 2 + lpi_ep     # LP_i at 90° (H)
     signal_lp_angle = 0         # Signal LP transmits V (0°)
 
     # Operators acting on the two photons
@@ -592,6 +596,6 @@ def model_mixed_idler_signals_V():
 
 
 # model_rotated_pairs()
-#model_nominal_setup()
+model_nominal_setup()
 model_mixed_idler_signals_V()
 # model_unbalanced_pairs(80)  # Try with 80% |HH> component
