@@ -633,7 +633,7 @@ def model_unbalanced_pairs(percent_HH=80):
     )
 
 
-def model_mixed_idler_signals_V():
+def model_mixed_idler_signals_V(percent_H: float = 50):
     """
     Density-matrix implementation of the mixed-idler case.
 
@@ -654,17 +654,19 @@ def model_mixed_idler_signals_V():
 
     print("=" * 100)
     print()
-    print("model_mixed_idler_signals_V")
+    print(f"model_mixed_idler_signals_V (percent_H={percent_H})")
 
 
     # ──────────────────────────────────────────────────────────
-    # Input density matrix  ρ_in = |V⟩⟨V|_s ⊗ ½ I₂,i
+    # Input density matrix  ρ_in = |V⟩⟨V|_s ⊗ ρ_i  (biased mixture)
     psi_s_V = psi_b_V
     ketbra_s_V = psi_s_V * psi_s_V.T                      # |V⟩⟨V|_s  (4×4)
 
     psi_i_H = psi_b_H
     psi_i_V = psi_b_V
-    rho_i = (psi_i_H * psi_i_H.T + psi_i_V * psi_i_V.T) / 2  # ½ I₂  (4×4)
+    p_H = percent_H / 100
+    p_V = 1 - p_H
+    rho_i = p_H * (psi_i_H * psi_i_H.T) + p_V * (psi_i_V * psi_i_V.T)  # biased mixture  (4×4)
 
     rho_in = TP(ketbra_s_V, rho_i)                        # 16×16
 
