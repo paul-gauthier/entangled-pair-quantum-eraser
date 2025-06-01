@@ -317,6 +317,15 @@ def demo_pair(initial_state, mzi_hwp_angle, idler_lp_angle, signal_lp_angle):
         (probability expression, visibility expression)
     """
 
+    # Apply a −π/8 rotation to both photons’ polarisation (H,V basis)
+    rot_angle = -pi / 8
+    R_pol = Matrix([[cos(rot_angle), -sin(rot_angle)],
+                    [sin(rot_angle),  cos(rot_angle)]])
+    rot_op_signal = TP(I22, R_pol)   # 4×4 acting on signal photon
+    rot_op_idler = TP(I22, R_pol)    # 4×4 acting on idler photon
+    rotation_operator = TP(rot_op_signal, rot_op_idler)  # 16×16
+    initial_state = rotation_operator * initial_state
+
     # HWP_u at vartheta = mzi_hwp_angle, LP_i at theta = idler_lp_angle
     E_hat_prime_current = E_hat_prime.subs(vartheta, mzi_hwp_angle).subs(
         theta, idler_lp_angle
