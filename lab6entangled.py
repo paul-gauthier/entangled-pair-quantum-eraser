@@ -522,6 +522,50 @@ def model_unbalanced_pairs(percent_HH=80):
     )
 
 
+def model_mixed_idler_signals_V():
+    """
+    Model entangled pairs where the idler photon is in the completely
+    mixed polarisation state ρ_i = (|H⟩⟨H| + |V⟩⟨V|) / 2 while the signal
+    photon is prepared in vertical polarisation |V⟩.
+
+    The detection probability is obtained by averaging the results for the
+    two pure product components |V⟩_s⊗|H⟩_i and |V⟩_s⊗|V⟩_i.
+    """
+    # Pure components of the mixture
+    psi_vv_state = TP(psi_b_V, psi_b_V)
+    psi_vh_state = TP(psi_b_V, psi_b_H)
+
+    # Nominal interferometer settings
+    mzi_hwp_angle = pi / 4    # HWP_u swaps H/V
+    idler_lp_angle = pi / 2   # LP_i at 90° (H)
+    signal_lp_angle = 0       # Signal LP transmits |V⟩ (0°)
+
+    E_hat_prime_current = E_hat_prime.subs(vartheta, mzi_hwp_angle).subs(
+        theta, idler_lp_angle
+    )
+
+    # Probabilities for the two components
+    prob_vv = coincident_probability(psi_vv_state, signal_lp_angle, E_hat_prime_current)
+    prob_vh = coincident_probability(psi_vh_state, signal_lp_angle, E_hat_prime_current)
+
+    # Classical mixture (equal weights)
+    prob_mixed = simplify((prob_vv + prob_vh) / 2).rewrite(cos)
+
+    # Extrema with respect to the phase delay δ
+    min_prob = minimum(prob_mixed, delta)
+    max_prob = maximum(prob_mixed, delta)
+
+    visibility = simplify((max_prob - min_prob) / (max_prob + min_prob))
+
+    print("#" * 80)
+    dump("Mixed idler (H/V 50-50), signal V")
+    show(prob_mixed)
+    dump(min_prob.evalf(5), max_prob.evalf(5), visibility.evalf(5))
+
+    return prob_mixed, visibility
+
+
 # model_rotated_pairs()
 model_nominal_setup()
+model_mixed_idler_signals_V()
 # model_unbalanced_pairs(80)  # Try with 80% |HH> component
