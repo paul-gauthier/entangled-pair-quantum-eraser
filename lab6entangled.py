@@ -295,37 +295,6 @@ def coincident_probability(initial_state, theta_val, E_hat_prime_current):
     return probability
 
 
-def idler_rotation_operator(theta_val):
-    """
-    Return an operator that rotates ONLY the *idler* photon's polarisation
-    by angle ``theta_val`` (radians), leaving all other degrees of freedom
-    untouched.
-
-    It realises the rotation
-
-        |H⟩ →  cosθ |H⟩ + sinθ |V⟩
-        |V⟩ → -sinθ |H⟩ + cosθ |V⟩
-
-    represented by the 2×2 matrix
-
-        R(θ) = [[cosθ, -sinθ],
-                [sinθ,  cosθ]] .
-
-    In the full 16-dimensional (signal ⊗ idler) space the operator is
-
-        Iₛ ⊗ (I_path ⊗ R(θ)) .
-    """
-    # 2×2 rotation acting on the polarisation qubit
-    R_pol = Matrix([[cos(theta_val), -sin(theta_val)],
-                    [sin(theta_val),  cos(theta_val)]])
-
-    # 4×4 operator for the idler’s (path ⊗ polarisation) Hilbert space
-    R_hat_idler = TP(I22, R_pol)
-
-    # 16×16 operator acting on the joint (signal ⊗ idler) state
-    return TP(I44, R_hat_idler)
-
-
 def demo_pair(initial_state, mzi_hwp_angle, idler_lp_angle, signal_lp_angle):
     """
     Compute the coincident-detection probability for the given parameters
@@ -381,7 +350,7 @@ phi_plus_state = (psi_hh + psi_vv) / sqrt(2)  # 16×1 column state
 assert phi_plus_state.norm() == 1
 
 
-hwp_ep = pi/8 # pi/8 seems to reproduce all the experimental data
+hwp_ep = 0 # pi/8 seems to reproduce all the experimental data
 lpi_ep = hwp_ep
 
 
