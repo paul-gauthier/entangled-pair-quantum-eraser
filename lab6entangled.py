@@ -295,7 +295,7 @@ def coincident_probability(initial_state, theta_val, E_hat_prime_current):
     return probability
 
 
-def demo_pair(initial_state, mzi_hwp_angle, idler_lp_angle, signal_lp_angle):
+def demo_pair(initial_state, mzi_hwp_angle, idler_lp_angle, signal_lp_angle, *, signal_rot_angle=0, idler_rot_angle=pi/8):
     """
     Compute the coincident-detection probability for the given parameters
     and the corresponding interference visibility.
@@ -310,6 +310,10 @@ def demo_pair(initial_state, mzi_hwp_angle, idler_lp_angle, signal_lp_angle):
         Linear-polariser angle (θ) in the idler arm.
     signal_lp_angle :
         Linear-polariser angle (θ) in the signal arm.
+    signal_rot_angle :
+        Polarisation rotation angle applied to the signal photon (radians, default 0).
+    idler_rot_angle :
+        Polarisation rotation angle applied to the idler photon (radians, default π/8).
 
     Returns
     -------
@@ -317,12 +321,13 @@ def demo_pair(initial_state, mzi_hwp_angle, idler_lp_angle, signal_lp_angle):
         (probability expression, visibility expression)
     """
 
-    # Apply a −π/8 rotation to the idler
-    rot_angle = pi / 8
-    R_pol = Matrix([[cos(rot_angle), -sin(rot_angle)],
-                    [sin(rot_angle),  cos(rot_angle)]])
-    rot_op_signal = TP(I22, I22)   # 4×4 acting on signal photon
-    rot_op_idler = TP(I22, R_pol)    # 4×4 acting on idler photon
+    # Optional polarisation rotations applied to the input state
+    R_pol_signal = Matrix([[cos(signal_rot_angle), -sin(signal_rot_angle)],
+                           [sin(signal_rot_angle),  cos(signal_rot_angle)]])
+    R_pol_idler = Matrix([[cos(idler_rot_angle), -sin(idler_rot_angle)],
+                          [sin(idler_rot_angle),  cos(idler_rot_angle)]])
+    rot_op_signal = TP(I22, R_pol_signal)   # 4×4 acting on signal photon
+    rot_op_idler = TP(I22, R_pol_idler)     # 4×4 acting on idler photon
     rotation_operator = TP(rot_op_signal, rot_op_idler)  # 16×16
     initial_state = rotation_operator * initial_state
 
