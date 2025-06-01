@@ -358,18 +358,23 @@ def model_nominal_setup():
     ##############################################################
     # Model the entangled pair quantum eraser in the nominal eraser on & off conditions
 
+    # Common parameters
+    initial_state = phi_plus_state
+    mzi_hwp_angle = pi / 4 + mzi_ep  # swap H/V in the upper arm
+    idler_lp_angle = pi / 2 + lpi_ep  # 90 degree = H
+
     # Proper settings, eraser on at 45
     prob, visibility = demo_pair(
-        phi_plus_state,
-        mzi_hwp_angle=pi / 4 + mzi_ep,  # swap H/V in the upper arm
-        idler_lp_angle=pi / 2 + lpi_ep,  # 90 degree = H
+        initial_state,
+        mzi_hwp_angle=mzi_hwp_angle,
+        idler_lp_angle=idler_lp_angle,
         signal_lp_angle=pi / 4,  # 45 = pi/4 = Eraser on
     )
     # Proper settings, eraser off at 0
     demo_pair(
-        phi_plus_state,
-        mzi_hwp_angle=pi / 4 + mzi_ep,  # swap H/V in the upper arm
-        idler_lp_angle=pi / 2 + lpi_ep,  # 90 degree = H
+        initial_state,
+        mzi_hwp_angle=mzi_hwp_angle,
+        idler_lp_angle=idler_lp_angle,
         signal_lp_angle=0,  # 0 = Eraser off
     )
 
@@ -388,19 +393,24 @@ def model_2025_05_23_lab_session():
     # Both interfere, with N_c_eraser_on = 1/2 N_c_eraser_off
     #
 
+    # Common parameters
+    initial_state = psi_vv  # Pump HWP was set to 45 => Pump @ 90/H => 0/V signals&idlers
+    mzi_hwp_angle = pi / 4  # swap H/V in the upper arm
+    idler_lp_angle = pi / 4  # This was set to 45deg instead of 90 deg
+
     # Misconfigured on Friday, "eraser on"
     demo_pair(
-        psi_vv,  # Pump HWP was set to 45 => Pump @ 90/H => 0/V signals&idlers
-        mzi_hwp_angle=pi / 4,  # swap H/V in the upper arm
-        idler_lp_angle=pi / 4,  # This was set to 45deg instead of 90 deg
+        initial_state,
+        mzi_hwp_angle=mzi_hwp_angle,
+        idler_lp_angle=idler_lp_angle,
         signal_lp_angle=pi / 4,  # Eraser on
     )
 
     # Misconfigured on Friday, "eraser off"
     prob, visibility = demo_pair(
-        psi_vv,  # Pump HWP was set to 45 => Pump @ 90/H => 0/V signals&idlers
-        mzi_hwp_angle=pi / 4,  # swap H/V in the upper arm
-        idler_lp_angle=pi / 4,  # This was set to 45deg instead of 90 deg
+        initial_state,
+        mzi_hwp_angle=mzi_hwp_angle,
+        idler_lp_angle=idler_lp_angle,
         signal_lp_angle=0,  # Eraser off
     )
 
@@ -452,18 +462,23 @@ def model_rotated_pairs():
     assert deg_90.evalf() == math.radians(90)
     assert deg_22_5.evalf() == math.radians(22.5)
 
+    # Common parameters
+    initial_state = phi_plus_rotated_neg_pi_8
+    mzi_hwp_angle = deg_45
+    idler_lp_angle = deg_90
+
     # Proper settings, eraser on at 45
     prob, visibility = demo_pair(
-        phi_plus_rotated_neg_pi_8,
-        mzi_hwp_angle=deg_45,
-        idler_lp_angle=deg_90,
+        initial_state,
+        mzi_hwp_angle=mzi_hwp_angle,
+        idler_lp_angle=idler_lp_angle,
         signal_lp_angle=-deg_45,
     )
     # Proper settings, eraser off at 0
     demo_pair(
-        phi_plus_rotated_neg_pi_8,
-        mzi_hwp_angle=deg_45,
-        idler_lp_angle=deg_90,
+        initial_state,
+        mzi_hwp_angle=mzi_hwp_angle,
+        idler_lp_angle=idler_lp_angle,
         signal_lp_angle=0,
     )
 
@@ -502,27 +517,32 @@ def model_unbalanced_pairs(percent_HH=80):
     print(f"alpha={alpha:.4f}, beta={beta:.4f}")
     print("#" * 80)
 
+    # Common parameters
+    initial_state = unbalanced_state
+    mzi_hwp_angle = pi / 4  # swap H/V in the upper arm
+    idler_lp_angle = pi / 2  # 90 degree = H
+
     # Proper settings, eraser on at 45
     prob, visibility = demo_pair(
-        unbalanced_state,
-        mzi_hwp_angle=pi / 4,  # swap H/V in the upper arm
-        idler_lp_angle=pi / 2,  # 90 degree = H
+        initial_state,
+        mzi_hwp_angle=mzi_hwp_angle,
+        idler_lp_angle=idler_lp_angle,
         signal_lp_angle=pi / 4,  # 45 = pi/4 = Eraser on
     )
 
     # Proper settings, eraser off at 0
     demo_pair(
-        unbalanced_state,
-        mzi_hwp_angle=pi / 4,  # swap H/V in the upper arm
-        idler_lp_angle=pi / 2,  # 90 degree = H
+        initial_state,
+        mzi_hwp_angle=mzi_hwp_angle,
+        idler_lp_angle=idler_lp_angle,
         signal_lp_angle=0,  # 0 = Eraser off
     )
 
     # Proper settings, eraser off at 90
     demo_pair(
-        unbalanced_state,
-        mzi_hwp_angle=pi / 4,  # swap H/V in the upper arm
-        idler_lp_angle=pi / 2,  # 90 degree = H
+        initial_state,
+        mzi_hwp_angle=mzi_hwp_angle,
+        idler_lp_angle=idler_lp_angle,
         signal_lp_angle=pi / 2,  # 90 = Eraser off
     )
 
