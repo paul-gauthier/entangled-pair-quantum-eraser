@@ -113,6 +113,7 @@ Z_hat_prime = B_hat_prime * W_hat_prime * A_hat_prime * M_hat_prime * B_hat_prim
 # show(Z_hat_prime, 2)
 
 psi_b_D = (psi_b_H + psi_b_V) / sqrt(2)
+psi_b_A = (psi_b_H - psi_b_V) / sqrt(2)
 psi_t_D = (psi_t_H + psi_t_V) / sqrt(2)
 
 ##############################################################
