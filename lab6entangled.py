@@ -329,8 +329,8 @@ def demo_pair(initial_state, mzi_hwp_angle, idler_lp_angle, signal_lp_angle):
     prob_simplified = simplify(prob.rewrite(cos))
 
     # Extremal values with respect to the phase delay δ
-    min_prob = minimum(prob_simplified, delta)
-    max_prob = maximum(prob_simplified, delta)
+    min_prob = minimum(prob_simplified.evalf(), delta)
+    max_prob = maximum(prob_simplified.evalf(), delta)
 
     # Visibility  V = (max − min) / (max + min)
     visibility = simplify((max_prob - min_prob) / (max_prob + min_prob))
@@ -350,8 +350,8 @@ phi_plus_state = (psi_hh + psi_vv) / sqrt(2)  # 16×1 column state
 assert phi_plus_state.norm() == 1
 
 
-mzi_ep = pi/16
-lpi_ep = mzi_ep
+hwp_ep = 0 # pi/8 seems to reproduce all the experimental data
+lpi_ep = hwp_ep
 
 
 def model_nominal_setup():
@@ -364,7 +364,7 @@ def model_nominal_setup():
 
     # Common parameters
     initial_state = phi_plus_state
-    mzi_hwp_angle = pi / 4 + mzi_ep  # swap H/V in the upper arm
+    mzi_hwp_angle = pi / 4 + hwp_ep  # swap H/V in the upper arm
     idler_lp_angle = pi / 2 + lpi_ep  # 90 degree = H
 
     # Proper settings, eraser on at 45
@@ -395,7 +395,7 @@ def model_2025_05_29_lab_session():
 
     # Common parameters
     initial_state = phi_plus_state
-    mzi_hwp_angle = pi / 4 + mzi_ep  # swap H/V in the upper arm
+    mzi_hwp_angle = pi / 4 + hwp_ep  # swap H/V in the upper arm
     idler_lp_angle = pi / 2 + lpi_ep  # 90 degree = H
 
     # Proper settings, eraser on at 45
@@ -521,6 +521,34 @@ def model_rotated_pairs():
 ###
 
 
+def model_lab6():
+
+    print("=" * 100)
+    print()
+    print("model_lab6")
+
+    psi_hh = TP(psi_b_H, psi_b_H)
+
+    # Common parameters
+    initial_state = psi_hh
+    mzi_hwp_angle = pi / 4 + hwp_ep # swap H/V in the upper arm
+
+    # Proper settings, eraser on at 45
+    prob, visibility = demo_pair(
+        initial_state,
+        mzi_hwp_angle=mzi_hwp_angle,
+        idler_lp_angle=pi/4 + lpi_ep,   # 45 = pi/4 = Eraser on
+        signal_lp_angle=pi / 2,
+    )
+
+    # Proper settings, eraser off at 90
+    demo_pair(
+        initial_state,
+        mzi_hwp_angle=mzi_hwp_angle,
+        idler_lp_angle=pi/2 + lpi_ep,   # 90 = pi/2 = Eraser off
+        signal_lp_angle=pi / 2,
+    )
+
 def model_unbalanced_pairs(percent_HH=80):
     """
     Model entangled pairs with unequal amplitudes: alpha|HH> + beta|VV>
@@ -532,6 +560,11 @@ def model_unbalanced_pairs(percent_HH=80):
     percent_HH : float
         Percentage of the |HH> component (0 to 100)
     """
+
+    print("=" * 100)
+    print()
+    print("model_unbalanced_pairs", percent_HH)
+
     # Calculate alpha and beta to ensure normalization: |alpha|^2 + |beta|^2 = 1
     # where |alpha|^2 = percent_HH/100
     alpha = sqrt(percent_HH / 100)
@@ -554,8 +587,8 @@ def model_unbalanced_pairs(percent_HH=80):
 
     # Common parameters
     initial_state = unbalanced_state
-    mzi_hwp_angle = pi / 4  # swap H/V in the upper arm
-    idler_lp_angle = pi / 2  # 90 degree = H
+    mzi_hwp_angle = pi / 4 + hwp_ep # swap H/V in the upper arm
+    idler_lp_angle = pi / 2 + lpi_ep # 90 degree = H
 
     # Proper settings, eraser on at 45
     prob, visibility = demo_pair(
@@ -563,14 +596,6 @@ def model_unbalanced_pairs(percent_HH=80):
         mzi_hwp_angle=mzi_hwp_angle,
         idler_lp_angle=idler_lp_angle,
         signal_lp_angle=pi / 4,  # 45 = pi/4 = Eraser on
-    )
-
-    # Proper settings, eraser off at 0
-    demo_pair(
-        initial_state,
-        mzi_hwp_angle=mzi_hwp_angle,
-        idler_lp_angle=idler_lp_angle,
-        signal_lp_angle=0,  # 0 = Eraser off
     )
 
     # Proper settings, eraser off at 90
@@ -619,7 +644,7 @@ def model_mixed_idler_signals_V():
 
     # ──────────────────────────────────────────────────────────
     # Optical settings (nominal quantum-eraser configuration)
-    mzi_hwp_angle = pi / 4 + mzi_ep      # HWP_u swaps H/V
+    mzi_hwp_angle = pi / 4 + hwp_ep      # HWP_u swaps H/V
     idler_lp_angle = pi / 2 + lpi_ep     # LP_i at 90° (H)
     signal_lp_angle = 0         # Signal LP transmits V (0°)
 
@@ -658,4 +683,5 @@ def model_mixed_idler_signals_V():
 model_nominal_setup()
 model_2025_05_29_lab_session()
 model_mixed_idler_signals_V()
-# model_unbalanced_pairs(80)  # Try with 80% |HH> component
+model_lab6()
+#model_unbalanced_pairs(100)  # Try with 80% |HH> component
