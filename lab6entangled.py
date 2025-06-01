@@ -321,6 +321,11 @@ def demo_pair(initial_state, mzi_hwp_angle, idler_lp_angle, signal_lp_angle, *, 
         (probability expression, visibility expression)
     """
 
+    # Reproduces all experimental data but the signal blocked case.
+    # We got interference in the lab, but the model show V=0
+    # signal_rot_angle=-pi/8
+    # idler_rot_angle=0
+
     signal_rot_angle=0
     idler_rot_angle=0
 
@@ -706,4 +711,4 @@ model_nominal_setup()
 model_2025_05_29_lab_session()
 model_mixed_idler_signals_V()
 model_lab6()
-#model_unbalanced_pairs(100)  # Try with 80% |HH> component
+#model_unbalanced_pairs(50)
