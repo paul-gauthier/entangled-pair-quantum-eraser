@@ -317,11 +317,11 @@ def demo_pair(initial_state, mzi_hwp_angle, idler_lp_angle, signal_lp_angle):
         (probability expression, visibility expression)
     """
 
-    # Apply a −π/8 rotation to both photons’ polarisation (H,V basis)
-    rot_angle = -pi / 8
+    # Apply a −π/8 rotation to the idler
+    rot_angle = pi / 8
     R_pol = Matrix([[cos(rot_angle), -sin(rot_angle)],
                     [sin(rot_angle),  cos(rot_angle)]])
-    rot_op_signal = TP(I22, R_pol)   # 4×4 acting on signal photon
+    rot_op_signal = TP(I22, I22)   # 4×4 acting on signal photon
     rot_op_idler = TP(I22, R_pol)    # 4×4 acting on idler photon
     rotation_operator = TP(rot_op_signal, rot_op_idler)  # 16×16
     initial_state = rotation_operator * initial_state
@@ -347,7 +347,7 @@ def demo_pair(initial_state, mzi_hwp_angle, idler_lp_angle, signal_lp_angle):
     print("#" * 80)
     dump(mzi_hwp_angle, idler_lp_angle, signal_lp_angle)
     show(prob_simplified)  # symbolic probability
-    dump(min_prob.evalf(5), max_prob.evalf(5), visibility.evalf(5))
+    print("VISIBILITY", visibility.evalf(3))
 
     return prob_simplified, visibility
 
@@ -683,7 +683,8 @@ def model_mixed_idler_signals_V():
     visibility = simplify((max_prob - min_prob) / (max_prob + min_prob))
 
     show(prob)
-    dump(min_prob.evalf(5), max_prob.evalf(5), visibility.evalf(5))
+    #dump(min_prob.evalf(5), max_prob.evalf(5), visibility.evalf(5))
+    print("VISIBILITY", visibility.evalf(3))
 
     return prob, visibility
 
