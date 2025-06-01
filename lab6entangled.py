@@ -350,7 +350,7 @@ phi_plus_state = (psi_hh + psi_vv) / sqrt(2)  # 16×1 column state
 assert phi_plus_state.norm() == 1
 
 
-hwp_ep = 0 # pi/8 seems to reproduce all the experimental data
+hwp_ep = pi/8 # pi/8 seems to reproduce all the experimental data
 lpi_ep = hwp_ep
 
 
