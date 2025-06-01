@@ -350,13 +350,17 @@ phi_plus_state = (psi_hh + psi_vv) / sqrt(2)  # 16×1 column state
 assert phi_plus_state.norm() == 1
 
 
-mzi_ep = pi/8
-lpi_ep = pi/8
+mzi_ep = pi/16
+lpi_ep = mzi_ep
 
 
 def model_nominal_setup():
     ##############################################################
     # Model the entangled pair quantum eraser in the nominal eraser on & off conditions
+
+    print("=" * 100)
+    print()
+    print("model_nominal_setup")
 
     # Common parameters
     initial_state = phi_plus_state
@@ -376,6 +380,37 @@ def model_nominal_setup():
         mzi_hwp_angle=mzi_hwp_angle,
         idler_lp_angle=idler_lp_angle,
         signal_lp_angle=0,  # 0 = Eraser off
+    )
+
+    expected_prob = (1 - cos(delta)) / 8
+    #assert prob.equals(expected_prob), f"Probability {prob} != expected {expected_prob}"
+
+def model_2025_05_29_lab_session():
+    ##############################################################
+    # Model the entangled pair quantum eraser in the +/- pi/8 eraser on & off conditions
+
+    print("=" * 100)
+    print()
+    print("model_2025_05_29_lab_session")
+
+    # Common parameters
+    initial_state = phi_plus_state
+    mzi_hwp_angle = pi / 4 + mzi_ep  # swap H/V in the upper arm
+    idler_lp_angle = pi / 2 + lpi_ep  # 90 degree = H
+
+    # Proper settings, eraser on at 45
+    prob, visibility = demo_pair(
+        initial_state,
+        mzi_hwp_angle=mzi_hwp_angle,
+        idler_lp_angle=idler_lp_angle,
+        signal_lp_angle=pi/8,  # Eraser on
+    )
+    # Proper settings, eraser off at 0
+    demo_pair(
+        initial_state,
+        mzi_hwp_angle=mzi_hwp_angle,
+        idler_lp_angle=idler_lp_angle,
+        signal_lp_angle=-pi/8,  # Eraser off
     )
 
     expected_prob = (1 - cos(delta)) / 8
@@ -565,6 +600,12 @@ def model_mixed_idler_signals_V():
 
     where Π projects the idler onto the b-path.
     """
+
+    print("=" * 100)
+    print()
+    print("model_mixed_idler_signals_V")
+
+
     # ──────────────────────────────────────────────────────────
     # Input density matrix  ρ_in = |V⟩⟨V|_s ⊗ ½ I₂,i
     psi_s_V = psi_b_V
@@ -607,8 +648,6 @@ def model_mixed_idler_signals_V():
     max_prob = maximum(prob, delta)
     visibility = simplify((max_prob - min_prob) / (max_prob + min_prob))
 
-    print("#" * 80)
-    dump("Mixed idler (density-matrix), signal V")
     show(prob)
     dump(min_prob.evalf(5), max_prob.evalf(5), visibility.evalf(5))
 
@@ -617,5 +656,6 @@ def model_mixed_idler_signals_V():
 
 # model_rotated_pairs()
 model_nominal_setup()
+model_2025_05_29_lab_session()
 model_mixed_idler_signals_V()
 # model_unbalanced_pairs(80)  # Try with 80% |HH> component
