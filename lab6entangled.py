@@ -295,7 +295,7 @@ def coincident_probability(initial_state, theta_val, E_hat_prime_current):
     return probability
 
 
-def demo_pair(initial_state, mzi_hwp_angle, idler_lp_angle, signal_lp_angle, *, signal_rot_angle=0, idler_rot_angle=pi/8):
+def demo_pair(initial_state, mzi_hwp_angle, idler_lp_angle, signal_lp_angle, *, signal_rot_angle=0, idler_rot_angle=0):
     """
     Compute the coincident-detection probability for the given parameters
     and the corresponding interference visibility.
@@ -320,6 +320,9 @@ def demo_pair(initial_state, mzi_hwp_angle, idler_lp_angle, signal_lp_angle, *, 
     tuple
         (probability expression, visibility expression)
     """
+
+    signal_rot_angle=0
+    idler_rot_angle=0
 
     # Optional polarisation rotations applied to the input state
     R_pol_signal = Matrix([[cos(signal_rot_angle), -sin(signal_rot_angle)],
@@ -364,7 +367,10 @@ phi_plus_state = (psi_hh + psi_vv) / sqrt(2)  # 16×1 column state
 assert phi_plus_state.norm() == 1
 
 
-hwp_ep = 0 # pi/8 seems to reproduce all the experimental data
+# pi/8 for both seems to reproduce all the experimental data, except Lab 6 eraser off
+# But this doesn't account for HWP(0) in the lower arm.
+# Actually rotating the signals/idlers would, but doesn't match the data.
+hwp_ep = pi/8
 lpi_ep = hwp_ep
 
 
