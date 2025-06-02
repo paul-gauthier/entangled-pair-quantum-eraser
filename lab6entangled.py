@@ -593,7 +593,7 @@ def model_unbalanced_pairs(percent_HH=80):
 
     # Calculate alpha and beta to ensure normalization: |alpha|^2 + |beta|^2 = 1
     # where |alpha|^2 = percent_HH/100
-    alpha = sqrt(percent_HH / 100)
+    alpha = sqrt(Rational(percent_HH, 100))
     beta = sqrt(1 - alpha**2)  # = sqrt((100-percent_HH)/100)
 
     # Build unbalanced state
@@ -711,6 +711,6 @@ def model_mixed_idler_signals_V(percent_H: float = 50):
 # model_rotated_pairs()
 model_nominal_setup()
 model_2025_05_29_lab_session()
-model_mixed_idler_signals_V()
-model_lab6()
+#model_mixed_idler_signals_V()
+#model_lab6()
 #model_unbalanced_pairs(50)
