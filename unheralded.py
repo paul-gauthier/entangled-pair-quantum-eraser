@@ -109,7 +109,29 @@ def fit_eraser_fraction(*, verbose: bool = True):
     _, Ni_off, _ = _parse_counts(eraser_off)
     _, Ni_on,  Nc_on = _parse_counts(eraser_on)
 
+    # ------------------------------------------------------------------
+    # Stage 1 – fit the ON coincidence trace to extract φ₂, C_c, A_c
+    # ------------------------------------------------------------------
     delta = delta_from_steps(piezo_steps)
+    p0_nc = [np.ptp(Nc_on), np.min(Nc_on), 0.0]  # A_c, C_c, φ₂
+    (A_c, C_c, phi2), _ = curve_fit(
+        lambda d, A, C0, p: C0 + A * (1 + np.cos(d + p)) / 2,
+        delta,
+        Nc_on,
+        p0=p0_nc,
+        sigma=np.sqrt(Nc_on),
+        absolute_sigma=True,
+    )
+    # Normalise parameters
+    if A_c < 0:
+        A_c = -A_c
+        phi2 += np.pi
+    phi2 = (phi2 + np.pi) % (2 * np.pi) - np.pi  # wrap into (−π, π]
+
+    if verbose:
+        print("\nStage-1 fit (coincidences only):")
+        print(f"  φ₂   = {phi2:.3f} rad ({np.degrees(phi2):.1f}°)")
+        print(f"  C_c = {C_c:.3f}   A_c = {A_c:.3f}")
 
     # Combined data vectors ------------------------------------------------
     x_delta = np.concatenate([delta, delta, delta])
@@ -126,10 +148,13 @@ def fit_eraser_fraction(*, verbose: bool = True):
 
     # ------------------------------------------------------------------
     # Model
-    def _model(x, C1, A1, phi1, C2, A2, phi2, e_off, e_on, Cc, Ac):
+    # ------------------------------------------------------------------
+    # Stage 2 – global model with φ₂, C_c, A_c fixed
+    # ------------------------------------------------------------------
+    def _model(x, C, A1, phi1, A2, e_off, e_on):
         d, who = x
-        Ni1 = C1 + A1 * (1 + np.cos(d + phi1)) / 2
-        Ni2 = C2 + A2 * (1 + np.cos(d + phi2)) / 2
+        Ni1 = C + A1 * (1 + np.cos(d + phi1)) / 2
+        Ni2 = C + A2 * (1 + np.cos(d + phi2)) / 2
 
         out = np.empty_like(d)
 
@@ -139,35 +164,27 @@ def fit_eraser_fraction(*, verbose: bool = True):
 
         out[mask0] = (1 - e_off) * Ni1[mask0] + e_off * Ni2[mask0]
         out[mask1] = (1 -  e_on) * Ni1[mask1] +  e_on * Ni2[mask1]
-        out[mask2] = Cc + Ac * (1 + np.cos(d[mask2] + phi2)) / 2  # same φ₂ branch
+        out[mask2] = C_c + A_c * (1 + np.cos(d[mask2] + phi2)) / 2
         return out
 
     # ------------------------------------------------------------------
     # Initial guesses & bounds
     p0 = [
-        np.mean(Ni_off),           # C1
+        np.mean(Ni_off),           # C
         np.ptp(Ni_off) / 2,        # A1
         0.0,                       # phi1
-        np.mean(Ni_on),            # C2
         np.ptp(Ni_on) / 2,         # A2
-        0.0,                       # phi2
-        0.0,                       # e_off
-        0.1,                       # e_on
-        np.mean(Nc_on) * 0.1,      # Cc
-        np.ptp(Nc_on) / 2,         # Ac
+        0.05,                      # e_off
+        0.10,                      # e_on
     ]
 
     lower = [
-        0, 0, -2 * np.pi,
-        0, 0, -2 * np.pi,
-        0, 0,
-        0, 0,
+        0, 0, -np.pi,
+        0, 0, 0,
     ]
     upper = [
-        np.inf, np.inf, 2 * np.pi,
-        np.inf, np.inf, 2 * np.pi,
-        1, 1,
-        np.inf, np.inf,
+        np.inf, np.inf, np.pi,
+        np.inf, 1, 1,
     ]
 
     # ------------------------------------------------------------------
@@ -192,21 +209,18 @@ def fit_eraser_fraction(*, verbose: bool = True):
     # ------------------------------------------------------------------
     # Console output
     if verbose:
-        names = ["C1", "A1", "phi1",
-                 "C2", "A2", "phi2",
-                 "e_off", "e_on",
-                 "Cc", "Ac"]
+        names = ["C", "A1", "phi1", "A2", "e_off", "e_on"]
         print("\nFit results (±1σ):")
         for n, v, e in zip(names, popt, perr):
             unit = " rad" if "phi" in n else ""
             print(f"  {n:>5} = {v:8.3f} ± {e:.3f}{unit}")
         print(f"\nχ² / dof = {chi2_val:.1f} / {dof_val} = {chi2_val/dof_val:.2f}")
-        print(f"\n⇒ e_off = {popt[6]:.3f} ± {perr[6]:.3f}")
-        print(f"⇒ e_on  = {popt[7]:.3f} ± {perr[7]:.3f}\n")
+        print(f"\n⇒ e_off = {popt[4]:.3f} ± {perr[4]:.3f}")
+        print(f"⇒ e_on  = {popt[5]:.3f} ± {perr[5]:.3f}\n")
 
     return {
-        "e_off": (popt[6], perr[6]),
-        "e_on":  (popt[7], perr[7]),
+        "e_off": (popt[4], perr[4]),
+        "e_on":  (popt[5], perr[5]),
         "popt": popt,
         "perr": perr,
         "chi2": chi2_val,
