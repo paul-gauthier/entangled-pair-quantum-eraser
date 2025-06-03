@@ -9,7 +9,7 @@ Mach–Zehnder–based entangled pair quantum-eraser experiment.
 ## Docs
 
 - [Description of the experiment, relevant theory](render/lab-6-entangled.pdf) 
-- [Results](render/2025-05-29-visibility.pdf) that show erasing which-way information from the signal photon (by changing the signal linear polarizer angle) controls self-interference of the idler in the MZI.
+- [Results](render/2025-06-02-visibility.pdf) that show erasing which-way information from the signal photon (by changing the signal linear polarizer angle) controls self-interference of the idler in the MZI.
 
 ## SymPy model of experiment as quantum operator
 
