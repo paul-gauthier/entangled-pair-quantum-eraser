@@ -97,36 +97,37 @@ _, Ni_off, _ = _parse_counts(eraser_off)
 # ---------------------------------------------------------------------------
 # Model definitions
 # ---------------------------------------------------------------------------
-def _ni1(delta, C1, A1, phi1):
-    return C1 + A1 * (1 + np.cos(delta + phi1)) / 2
+def _ni1(delta, C1, A, phi1):
+    """Idler population 1 with common amplitude A."""
+    return C1 + A * (1 + np.cos(delta + phi1)) / 2
 
 
-def _ni2(delta, C2, A2, phi2):
-    return C2 + A2 * (1 + np.cos(delta + phi2)) / 2
+def _ni2(delta, C2, A, phi2):
+    """Idler population 2; shares the SAME amplitude A (A₁ = A₂)."""
+    return C2 + A * (1 + np.cos(delta + phi2)) / 2
 
 
-def _ni_total(delta, C1, A1, phi1, C2, A2, phi2, e):
-    """Weighted mixture of the two idler populations."""
-    return (1.0 - e) * _ni1(delta, C1, A1, phi1) + e * _ni2(delta, C2, A2, phi2)
+def _ni_total(delta, C1, A, phi1, C2, phi2, e):
+    """Weighted mixture with shared amplitude A (A₁ = A₂)."""
+    return (1.0 - e) * _ni1(delta, C1, A, phi1) + e * _ni2(delta, C2, A, phi2)
 
 
 def _joint_model(
     delta_concat: np.ndarray,
     C1,
-    A1,
+    A,
     phi1,
     C2,
-    A2,
     phi2,
     e_on,
     e_off,
     npts: int,
 ):
-    """Model for concatenated δ arrays of the two runs."""
+    """Model for concatenated δ arrays with A₁ = A₂."""
     delta_on = delta_concat[:npts]
     delta_off = delta_concat[npts:]
-    pred_on = _ni_total(delta_on, C1, A1, phi1, C2, A2, phi2, e_on)
-    pred_off = _ni_total(delta_off, C1, A1, phi1, C2, A2, phi2, e_off)
+    pred_on = _ni_total(delta_on, C1, A, phi1, C2, phi2, e_on)
+    pred_off = _ni_total(delta_off, C1, A, phi1, C2, phi2, e_off)
     return np.concatenate([pred_on, pred_off])
 
 
@@ -151,18 +152,18 @@ def fit_eraser_fraction(
 
     # Initial guesses
     p0 = [
-        Ni_off.min(), Ni_off.ptp(), 0.0,       # C1, A1, φ1
-        Ni_on.min(), Ni_on.ptp(),  0.0,        # C2, A2, φ2
+        Ni_off.min(), Ni_off.ptp(), 0.0,       # C1, A (shared), φ1
+        Ni_on.min(), 0.0,                      # C2, φ2
         0.5, 0.0,                              # e_on, e_off
     ]
     bounds = (
-        [0, 0, -np.pi,   0, 0, -np.pi,   0, 0],             # lower
-        [np.inf, np.inf, np.pi,  np.inf, np.inf, np.pi, 1, 1],  # upper
+        [0, 0, -np.pi,   0, -np.pi,   0, 0],          # lower
+        [np.inf, np.inf, np.pi,  np.inf, np.pi, 1, 1],  # upper
     )
 
     popt, pcov = curve_fit(
-        lambda dcat, C1, A1, phi1, C2, A2, phi2, e_on, e_off: _joint_model(
-            dcat, C1, A1, phi1, C2, A2, phi2, e_on, e_off, npts
+        lambda dcat, C1, A, phi1, C2, phi2, e_on, e_off: _joint_model(
+            dcat, C1, A, phi1, C2, phi2, e_on, e_off, npts
         ),
         delta_cat,
         Ni_cat,
@@ -174,7 +175,7 @@ def fit_eraser_fraction(
     )
 
     perr = np.sqrt(np.diag(pcov))
-    names = ("C1", "A1", "phi1", "C2", "A2", "phi2", "e_on", "e_off")
+    names = ("C1", "A", "phi1", "C2", "phi2", "e_on", "e_off")
     results = {k: v for k, v in zip(names, popt)}
     results_err = {f"{k}_err": v for k, v in zip(names, perr)}
 
