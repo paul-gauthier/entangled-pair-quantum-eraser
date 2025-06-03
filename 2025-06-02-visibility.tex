@@ -32,9 +32,9 @@
 \toprule
 Condition & \makecell{Signal \\ LP angle} & \makecell{Idler self-interference \\ visibility (V)} \\
 \midrule
-Signal Blocked     & N/A & 0.023 \\
 Eraser On          & $45^\circ$  & 0.577 \\
 Eraser Off         & $0^\circ$ & 0.121 \\
+Signal Blocked     & Blocked & 0.023 \\
 \bottomrule
 \end{tabular}
 \caption{
@@ -43,24 +43,12 @@ Eraser Off         & $0^\circ$ & 0.121 \\
   in the entangled quantum eraser experiment.}
 \end{table}
 
-
-\begin{figure}[h!]
-\centering
-\includegraphics[width=0.6\textwidth]{coincidence_counts_signal_blocked.pdf}
-\caption{
-  With the signal beam completely blocked, no which-way information is available,
-  but the very low visibility ($V=0.023$) indicates minimal interference due to
-  lack of entanglement correlation. Coincidence counts vs Phase Delay with signal blocked.
-}
-\end{figure}
-
 \begin{figure}[h!]
 \centering
 \includegraphics[width=0.6\textwidth]{coincidence_counts_eraser_on.pdf}
 \caption{
-  Erasing which-way information from the signal photons
-  produced high visibility ($V=0.577$) self-interference of the idlers in the MZI.
-  Coincidence counts vs Phase Delay with the eraser on.
+  Erasing which-way info from the signals
+  produced high visibility ($V=0.577$) idler self-interference.
 }
 \end{figure}
 
@@ -73,6 +61,16 @@ Eraser Off         & $0^\circ$ & 0.121 \\
   prevented self-interference of the idlers in the MZI,
   resulting in low visibility ($V=0.121$).
   Coincidence counts vs Phase Delay with the eraser off.
+}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.6\textwidth]{coincidence_counts_signal_blocked.pdf}
+\caption{
+  With the signal beam completely blocked, no which-way information is available,
+  but the very low visibility ($V=0.023$) indicates minimal interference due to
+  lack of entanglement correlation. Coincidence counts vs Phase Delay with signal blocked.
 }
 \end{figure}
 
