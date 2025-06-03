@@ -41,35 +41,48 @@ if __name__ == "__main__":
     parsed_data = np.array(data_rows)
 
     piezo_steps = parsed_data[:, 0] # Already step values
-    Nc_off = parsed_data[:, 2]
-    Nc_on = parsed_data[:, 1]
+    Nc_signal_blocked = parsed_data[:, 1]
+    Nc_eraser_on = parsed_data[:, 2]
+    Nc_eraser_off = parsed_data[:, 3]
 
-    # Plot for "Eraser off"
+    # Plot for "Signal blocked"
     plot_coincidence_counts_only(
         piezo_steps,
-        Nc_off,
-        output_filename="coincidence_counts_eraser_off.pdf",
-        label_suffix="eraser-off"
+        Nc_signal_blocked,
+        output_filename="coincidence_counts_signal_blocked.pdf",
+        label_suffix="signal-blocked"
     )
-    # Plot for "Eraser off"
     plot_coincidence_counts_only(
         piezo_steps,
-        Nc_off,
-        output_filename="coincidence_counts_eraser_off.png",
-        label_suffix="eraser-off"
+        Nc_signal_blocked,
+        output_filename="coincidence_counts_signal_blocked.png",
+        label_suffix="signal-blocked"
     )
 
     # Plot for "Eraser on"
     plot_coincidence_counts_only(
         piezo_steps,
-        Nc_on,
+        Nc_eraser_on,
         output_filename="coincidence_counts_eraser_on.pdf",
         label_suffix="eraser-on"
     )
-    # Plot for "Eraser on"
     plot_coincidence_counts_only(
         piezo_steps,
-        Nc_on,
+        Nc_eraser_on,
         output_filename="coincidence_counts_eraser_on.png",
         label_suffix="eraser-on"
+    )
+
+    # Plot for "Eraser off"
+    plot_coincidence_counts_only(
+        piezo_steps,
+        Nc_eraser_off,
+        output_filename="coincidence_counts_eraser_off.pdf",
+        label_suffix="eraser-off"
+    )
+    plot_coincidence_counts_only(
+        piezo_steps,
+        Nc_eraser_off,
+        output_filename="coincidence_counts_eraser_off.png",
+        label_suffix="eraser-off"
     )
