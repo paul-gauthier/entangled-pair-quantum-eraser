@@ -50,13 +50,13 @@ if __name__ == "__main__":
         piezo_steps,
         Nc_signal_blocked,
         output_filename="coincidence_counts_signal_blocked.pdf",
-        label_suffix="signal-blocked"
+        label_suffix="Idler counts, signal-blocked"
     )
     plot_coincidence_counts_only(
         piezo_steps,
         Nc_signal_blocked,
         output_filename="coincidence_counts_signal_blocked.png",
-        label_suffix="signal-blocked"
+        label_suffix="Idler counts, signal-blocked"
     )
 
     # Plot for "Eraser on"
@@ -64,13 +64,13 @@ if __name__ == "__main__":
         piezo_steps,
         Nc_eraser_on,
         output_filename="coincidence_counts_eraser_on.pdf",
-        label_suffix="eraser-on"
+        label_suffix="Coincidence counts, eraser-on"
     )
     plot_coincidence_counts_only(
         piezo_steps,
         Nc_eraser_on,
         output_filename="coincidence_counts_eraser_on.png",
-        label_suffix="eraser-on"
+        label_suffix="Coincidence counts, eraser-on"
     )
 
     # Plot for "Eraser off"
@@ -78,11 +78,11 @@ if __name__ == "__main__":
         piezo_steps,
         Nc_eraser_off,
         output_filename="coincidence_counts_eraser_off.pdf",
-        label_suffix="eraser-off"
+        label_suffix="Coincidence counts, eraser-off"
     )
     plot_coincidence_counts_only(
         piezo_steps,
         Nc_eraser_off,
         output_filename="coincidence_counts_eraser_off.png",
-        label_suffix="eraser-off"
+        label_suffix="Coincidence counts, eraser-off"
     )

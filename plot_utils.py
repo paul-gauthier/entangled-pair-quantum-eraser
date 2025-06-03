@@ -307,20 +307,20 @@ def plot_coincidence_counts_only(
     # Figure & axes
     fig, ax = plt.subplots(1, 1, figsize=(10, 5))
 
-    title = "Coincidence Counts vs Phase Delay"
+    title = "Counts vs Phase Delay"
     if label_suffix:
         title += f": {label_suffix}"
     fig.suptitle(title, fontsize=20)
 
     # Plot Nc
-    ax.set_ylabel(r"Coincidence Counts/sec", fontsize=18)
+    ax.set_ylabel(r"Counts/sec", fontsize=18)
     ax.errorbar(
         delta,
         Nc,
         yerr=Nc_err,
         fmt="x",
         color=color_nc,
-        label=fr"Coincidence ($N_{{c,{label_suffix}}})$, $V={V_vis:.3f}$) with fit",
+        label=fr"{label_suffix}, $V={V_vis:.3f}$) with fit",
         capsize=3,
     )
     ax.plot(delta_fine, Nc_fit_curve, linestyle="--", color=color_nc, lw=1)
