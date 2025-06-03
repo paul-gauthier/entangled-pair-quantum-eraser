@@ -165,13 +165,13 @@ def plot_counts(
     print(f"  Coincidence counts:")
     print(f"    C0 = {C0_fit_c:.2f}")
     print(f"    A = {A_fit_c:.2f}")
-    print(f"    phi = {phi_fit_c:.2f} rad")
+    print(f"    phi = {phi_fit_c:.2f} rad ({np.degrees(phi_fit_c):.1f}°)")
     V_vis_c = A_fit_c / (A_fit_c + 2 * C0_fit_c)
     print(f"    Visibility V = {V_vis_c:.3f}")
     print(f"  Idler counts:")
     print(f"    C0 = {C0_fit_i:.2f}")
     print(f"    A = {A_fit_i:.2f}")
-    print(f"    phi = {phi_fit_i:.2f} rad")
+    print(f"    phi = {phi_fit_i:.2f} rad ({np.degrees(phi_fit_i):.1f}°)")
     V_vis_i = A_fit_i / (A_fit_i + 2 * C0_fit_i)
     print(f"    Visibility V = {V_vis_i:.3f}")
     print(f"  LaTeX: Coincidence: $C_0 = {C0_fit_c:.2f},  A = {A_fit_c:.2f},  \\phi = {phi_fit_c:.2f}\\," \
@@ -326,7 +326,7 @@ def plot_coincidence_counts_only(
     print(f"Fit results for {output_filename}:")
     print(f"  C0 = {C0_fit:.2f}")
     print(f"  A = {A_fit:.2f}")
-    print(f"  phi = {phi_fit:.2f} rad")
+    print(f"  phi = {phi_fit:.2f} rad ({np.degrees(phi_fit):.1f}°)")
     V_vis = A_fit / (A_fit + 2 * C0_fit) if (A_fit + 2 * C0_fit) != 0 else 0
     print(f"  Visibility V = {V_vis:.3f}")
     print(f"  LaTeX: $C_0 = {C0_fit:.2f},  A = {A_fit:.2f},  \\phi = {phi_fit:.2f}\\," \
