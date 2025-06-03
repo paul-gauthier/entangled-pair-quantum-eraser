@@ -69,3 +69,150 @@ N_s	N_i	N_c
 3812	1115	20
 3878	1101	22
 '''
+
+# ---------------------------------------------------------------------------
+# Fitting routine to extract the “eraser fraction” e
+# ---------------------------------------------------------------------------
+from plots import _parse_counts
+
+
+def fit_eraser_fraction(*, verbose: bool = True):
+    """
+    Simultaneously fit
+        • idler singles, eraser *OFF*   (N_i_off)
+        • idler singles, eraser *ON*    (N_i_on)
+        • coincidence counts, eraser ON (N_c_on)
+
+    to the composite model
+
+        N_i1(δ) = C1 + A1 · ½(1 + cos(δ + φ1))
+        N_i2(δ) = C2 + A2 · ½(1 + cos(δ + φ2))
+
+        N_i_total_off(δ) = (1 − e_off) · N_i1 + e_off · N_i2
+        N_i_total_on (δ) = (1 −  e_on) · N_i1 +  e_on · N_i2
+        N_c_total_on  (δ) = Cc + Ac · ½(1 + cos(δ + φ2))          (only branch 2 interferes)
+
+    Returns
+    -------
+    dict
+        {
+            "e_off": (value, σ),
+            "e_on":  (value, σ),
+            "popt":  array of best-fit parameters,
+            "perr":  1-σ uncertainties,
+            "chi2":  χ² value,
+            "dof":   degrees of freedom,
+        }
+    """
+    # ------------------------------------------------------------------
+    # Parse raw TSV tables
+    _, Ni_off, _ = _parse_counts(eraser_off)
+    _, Ni_on,  Nc_on = _parse_counts(eraser_on)
+
+    delta = delta_from_steps(piezo_steps)
+
+    # Combined data vectors ------------------------------------------------
+    x_delta = np.concatenate([delta, delta, delta])
+    y_vals  = np.concatenate([Ni_off, Ni_on, Nc_on])
+    y_err   = np.sqrt(y_vals)                       # Poisson σ ≈ √N
+
+    data_id = np.concatenate([
+        np.zeros_like(delta, dtype=int),            # 0 → Ni_off
+        np.ones_like(delta,  dtype=int),            # 1 → Ni_on
+        np.full_like(delta, 2, dtype=int),          # 2 → Nc_on
+    ])
+
+    xdata = (x_delta, data_id)
+
+    # ------------------------------------------------------------------
+    # Model
+    def _model(x, C1, A1, phi1, C2, A2, phi2, e_off, e_on, Cc, Ac):
+        d, who = x
+        Ni1 = C1 + A1 * (1 + np.cos(d + phi1)) / 2
+        Ni2 = C2 + A2 * (1 + np.cos(d + phi2)) / 2
+
+        out = np.empty_like(d)
+
+        mask0 = who == 0
+        mask1 = who == 1
+        mask2 = who == 2
+
+        out[mask0] = (1 - e_off) * Ni1[mask0] + e_off * Ni2[mask0]
+        out[mask1] = (1 -  e_on) * Ni1[mask1] +  e_on * Ni2[mask1]
+        out[mask2] = Cc + Ac * (1 + np.cos(d[mask2] + phi2)) / 2  # same φ₂ branch
+        return out
+
+    # ------------------------------------------------------------------
+    # Initial guesses & bounds
+    p0 = [
+        np.mean(Ni_off),           # C1
+        np.ptp(Ni_off) / 2,        # A1
+        0.0,                       # phi1
+        np.mean(Ni_on),            # C2
+        np.ptp(Ni_on) / 2,         # A2
+        0.0,                       # phi2
+        0.0,                       # e_off
+        0.1,                       # e_on
+        np.mean(Nc_on) * 0.1,      # Cc
+        np.ptp(Nc_on) / 2,         # Ac
+    ]
+
+    lower = [
+        0, 0, -2 * np.pi,
+        0, 0, -2 * np.pi,
+        0, 0,
+        0, 0,
+    ]
+    upper = [
+        np.inf, np.inf, 2 * np.pi,
+        np.inf, np.inf, 2 * np.pi,
+        1, 1,
+        np.inf, np.inf,
+    ]
+
+    # ------------------------------------------------------------------
+    # Fit
+    popt, pcov = curve_fit(
+        _model,
+        xdata,
+        y_vals,
+        p0=p0,
+        bounds=(lower, upper),
+        sigma=y_err,
+        absolute_sigma=True,
+        maxfev=10_000,
+    )
+    perr = np.sqrt(np.diag(pcov))
+
+    # Goodness-of-fit
+    resid = (y_vals - _model(xdata, *popt)) / y_err
+    chi2_val = np.sum(resid ** 2)
+    dof_val = y_vals.size - popt.size
+
+    # ------------------------------------------------------------------
+    # Console output
+    if verbose:
+        names = ["C1", "A1", "phi1",
+                 "C2", "A2", "phi2",
+                 "e_off", "e_on",
+                 "Cc", "Ac"]
+        print("\nFit results (±1σ):")
+        for n, v, e in zip(names, popt, perr):
+            unit = " rad" if "phi" in n else ""
+            print(f"  {n:>5} = {v:8.3f} ± {e:.3f}{unit}")
+        print(f"\nχ² / dof = {chi2_val:.1f} / {dof_val} = {chi2_val/dof_val:.2f}")
+        print(f"\n⇒ e_off = {popt[6]:.3f} ± {perr[6]:.3f}")
+        print(f"⇒ e_on  = {popt[7]:.3f} ± {perr[7]:.3f}\n")
+
+    return {
+        "e_off": (popt[6], perr[6]),
+        "e_on":  (popt[7], perr[7]),
+        "popt": popt,
+        "perr": perr,
+        "chi2": chi2_val,
+        "dof":  dof_val,
+    }
+
+
+if __name__ == "__main__":
+    fit_eraser_fraction()
