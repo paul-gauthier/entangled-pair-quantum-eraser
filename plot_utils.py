@@ -111,39 +111,73 @@ def plot_counts(
     # ------------------------------------------------------------------
     # Fit coincidence counts with ½(1+cos(δ+φ)) model
     # ------------------------------------------------------------------
-    p0 = [np.ptp(Nc), np.min(Nc), 0.0]  # initial guesses
-    popt, _ = curve_fit(
+    p0_c = [np.ptp(Nc), np.min(Nc), 0.0]  # initial guesses
+    popt_c, _ = curve_fit(
         _cos_model,
         delta,
         Nc,
-        p0=p0,
+        p0=p0_c,
         sigma=Nc_err,
         absolute_sigma=True,
     )
 
     # ------------------------------------------------------------------
-    # Convert optimiser output to physically meaningful parameters
+    # Convert optimiser output to physically meaningful parameters (Nc)
     # ------------------------------------------------------------------
-    A_fit, C0_fit, phi_fit = popt
-    if A_fit < 0:               # enforce non-negative modulation depth
-        A_fit = -A_fit
-        phi_fit += np.pi        # keep model invariant
-        C0_fit -= A_fit         # compensate offset to preserve model
+    A_fit_c, C0_fit_c, phi_fit_c = popt_c
+    if A_fit_c < 0:               # enforce non-negative modulation depth
+        A_fit_c = -A_fit_c
+        phi_fit_c += np.pi        # keep model invariant
+        C0_fit_c -= A_fit_c         # compensate offset to preserve model
     # Wrap phase into (−π, π]
-    phi_fit = (phi_fit + np.pi) % (2 * np.pi) - np.pi
+    phi_fit_c = (phi_fit_c + np.pi) % (2 * np.pi) - np.pi
+
+    # ------------------------------------------------------------------
+    # Fit idler counts with ½(1+cos(δ+φ)) model
+    # ------------------------------------------------------------------
+    p0_i = [np.ptp(Ni), np.min(Ni), 0.0]  # initial guesses
+    popt_i, _ = curve_fit(
+        _cos_model,
+        delta,
+        Ni,
+        p0=p0_i,
+        sigma=Ni_err,
+        absolute_sigma=True,
+    )
+
+    # ------------------------------------------------------------------
+    # Convert optimiser output to physically meaningful parameters (Ni)
+    # ------------------------------------------------------------------
+    A_fit_i, C0_fit_i, phi_fit_i = popt_i
+    if A_fit_i < 0:               # enforce non-negative modulation depth
+        A_fit_i = -A_fit_i
+        phi_fit_i += np.pi        # keep model invariant
+        C0_fit_i -= A_fit_i         # compensate offset to preserve model
+    # Wrap phase into (−π, π]
+    phi_fit_i = (phi_fit_i + np.pi) % (2 * np.pi) - np.pi
 
     delta_fine = np.linspace(delta.min(), delta.max(), 500)
-    Nc_fit = _cos_model(delta_fine, A_fit, C0_fit, phi_fit)
+    Nc_fit = _cos_model(delta_fine, A_fit_c, C0_fit_c, phi_fit_c)
+    Ni_fit = _cos_model(delta_fine, A_fit_i, C0_fit_i, phi_fit_i)
 
     # Print fitted parameters
     print(f"Fit results for {output_filename}:")
-    print(f"  C0 = {C0_fit:.2f}")
-    print(f"  A = {A_fit:.2f}")
-    print(f"  phi = {phi_fit:.2f} rad")
-    V_vis = A_fit / (A_fit + 2 * C0_fit)
-    print(f"  Visibility V = {V_vis:.3f}")
-    print(f"  LaTeX: $C_0 = {C0_fit:.2f},  A = {A_fit:.2f},  \\phi = {phi_fit:.2f}\\," \
-          f"\\text{{rad}}$. and $V = {V_vis:.3f}$")
+    print(f"  Coincidence counts:")
+    print(f"    C0 = {C0_fit_c:.2f}")
+    print(f"    A = {A_fit_c:.2f}")
+    print(f"    phi = {phi_fit_c:.2f} rad")
+    V_vis_c = A_fit_c / (A_fit_c + 2 * C0_fit_c)
+    print(f"    Visibility V = {V_vis_c:.3f}")
+    print(f"  Idler counts:")
+    print(f"    C0 = {C0_fit_i:.2f}")
+    print(f"    A = {A_fit_i:.2f}")
+    print(f"    phi = {phi_fit_i:.2f} rad")
+    V_vis_i = A_fit_i / (A_fit_i + 2 * C0_fit_i)
+    print(f"    Visibility V = {V_vis_i:.3f}")
+    print(f"  LaTeX: Coincidence: $C_0 = {C0_fit_c:.2f},  A = {A_fit_c:.2f},  \\phi = {phi_fit_c:.2f}\\," \
+          f"\\text{{rad}}$. and $V = {V_vis_c:.3f}$")
+    print(f"  LaTeX: Idler: $C_0 = {C0_fit_i:.2f},  A = {A_fit_i:.2f},  \\phi = {phi_fit_i:.2f}\\," \
+          f"\\text{{rad}}$. and $V = {V_vis_i:.3f}$")
 
     # Style ------------------------------------------------------------------
     plt.rcParams.update({"font.size": 16})
@@ -165,8 +199,16 @@ def plot_counts(
         fmt="s",
         color=color_ni,
         #linestyle=":",
-        label=fr"Idler ($N_{{i,{label_suffix}}}$)",
+        label=fr"Idler ($N_{{i,{label_suffix}}}$, $V={V_vis_i:.3f}$) with fit",
         capsize=3,
+    )
+    # Overlay best-fit cosine curve for idler
+    ax1.plot(
+        delta_fine,
+        Ni_fit,
+        linestyle="--",
+        color=color_ni,
+        lw=1,
     )
     ax1.grid(True, linestyle=":", alpha=0.7)
     ax1.legend(loc="center right")
@@ -180,7 +222,7 @@ def plot_counts(
         fmt="x",
         color=color_nc,
         #linestyle="--",
-        label=fr"Coincidence ($N_{{c,{label_suffix}}}$, $V={V_vis:.3f}$) with fit",
+        label=fr"Coincidence ($N_{{c,{label_suffix}}}$, $V={V_vis_c:.3f}$) with fit",
         capsize=3,
     )
     # Overlay best-fit cosine curve
