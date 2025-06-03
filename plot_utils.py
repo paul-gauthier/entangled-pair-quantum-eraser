@@ -156,18 +156,8 @@ def plot_counts(
     if label_suffix:
         fig.suptitle(f"Counts vs Phase Delay: {label_suffix}", fontsize=20)
 
-    # Top panel: Ns & Ni -----------------------------------------------------
+    # Top panel: Ni only -----------------------------------------------------
     ax1.set_ylabel(r"Counts/sec", fontsize=18)
-    ax1.errorbar(
-        delta,
-        Ns,
-        yerr=Ns_err,
-        fmt="o",
-        color=color_ns,
-        #linestyle="-",
-        label=fr"Signal ($N_{{s,{label_suffix}}}$)",
-        capsize=3,
-    )
     ax1.errorbar(
         delta,
         Ni,
