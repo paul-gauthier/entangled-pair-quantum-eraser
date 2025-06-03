@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
+# Comparing Signal and Idler
 data = """
 Angle	Signal	Idler
 -45	4815	782
@@ -13,6 +14,20 @@ Angle	Signal	Idler
 90	10049	1582
 112.5	8428	1046
 135	5127	621
+"""
+
+# Both runs of the idler (3sec acq, 8sec acq)
+data = """
+Angle	Idler	Idler
+-45	805	782
+-22.5	411	427
+0	715	720
+22.5	1263	1393
+45	1939	1918
+67.5	2020	1938
+90	1668	1582
+112.5	1110	1046
+135	600	621
 """
 
 def parse_data(data_str):
