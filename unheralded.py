@@ -7,6 +7,7 @@ import numpy as np
 from scipy.optimize import curve_fit, least_squares
 
 from plot_utils import delta_from_steps
+import matplotlib.pyplot as plt
 
 # Piezo-stage positions (common to both data sets)
 piezo_steps = np.array([
@@ -181,3 +182,58 @@ if __name__ == "__main__":
     print(f"  class-2  D2={D2:.1f}, B2={B2:.1f}, ψ2={psi2:.2f} rad ({deg(psi2):.1f}°)")
     dof = len(_residual(p0)) - res.x.size
     print(f"Reduced χ² = {res.cost / dof:.2f}")
+
+    # ------------------------------------------------------------------
+    # Plot all four datasets with best-fit model curves
+    # ------------------------------------------------------------------
+    delta_fine = np.linspace(delta.min(), delta.max(), 500)
+
+    Ni_fit_off = _ni_total(delta_fine, e_off_fit, C1, A1, phi1, C2, A2, phi2)
+    Ni_fit_on  = _ni_total(delta_fine, e_on_fit,  C1, A1, phi1, C2, A2, phi2)
+    Nc_fit_off = _nc_total(delta_fine, e_off_fit, D1, B1, psi1, D2, B2, psi2)
+    Nc_fit_on  = _nc_total(delta_fine, e_on_fit,  D1, B1, psi1, D2, B2, psi2)
+
+    fig, axes = plt.subplots(2, 2, sharex=True, figsize=(12, 8))
+
+    # Idler OFF
+    axes[0, 0].errorbar(delta, Ni_off, yerr=np.sqrt(Ni_off), fmt="o",
+                        color="tab:green", label="Ni off (data)")
+    axes[0, 0].plot(delta_fine, Ni_fit_off, color="black", label="model")
+    axes[0, 0].set_title("Idler OFF")
+    axes[0, 0].legend()
+    axes[0, 0].grid(True, linestyle=":")
+
+    # Idler ON
+    axes[0, 1].errorbar(delta, Ni_on, yerr=np.sqrt(Ni_on), fmt="o",
+                        color="tab:green", label="Ni on (data)")
+    axes[0, 1].plot(delta_fine, Ni_fit_on, color="black", label="model")
+    axes[0, 1].set_title("Idler ON")
+    axes[0, 1].legend()
+    axes[0, 1].grid(True, linestyle=":")
+
+    # Coincidence OFF
+    axes[1, 0].errorbar(delta, Nc_off, yerr=np.sqrt(Nc_off), fmt="o",
+                        color="tab:red", label="Nc off (data)")
+    axes[1, 0].plot(delta_fine, Nc_fit_off, color="black", label="model")
+    axes[1, 0].set_title("Coincidence OFF")
+    axes[1, 0].legend()
+    axes[1, 0].grid(True, linestyle=":")
+
+    # Coincidence ON
+    axes[1, 1].errorbar(delta, Nc_on, yerr=np.sqrt(Nc_on), fmt="o",
+                        color="tab:red", label="Nc on (data)")
+    axes[1, 1].plot(delta_fine, Nc_fit_on, color="black", label="model")
+    axes[1, 1].set_title("Coincidence ON")
+    axes[1, 1].legend()
+    axes[1, 1].grid(True, linestyle=":")
+
+    for ax in axes[1]:
+        ax.set_xlabel("Phase delay δ (rad)")
+    for ax in axes[:, 0]:
+        ax.set_ylabel("Counts")
+
+    fig.suptitle("Quantum Eraser: Data and Best-Fit Model", fontsize=16)
+    fig.tight_layout(rect=[0, 0, 1, 0.95])
+    output_plot = "all_counts_with_model_fits.pdf"
+    fig.savefig(output_plot)
+    print(f"Combined plot saved to {output_plot}")
