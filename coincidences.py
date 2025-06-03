@@ -2,41 +2,31 @@ import numpy as np
 from plot_utils import plot_coincidence_counts_only
 import matplotlib.pyplot as plt
 data = """
-Piezo motor position	Eraser off	Eraser on
-0	21	22
-2	16	16
-4	23	16
-6	20	16
-8	22	23
-10	20	28
-12	22	34
-14	22	40
-16	20	42
-18	18	33
-20	20	25
-22	15	24
-24	19	16
-26	20	12
-28	20	16
-30	20	22
-32	20	33
-34	19	38
-36	18	45
-38	22	40
-40	19	37
-42	21	25
-44	20	21
-46	20	17
-48	19	16
-50	19	18
-52	22	26
-54	20	34
-56	22	40
-58	25	42
-60	20	37
-62	25	29
-64	21	21
-66	18	16
+Piezo motor position   Signal blocked   Eraser on      Eraser off
+0	1296	24	21
+2	1322	15	19
+4	1315	11	20
+6	1330	8	19
+8	1366	8	19
+10	1366	11	15
+12	1361	11	18
+14	1352	14	15
+16	1407	21	14
+18	1344	23	19
+20	1314	21	19
+22	1327	21	19
+24	1336	18	18
+26	1333	13	20
+28	1364	8	20
+30	1328	4	17
+32	1374	8	16
+34	1376	12	17
+36	1385	16	17
+38	1365	22	15
+40	1349	22	22
+42	1293	22	18
+44	1306	24	20
+46	1325	19	22
 """
 
 if __name__ == "__main__":
@@ -51,8 +41,8 @@ if __name__ == "__main__":
     parsed_data = np.array(data_rows)
 
     piezo_steps = parsed_data[:, 0] # Already step values
-    Nc_off = parsed_data[:, 1]
-    Nc_on = parsed_data[:, 2]
+    Nc_off = parsed_data[:, 2]
+    Nc_on = parsed_data[:, 1]
 
     # Plot for "Eraser off"
     plot_coincidence_counts_only(
