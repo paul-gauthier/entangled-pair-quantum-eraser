@@ -75,6 +75,7 @@ def fit_and_plot():
     plt.xlabel('Angle (degrees)')
     plt.ylabel('Signal counts')
     plt.title('Signal vs Linear Polarizer Angle')
+    plt.xticks(np.arange(-45, 180, 45))
     plt.legend()
     plt.grid(True, alpha=0.3)
 
@@ -84,6 +85,7 @@ def fit_and_plot():
     plt.xlabel('Angle (degrees)')
     plt.ylabel('Idler counts')
     plt.title('Idler vs Linear Polarizer Angle')
+    plt.xticks(np.arange(-45, 180, 45))
     plt.legend()
     plt.grid(True, alpha=0.3)
 
