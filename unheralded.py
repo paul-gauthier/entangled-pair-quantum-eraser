@@ -6,7 +6,7 @@ from __future__ import annotations
 import numpy as np
 from scipy.optimize import curve_fit, least_squares
 
-from plot_utils import delta_from_steps
+from plot_utils import delta_from_steps, _cos_model
 import matplotlib.pyplot as plt
 
 # Piezo-stage positions (common to both data sets)
@@ -98,3 +98,97 @@ N_i
 1028
 1047
 """
+
+# ---------------------------------------------------------------------------
+# Learn a visibility model from the labelled “eraser-on/off” runs and
+# use it to predict the coincidence-curve visibility of an un-labelled
+# idler-singles data set contained in `novel`.
+# ---------------------------------------------------------------------------
+
+from typing import Tuple
+
+# ------------------------------------------------------------------ #
+# Helpers                                                            #
+# ------------------------------------------------------------------ #
+def _parse_Ni(tsv: str) -> np.ndarray:
+    """
+    Return the idler singles (N_i) column from a TSV block.
+    The block may contain either one numeric column (novel run)
+    or three numeric columns (N_s, N_i, N_c).
+    """
+    rows = [
+        [float(x) for x in line.split()]
+        for line in tsv.strip().splitlines()[1:]  # skip header
+        if line.strip()
+    ]
+    return np.asarray([r[1] if len(r) >= 2 else r[0] for r in rows], dtype=float)
+
+
+def _parse_Nc(tsv: str) -> np.ndarray:
+    """Return coincidence counts (N_c) from a 3-column TSV block."""
+    rows = [
+        [float(x) for x in line.split()]
+        for line in tsv.strip().splitlines()[1:]  # skip header
+        if line.strip()
+    ]
+    return np.asarray([r[2] for r in rows], dtype=float)
+
+
+def _fit_vis_and_phase(counts: np.ndarray) -> Tuple[float, float]:
+    """
+    Fit `counts` with the cosine model and return
+    (visibility, fitted phase φ wrapped into (−π, π]).
+    """
+    delta = delta_from_steps(piezo_steps)
+    p0 = [np.ptp(counts), np.min(counts), 0.0]
+    A, C0, phi = curve_fit(
+        _cos_model,
+        delta,
+        counts,
+        p0=p0,
+        sigma=np.sqrt(counts),
+        absolute_sigma=True,
+    )[0]
+    # enforce positive modulation depth
+    if A < 0:
+        A, phi, C0 = -A, phi + np.pi, C0 - A
+    phi = (phi + np.pi) % (2 * np.pi) - np.pi
+    visibility = A / (A + 2 * C0) if (A + 2 * C0) != 0 else 0.0
+    return visibility, phi
+
+
+# ------------------------------------------------------------------ #
+# Training data (“eraser on/off”)                                    #
+# ------------------------------------------------------------------ #
+Ni_on = _parse_Ni(eraser_on)
+Ni_off = _parse_Ni(eraser_off)
+Nc_on = _parse_Nc(eraser_on)
+Nc_off = _parse_Nc(eraser_off)
+
+Vi_on, phi_on = _fit_vis_and_phase(Ni_on)
+Vi_off, phi_off = _fit_vis_and_phase(Ni_off)
+Vc_on, _ = _fit_vis_and_phase(Nc_on)
+Vc_off, _ = _fit_vis_and_phase(Nc_off)
+
+# Decision boundary and target visibilities
+_phi_thresh = (phi_on + phi_off) / 2
+_high_vis = Vc_on if phi_on > phi_off else Vc_off
+_low_vis = Vc_off if phi_on > phi_off else Vc_on
+
+
+def predict_Vc_from_Ni(Ni: np.ndarray) -> float:
+    """
+    Predict the visibility of the coincidence curve that would accompany
+    an idler-singles trace `Ni`.
+    """
+    _, phi = _fit_vis_and_phase(Ni)
+    return _high_vis if phi > _phi_thresh else _low_vis
+
+
+# ------------------------------------------------------------------ #
+# Stand-alone usage                                                  #
+# ------------------------------------------------------------------ #
+if __name__ == "__main__":
+    Ni_novel = _parse_Ni(novel)
+    Vc_pred = predict_Vc_from_Ni(Ni_novel)
+    print(f"Predicted coincidence visibility for the novel run: {Vc_pred:.3f}")
