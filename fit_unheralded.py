@@ -45,6 +45,19 @@ def _parse_counts(tsv: str):
 Ns_on,  Ni_on,  Nc_on  = _parse_counts(unheralded.eraser_on)
 Ns_off, Ni_off, Nc_off = _parse_counts(unheralded.eraser_off)
 
+# ---------------------------------------------------------------------------
+#  Novel idler-singles data (no coincidence trace)
+# ---------------------------------------------------------------------------
+novel_f_before_scale: float = 0.5  # scaling factor applied to f_before for novel data
+Ni_novel = np.array(
+    [
+        float(x)
+        for x in unheralded.novel.strip().splitlines()[1:]  # skip header
+        if x.strip()
+    ],
+    dtype=float,
+)
+
 # Common phase-delay array
 delta = delta_from_steps(unheralded.piezo_steps)
 
@@ -63,7 +76,7 @@ def _residuals(params: np.ndarray) -> np.ndarray:
                   e_on,    φ_on,
                   e_off,   φ_off]
     """
-    f_before, g, phi_c, e_on, phi_on, e_off, phi_off = params
+    f_before, g, phi_c, e_on, phi_on, e_off, phi_off, e_novel, phi_novel = params
 
     one_minus_fb = 1.0 - f_before
 
@@ -79,7 +92,17 @@ def _residuals(params: np.ndarray) -> np.ndarray:
     res_Ni_off = (Ni_off - Ni_off_model) / np.sqrt(Ni_off + 1.0)
     res_Nc_off = (Nc_off - Nc_off_model) / np.sqrt(Nc_off + 1.0)
 
-    return np.concatenate([res_Ni_on, res_Nc_on, res_Ni_off, res_Nc_off])
+    # --- novel idler singles ---------------------------------------------
+    f_before_scaled = f_before * novel_f_before_scale
+    one_minus_fb_scaled = 1.0 - f_before_scaled
+    Ni_novel_model = 0.5 * R_FIXED * (
+        1 + one_minus_fb_scaled * e_novel * np.cos(delta + phi_novel)
+    )
+    res_Ni_novel = (Ni_novel - Ni_novel_model) / np.sqrt(Ni_novel + 1.0)
+
+    return np.concatenate(
+        [res_Ni_on, res_Nc_on, res_Ni_off, res_Nc_off, res_Ni_novel]
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -97,21 +120,53 @@ def fit_parameters():
 
     e_on_0  = _visibility(Nc_on)
     e_off_0 = max(_visibility(Nc_off), 0.02)  # keep away from zero for stability
+    e_novel_0 = max(_visibility(Ni_novel), 0.02)
 
-    phi_on_0  = 0.0
-    phi_off_0 = 0.0
+    phi_on_0   = 0.0
+    phi_off_0  = 0.0
+    phi_novel_0 = 0.0
 
-    p0 = np.array([f_before_0, g_0, phi_c_0,
-                   e_on_0,     phi_on_0,
-                   e_off_0,    phi_off_0])
+    p0 = np.array(
+        [
+            f_before_0,
+            g_0,
+            phi_c_0,
+            e_on_0,
+            phi_on_0,
+            e_off_0,
+            phi_off_0,
+            e_novel_0,
+            phi_novel_0,
+        ]
+    )
 
     # Bounds:   f_before, g in [0,1];  e in [0,1];  phases in [-π, π]
-    lower = np.array([0.0, 0.0, -math.pi,
-                      0.0, -math.pi,
-                      0.0, -math.pi])
-    upper = np.array([1.0, 1.0,  math.pi,
-                      1.0,  math.pi,
-                      1.0,  math.pi])
+    lower = np.array(
+        [
+            0.0,
+            0.0,
+            -math.pi,
+            0.0,
+            -math.pi,
+            0.0,
+            -math.pi,
+            0.0,
+            -math.pi,
+        ]
+    )
+    upper = np.array(
+        [
+            1.0,
+            1.0,
+            math.pi,
+            1.0,
+            math.pi,
+            1.0,
+            math.pi,
+            1.0,
+            math.pi,
+        ]
+    )
 
     result = least_squares(
         _residuals,
@@ -138,7 +193,17 @@ def fit_parameters():
     perr = np.sqrt(np.diag(cov))
 
     # Unpack & report -------------------------------------------------------
-    f_before, g, phi_c, e_on, phi_on, e_off, phi_off = result.x
+    (
+        f_before,
+        g,
+        phi_c,
+        e_on,
+        phi_on,
+        e_off,
+        phi_off,
+        e_novel,
+        phi_novel,
+    ) = result.x
     (
         f_before_err,
         g_err,
@@ -147,6 +212,8 @@ def fit_parameters():
         phi_on_err,
         e_off_err,
         phi_off_err,
+        e_novel_err,
+        phi_novel_err,
     ) = perr
     one_minus_fb = 1.0 - f_before
     f_after = 1.0 - g / max(one_minus_fb, 1e-9)
@@ -167,6 +234,14 @@ def fit_parameters():
     print(f"    φ_off          : {phi_off:.3f} ± {phi_off_err:.3f} rad  ({np.degrees(phi_off):.1f}°)")
     print(f"    Predicted V_i  : {(one_minus_fb * e_off):.3f}")
     print(f"    Predicted V_c  : {e_off:.3f}")
+    print("  --- novel idler singles ---")
+    f_before_scaled = f_before * novel_f_before_scale
+    print(f"    e_novel        : {e_novel:.3f} ± {e_novel_err:.3f}")
+    print(
+        f"    φ_novel        : {phi_novel:.3f} ± {phi_novel_err:.3f} rad  "
+        f"({np.degrees(phi_novel):.1f}°)"
+    )
+    print(f"    Predicted V_i  : {(1.0 - f_before_scaled) * e_novel:.3f}")
     print("  ================================================================\n")
 
     return result
@@ -174,7 +249,17 @@ def fit_parameters():
 
 def plot_fitted_traces(result):
     """Plot N_i and N_c (eraser-on / eraser-off) with their best-fit curves."""
-    f_before, g, phi_c, e_on, phi_on, e_off, phi_off = result.x
+    (
+        f_before,
+        g,
+        phi_c,
+        e_on,
+        phi_on,
+        e_off,
+        phi_off,
+        e_novel,
+        phi_novel,
+    ) = result.x
     one_minus_fb = 1.0 - f_before
 
     # Fine grid for smooth model curves
