@@ -265,6 +265,40 @@ def plot_piezo_period_fit(fit_info: dict, dataset_name: str = "", count_type: st
     return fig
 
 
+# ------------------------------------------------------------------
+# Generic “data + fit” plot
+# ------------------------------------------------------------------
+def plot_counts_with_fit(
+    positions: np.ndarray,
+    counts: np.ndarray,
+    fitted: np.ndarray,
+    *,
+    dataset_name: str,
+    count_type: str,
+    output_filename: str | None = None,
+    show: bool = False,
+):
+    """Scatter raw counts and overlay the fitted cosine."""
+    fig, ax = plt.subplots(figsize=(6, 4))
+    ax.scatter(positions, counts, color="tab:blue", label="Data", alpha=0.8)
+    ax.plot(positions, fitted, color="tab:red", label="Fit", lw=2)
+    ax.set_xlabel("Piezo position (steps)")
+    ax.set_ylabel(f"{count_type} counts")
+    ax.set_title(f"{dataset_name} – {count_type} fit")
+    ax.legend()
+    ax.grid(alpha=0.3)
+    fig.tight_layout()
+
+    if output_filename:
+        fig.savefig(output_filename, dpi=150, bbox_inches="tight")
+        print(f"Plot saved to {output_filename}")
+
+    if show:
+        plt.show()
+
+    plt.close(fig)
+
+
 def analyze_all_periods(datasets: List[PhotonicsDataset], count_type: str = 'N_i') -> dict:
     """Analyze piezo periods for all datasets."""
     results = {}
