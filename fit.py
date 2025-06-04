@@ -305,6 +305,13 @@ def analyze_all_periods(datasets: List[PhotonicsDataset], count_type: str = 'N_i
 
     for i, dataset in enumerate(datasets):
         try:
+            # Check if this count type has non-zero values
+            count_values = [dataset.piezo_data[pos][count_type] for pos in dataset.piezo_data.keys()]
+            if all(val == 0 for val in count_values):
+                print(f"Dataset {i+1} ({dataset.name}): Skipping {count_type} - all values are zero")
+                results[i] = None
+                continue
+                
             period, fit_info = determine_piezo_period(dataset, count_type)
             results[i] = {
                 'dataset_name': dataset.name,
@@ -313,9 +320,9 @@ def analyze_all_periods(datasets: List[PhotonicsDataset], count_type: str = 'N_i
                 'r_squared': fit_info['r_squared'],
                 'fit_info': fit_info
             }
-            print(f"Dataset {i+1} ({dataset.name}): Period = {period:.2f} ± {fit_info['period_error']:.2f} steps, R² = {fit_info['r_squared']:.4f}")
+            print(f"Dataset {i+1} ({dataset.name}) {count_type}: Period = {period:.2f} ± {fit_info['period_error']:.2f} steps, R² = {fit_info['r_squared']:.4f}")
         except Exception as e:
-            print(f"Failed to analyze dataset {i+1} ({dataset.name}): {e}")
+            print(f"Failed to analyze dataset {i+1} ({dataset.name}) {count_type}: {e}")
             results[i] = None
 
     return results
@@ -554,31 +561,64 @@ if __name__ == "__main__":
         print("PIEZO PERIOD ANALYSIS")
         print("="*60)
 
-        # Analyze piezo periods for all datasets
+        # Analyze piezo periods for all datasets using N_i
+        print("Analyzing N_i counts:")
         period_results = analyze_all_periods(datasets, count_type="N_i")
 
-        # Calculate average period across all successful fits
-        successful_periods = [r['period'] for r in period_results.values() if r is not None]
-        if successful_periods:
-            avg_period = np.mean(successful_periods)
-            std_period = np.std(successful_periods)
-            print(f"\nAverage period across all datasets: {avg_period:.2f} ± {std_period:.2f} steps per 2π")
+        # Also analyze N_c counts when non-zero
+        print("\nAnalyzing N_c counts:")
+        period_results_nc = analyze_all_periods(datasets, count_type="N_c")
+
+        # Calculate average period across all successful fits (combining N_i and N_c)
+        all_successful_periods = []
+        all_successful_periods.extend([r['period'] for r in period_results.values() if r is not None])
+        all_successful_periods.extend([r['period'] for r in period_results_nc.values() if r is not None])
+        
+        if all_successful_periods:
+            avg_period = np.mean(all_successful_periods)
+            std_period = np.std(all_successful_periods)
+            print(f"\nAverage period across all datasets (N_i + N_c): {avg_period:.2f} ± {std_period:.2f} steps per 2π")
             print(f"This corresponds to {2*np.pi/avg_period:.4f} radians per step")
+            
+        # Show separate averages
+        ni_periods = [r['period'] for r in period_results.values() if r is not None]
+        nc_periods = [r['period'] for r in period_results_nc.values() if r is not None]
+        
+        if ni_periods:
+            print(f"N_i average period: {np.mean(ni_periods):.2f} ± {np.std(ni_periods):.2f} steps per 2π")
+        if nc_periods:
+            print(f"N_c average period: {np.mean(nc_periods):.2f} ± {np.std(nc_periods):.2f} steps per 2π")
 
         # Create output directory based on CSV filename
         csv_basename = os.path.splitext(os.path.basename(csv_filename))[0]
         output_dir = csv_basename
         os.makedirs(output_dir, exist_ok=True)
 
-        # Plot the first successful fit as an example
+        # Plot the first successful N_i fit as an example
         for i, result in period_results.items():
             if result is not None:
                 output_path = os.path.join(
-                    output_dir, f"piezo_period_fit_dataset_{i+1}.pdf"
+                    output_dir, f"piezo_period_fit_Ni_dataset_{i+1}.pdf"
                 )
                 plot_piezo_period_fit(
                     result["fit_info"],
                     dataset_name=result["dataset_name"],
+                    count_type="N_i",
+                    output_filename=output_path,
+                    show=False,
+                )
+                break
+                
+        # Plot the first successful N_c fit as an example
+        for i, result in period_results_nc.items():
+            if result is not None:
+                output_path = os.path.join(
+                    output_dir, f"piezo_period_fit_Nc_dataset_{i+1}.pdf"
+                )
+                plot_piezo_period_fit(
+                    result["fit_info"],
+                    dataset_name=result["dataset_name"],
+                    count_type="N_c",
                     output_filename=output_path,
                     show=False,
                 )
