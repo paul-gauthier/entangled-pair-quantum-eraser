@@ -3,7 +3,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Data from lab-5.tex table
 piezo_steps = np.array([
     0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46,
 ])
