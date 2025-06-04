@@ -3,6 +3,7 @@
 import csv
 import pandas as pd
 import numpy as np
+import sys
 from typing import Dict, List, Tuple, Any, Optional
 
 
@@ -166,12 +167,24 @@ def print_dataset_summary(datasets: List[PhotonicsDataset]):
 
 
 if __name__ == "__main__":
-    # Example usage
-    datasets = parse_photonics_csv("2025-06-02.csv")
-    print_dataset_summary(datasets)
+    if len(sys.argv) != 2:
+        print("Usage: fit.py <csv_filename>", file=sys.stderr)
+        sys.exit(1)
     
-    # Convert to DataFrame for analysis
-    df = datasets_to_dataframe(datasets)
-    print("DataFrame shape:", df.shape)
-    print("\nFirst few rows:")
-    print(df.head())
+    csv_filename = sys.argv[1]
+    
+    try:
+        datasets = parse_photonics_csv(csv_filename)
+        print_dataset_summary(datasets)
+        
+        # Convert to DataFrame for analysis
+        df = datasets_to_dataframe(datasets)
+        print("DataFrame shape:", df.shape)
+        print("\nFirst few rows:")
+        print(df.head())
+    except FileNotFoundError:
+        print(f"Error: File '{csv_filename}' not found.", file=sys.stderr)
+        sys.exit(1)
+    except Exception as e:
+        print(f"Error parsing file: {e}", file=sys.stderr)
+        sys.exit(1)
