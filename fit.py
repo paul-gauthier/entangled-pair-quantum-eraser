@@ -7,6 +7,8 @@ import sys
 import os
 from typing import Dict, List, Tuple, Any, Optional
 from scipy.optimize import curve_fit
+import argparse
+from global_fit import fit_global_model
 import matplotlib.pyplot as plt
 
 
@@ -126,6 +128,10 @@ def parse_photonics_csv(filename: str) -> List[PhotonicsDataset]:
                             break
                 col_idx += 3
 
+    # Update dataset names from metadata if provided
+    for ds in datasets:
+        if 'name' in ds.metadata and isinstance(ds.metadata['name'], str):
+            ds.name = str(ds.metadata['name'])
     return datasets
 
 
@@ -305,11 +311,21 @@ def print_dataset_summary(datasets: List[PhotonicsDataset]):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: fit.py <csv_filename>", file=sys.stderr)
-        sys.exit(1)
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(
+        prog="fit.py",
+        description="Photonics dataset analysis and global model fitting",
+    )
+    parser.add_argument("csv_filename", help="CSV containing the datasets in column format")
+    parser.add_argument(
+        "--fixed-phi",
+        action="store_true",
+        help="Fit a single global φ (phase offset) for all datasets",
+    )
+    args = parser.parse_args()
 
-    csv_filename = sys.argv[1]
+    csv_filename = args.csv_filename
+    fixed_phi = args.fixed_phi
 
     try:
         datasets = parse_photonics_csv(csv_filename)
@@ -335,6 +351,39 @@ if __name__ == "__main__":
             std_period = np.std(successful_periods)
             print(f"\nAverage period across all datasets: {avg_period:.2f} ± {std_period:.2f} steps per 2π")
             print(f"This corresponds to {2*np.pi/avg_period:.4f} radians per step")
+
+            # ---------------------------------------------------------
+            # Global model fitting
+            # ---------------------------------------------------------
+            print("\n" + "="*60)
+            print("GLOBAL MODEL FIT")
+            print("="*60)
+
+            fit_result = fit_global_model(datasets, avg_period, fixed_phi=fixed_phi)
+
+            if not fit_result.success:
+                print("Model fit failed:", fit_result.message, file=sys.stderr)
+            else:
+                fitted_params = fit_result.x
+                param_labels = ["f_before", "f_after", "phi_c"]
+                idx = 3
+                if fixed_phi:
+                    param_labels.append("phi_global")
+                    idx += 1
+                param_labels.extend([f"e_{i}" for i in range(len(datasets))])
+                if not fixed_phi:
+                    param_labels.extend([f"phi_{i}" for i in range(len(datasets))])
+
+                print("\nFitted parameters:")
+                for name, val in zip(param_labels, fitted_params):
+                    if "phi" in name:
+                        print(f"  {name:12s}= {val: .4f} rad ({np.degrees(val):.2f}°)")
+                    else:
+                        print(f"  {name:12s}= {val: .4f}")
+
+                print(f"\nCost (χ²) = {fit_result.cost:.2f}")
+                print(f"DOF       = {fit_result.fun.size - fitted_params.size}")
+                print(f"Reduced χ²= {fit_result.cost / max(1, (fit_result.fun.size - fitted_params.size)):.2f}")
 
         # Create output directory based on CSV filename
         csv_basename = os.path.splitext(os.path.basename(csv_filename))[0]
