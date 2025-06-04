@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import sys
 import os
+import argparse
 from typing import Dict, List, Tuple, Any, Optional
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
@@ -286,6 +287,194 @@ def analyze_all_periods(datasets: List[PhotonicsDataset], count_type: str = 'N_i
     return results
 
 
+def fit_ni_counts(
+    datasets: List[PhotonicsDataset],
+    period_results: dict,
+    *,
+    fixed_phi: bool = False
+) -> Tuple[dict, Optional[float]]:
+    """
+    Fit each dataset’s N_i counts to a cosine.
+
+    When fixed_phi is True all datasets share the same phase (phi);
+    otherwise each dataset gets its own phi.
+
+    Returns (per_dataset_result_dict, phi_global_or_None)
+    """
+    from scipy.optimize import least_squares
+
+    nd = len(datasets)
+    periods = [period_results[i]["period"] for i in range(nd)]
+
+    # Aggregate all N_i data
+    pos_all, cnt_all, idx_all = [], [], []
+    for d_idx, ds in enumerate(datasets):
+        for p in sorted(ds.piezo_data):
+            pos_all.append(p)
+            cnt_all.append(ds.piezo_data[p]["N_i"] - ds.dark_counts.get("N_i", 0))
+            idx_all.append(d_idx)
+
+    pos_all = np.asarray(pos_all, float)
+    cnt_all = np.asarray(cnt_all, float)
+    idx_all = np.asarray(idx_all, int)
+
+    # Initial guesses
+    amps0 = []
+    offs0 = []
+    for ds in datasets:
+        vals = np.array([v["N_i"] for v in ds.piezo_data.values()], float)
+        amps0.append((vals.max() - vals.min()) / 2)
+        offs0.append(vals.mean())
+
+    if fixed_phi:
+        x0 = amps0 + offs0 + [0.0]          # shared phi
+    else:
+        x0 = amps0 + offs0 + [0.0] * nd     # individual phis
+
+    def _res(params):
+        if fixed_phi:
+            amps = params[:nd]
+            offs = params[nd : 2 * nd]
+            phis = [params[-1]] * nd
+        else:
+            amps = params[:nd]
+            offs = params[nd : 2 * nd]
+            phis = params[2 * nd :]
+
+        pred = np.array(
+            [
+                amps[d] * np.cos(2 * np.pi * pos / periods[d] + phis[d]) + offs[d]
+                for pos, d in zip(pos_all, idx_all)
+            ]
+        )
+        return pred - cnt_all
+
+    sol = least_squares(_res, x0)
+
+    if fixed_phi:
+        phi_global = sol.x[-1]
+        phis = [phi_global] * nd
+    else:
+        phi_global = None
+        phis = sol.x[2 * nd :]
+
+    amps = sol.x[:nd]
+    offs = sol.x[nd : 2 * nd]
+
+    ni_fit = {}
+    for d_idx, ds in enumerate(datasets):
+        positions = np.array(sorted(ds.piezo_data))
+        counts = np.array(
+            [ds.piezo_data[p]["N_i"] - ds.dark_counts.get("N_i", 0) for p in positions],
+            float,
+        )
+        fitted = amps[d_idx] * np.cos(
+            2 * np.pi * positions / periods[d_idx] + phis[d_idx]
+        ) + offs[d_idx]
+        ss_res = np.sum((counts - fitted) ** 2)
+        ss_tot = np.sum((counts - counts.mean()) ** 2)
+        r2 = 1 - ss_res / ss_tot if ss_tot else np.nan
+        ni_fit[d_idx] = dict(
+            amplitude=amps[d_idx],
+            offset=offs[d_idx],
+            period=periods[d_idx],
+            phi=phis[d_idx],
+            r_squared=r2,
+        )
+
+    return ni_fit, phi_global
+
+
+def fit_nc_counts(
+    datasets: List[PhotonicsDataset],
+    period_results: dict,
+    ni_fit: dict,
+    *,
+    phi_global: Optional[float] = None,
+) -> Tuple[dict, float]:
+    """
+    Fit all N_c counts with one additional phase offset phi_c shared
+    across every dataset.
+
+    The phase used in each dataset is:
+        base_phi = phi_global (if provided) else ni_fit[i]["phi"]
+    The model is
+        N_c = A * cos(2π x/period + base_phi + phi_c) + offset
+    """
+    from scipy.optimize import least_squares
+
+    nd = len(datasets)
+    periods = [period_results[i]["period"] for i in range(nd)]
+    base_phi = [
+        phi_global if phi_global is not None else ni_fit[i]["phi"] for i in range(nd)
+    ]
+
+    # Aggregate N_c data
+    pos_all, cnt_all, idx_all = [], [], []
+    for d_idx, ds in enumerate(datasets):
+        for p in sorted(ds.piezo_data):
+            pos_all.append(p)
+            cnt_all.append(ds.piezo_data[p]["N_c"] - ds.dark_counts.get("N_c", 0))
+            idx_all.append(d_idx)
+
+    pos_all = np.asarray(pos_all, float)
+    cnt_all = np.asarray(cnt_all, float)
+    idx_all = np.asarray(idx_all, int)
+
+    # Initial guesses
+    amps0 = []
+    offs0 = []
+    for ds in datasets:
+        vals = np.array([v["N_c"] for v in ds.piezo_data.values()], float)
+        amps0.append((vals.max() - vals.min()) / 2)
+        offs0.append(vals.mean())
+
+    x0 = amps0 + offs0 + [0.0]  # phi_c
+
+    def _res(params):
+        amps = params[:nd]
+        offs = params[nd : 2 * nd]
+        phi_c = params[-1]
+        pred = np.array(
+            [
+                amps[d]
+                * np.cos(2 * np.pi * pos / periods[d] + base_phi[d] + phi_c)
+                + offs[d]
+                for pos, d in zip(pos_all, idx_all)
+            ]
+        )
+        return pred - cnt_all
+
+    sol = least_squares(_res, x0)
+    amps = sol.x[:nd]
+    offs = sol.x[nd : 2 * nd]
+    phi_c = sol.x[-1]
+
+    nc_fit = {}
+    for d_idx, ds in enumerate(datasets):
+        positions = np.array(sorted(ds.piezo_data))
+        counts = np.array(
+            [ds.piezo_data[p]["N_c"] - ds.dark_counts.get("N_c", 0) for p in positions],
+            float,
+        )
+        fitted = amps[d_idx] * np.cos(
+            2 * np.pi * positions / periods[d_idx] + base_phi[d_idx] + phi_c
+        ) + offs[d_idx]
+        ss_res = np.sum((counts - fitted) ** 2)
+        ss_tot = np.sum((counts - counts.mean()) ** 2)
+        r2 = 1 - ss_res / ss_tot if ss_tot else np.nan
+        nc_fit[d_idx] = dict(
+            amplitude=amps[d_idx],
+            offset=offs[d_idx],
+            period=periods[d_idx],
+            phi_base=base_phi[d_idx],
+            phi_c=phi_c,
+            r_squared=r2,
+        )
+
+    return nc_fit, phi_c
+
+
 def print_dataset_summary(datasets: List[PhotonicsDataset]):
     """Print a summary of the parsed datasets."""
     print(f"Parsed {len(datasets)} datasets:")
@@ -305,11 +494,17 @@ def print_dataset_summary(datasets: List[PhotonicsDataset]):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: fit.py <csv_filename>", file=sys.stderr)
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description="Photonics data fitting utility")
+    parser.add_argument("csv_filename", help="CSV file with photonics data")
+    parser.add_argument(
+        "--fixed-phi",
+        action="store_true",
+        help="Force all N_i datasets to share one common phase (phi)",
+    )
+    args = parser.parse_args()
 
-    csv_filename = sys.argv[1]
+    csv_filename = args.csv_filename
+    fixed_phi = args.fixed_phi
 
     try:
         datasets = parse_photonics_csv(csv_filename)
@@ -326,7 +521,7 @@ if __name__ == "__main__":
         print("="*60)
 
         # Analyze piezo periods for all datasets
-        period_results = analyze_all_periods(datasets, count_type='N_i')
+        period_results = analyze_all_periods(datasets, count_type="N_i")
 
         # Calculate average period across all successful fits
         successful_periods = [r['period'] for r in period_results.values() if r is not None]
@@ -344,18 +539,56 @@ if __name__ == "__main__":
         # Plot the first successful fit as an example
         for i, result in period_results.items():
             if result is not None:
-                output_path = os.path.join(output_dir, f"piezo_period_fit_dataset_{i+1}.pdf")
+                output_path = os.path.join(
+                    output_dir, f"piezo_period_fit_dataset_{i+1}.pdf"
+                )
                 plot_piezo_period_fit(
-                    result['fit_info'],
-                    dataset_name=result['dataset_name'],
+                    result["fit_info"],
+                    dataset_name=result["dataset_name"],
                     output_filename=output_path,
-                    show=False
+                    show=False,
                 )
                 break
+
+        # -------------------------------------------------
+        # N_i fits (with optional shared phi)
+        # -------------------------------------------------
+        print("\n" + "=" * 60)
+        print("N_i FIT")
+        print("=" * 60)
+        ni_fit, phi_global = fit_ni_counts(
+            datasets, period_results, fixed_phi=fixed_phi
+        )
+        for idx, info in ni_fit.items():
+            print(
+                f"Dataset {idx+1}: amp={info['amplitude']:.1f}, "
+                f"off={info['offset']:.1f}, phi={info['phi']:.3f}, "
+                f"R²={info['r_squared']:.4f}"
+            )
+        if phi_global is not None:
+            print(f"Global phi (shared across datasets) = {phi_global:.4f} rad")
+
+        # -------------------------------------------------
+        # N_c fits with global phi_c offset
+        # -------------------------------------------------
+        print("\n" + "=" * 60)
+        print("N_c FIT")
+        print("=" * 60)
+        nc_fit, phi_c = fit_nc_counts(
+            datasets, period_results, ni_fit, phi_global=phi_global
+        )
+        for idx, info in nc_fit.items():
+            print(
+                f"Dataset {idx+1}: amp={info['amplitude']:.1f}, "
+                f"off={info['offset']:.1f}, "
+                f"phi_base={info['phi_base']:.3f}, phi_c={phi_c:.3f}, "
+                f"R²={info['r_squared']:.4f}"
+            )
+        print(f"Global phi_c offset (shared) = {phi_c:.4f} rad")
 
     except FileNotFoundError:
         print(f"Error: File '{csv_filename}' not found.", file=sys.stderr)
         sys.exit(1)
     except Exception as e:
-        print(f"Error parsing file: {e}", file=sys.stderr)
+        print(f"Error processing file: {e}", file=sys.stderr)
         sys.exit(1)
