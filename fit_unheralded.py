@@ -125,23 +125,32 @@ def fit_parameters():
 
     # Unpack & report -------------------------------------------------------
     f_before, g, phi_c, e_on, phi_on, e_off, phi_off = result.x
+    (
+        f_before_err,
+        g_err,
+        phi_c_err,
+        e_on_err,
+        phi_on_err,
+        e_off_err,
+        phi_off_err,
+    ) = perr
     one_minus_fb = 1.0 - f_before
     f_after = 1.0 - g / max(one_minus_fb, 1e-9)
 
     print("\n==== Global fit results (idler singles + coincidences, two runs) ====")
     print(f"  R (fixed)        : {R_FIXED:.2f} counts /s")
-    print(f"  f_before         : {f_before:.3f}")
+    print(f"  f_before         : {f_before:.3f} ± {f_before_err:.3f}")
     print(f"  f_after          : {f_after:.3f}")
-    print(f"  g = (1-f_b)(1-f_a): {g:.3f}")
-    print(f"  φ_c              : {phi_c:.3f} rad  ({np.degrees(phi_c):.1f}°)")
+    print(f"  g = (1-f_b)(1-f_a): {g:.3f} ± {g_err:.3f}")
+    print(f"  φ_c              : {phi_c:.3f} ± {phi_c_err:.3f} rad  ({np.degrees(phi_c):.1f}°)")
     print("  --- eraser ON run ---")
-    print(f"    e_on           : {e_on:.3f}")
-    print(f"    φ_on           : {phi_on:.3f} rad  ({np.degrees(phi_on):.1f}°)")
+    print(f"    e_on           : {e_on:.3f} ± {e_on_err:.3f}")
+    print(f"    φ_on           : {phi_on:.3f} ± {phi_on_err:.3f} rad  ({np.degrees(phi_on):.1f}°)")
     print(f"    Predicted V_i  : {(one_minus_fb * e_on):.3f}")
     print(f"    Predicted V_c  : {e_on:.3f}")
     print("  --- eraser OFF run ---")
-    print(f"    e_off          : {e_off:.3f}")
-    print(f"    φ_off          : {phi_off:.3f} rad  ({np.degrees(phi_off):.1f}°)")
+    print(f"    e_off          : {e_off:.3f} ± {e_off_err:.3f}")
+    print(f"    φ_off          : {phi_off:.3f} ± {phi_off_err:.3f} rad  ({np.degrees(phi_off):.1f}°)")
     print(f"    Predicted V_i  : {(one_minus_fb * e_off):.3f}")
     print(f"    Predicted V_c  : {e_off:.3f}")
     print("  ================================================================\n")
