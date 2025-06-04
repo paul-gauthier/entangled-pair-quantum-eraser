@@ -1,11 +1,16 @@
 
 # Consider a model for the N_i and N_c counts from an experiment:
 
-# `f` the fraction of "orphan" idlers, which reach the idler detector but whose paired signal
-# photon did not reach its detector. The which way info on the signal has decohered into
-# the environment. The idler can not self-interfere.
+# `f_before` the fraction of signal photons that are lost before they reach the eraser.
+# The which way info on the signal has decohered into the environment.
+# The idler can not self-interfere.
 #
-# f is a fixed attribute of the apparatus.
+# f_before is a fixed attribute of the apparatus.
+
+# `f_after` is the fraction of signal photons lost after the eraser before reaching
+# the signal detector.
+#
+# f_after is a fixed attribute of the apparatus.
 
 # `e` is the fraction of idlers which are being erased in the experiment. This
 # depends on the setting of the signal LP, but also on imperfections in the apparatus.
@@ -33,21 +38,34 @@
 # R is a fixed constant that doesn't vary between experiments.
 
 N__i = R * (
-    # Orphans can't interfere, half go out each MZI port
-    + 1/2 * f
+    # Signals lost before the eraser can't interfere, half go out each MZI port
+    + 1/2 * f_before
 
     # Non-erased pairs can't interfere either, half go out each MZI port
-    + 1/2 * (1 - f) * (1 - e)
+    + 1/2 * (1 - f_before) * (1 - e)
 
-    # Non-orphaned, erased idlers will oscillate between all and none going out each MZI port
-    + 1/2 * (1 - f) * e * (cos(delta + phi) + 1)
+    # Signals that reached the eraser and were erased
+    # ... their idlers will oscillate between all and none going out each MZI port
+    + 1/2 * (1 - f_before) * e * (cos(delta + phi) + 1)
 )
 
-N_c = R * (1 - f) * ( # Only non-orphans get coincidences
+N_c = R * (1 - f_before) * (1 - f_after) * ( # signals that pass the eraser and reach the detector
     # Non-erased pairs can't interfere, half go out each MZI port
     + 1/2 * (1 - e)
 
     # erased pairs oscillate between all and none going out each MZI port
     + 1/2 * e * (cos(delta + phi + phi_c) + 1)
-
 )
+
+# When fitting data to these models, we can use these approaches:
+#
+# • R cancels out of every visibility and cosine amplitude ratio, so
+# it can only be inferred from the absolute level of the idler
+# singles.  That is fine, but its value is irrelevant to everything
+# else; you could fix R = 2 × mean(N_i) and make the fit more stable.
+#
+# • f_before and f_after never appear separately in any modulation
+# depth – they enter only through the product g ≡ (1–f_before)(1–f_after).
+# – From N_c∕N_i one gets g directly.
+# – From the idler visibility V_i^run = (1–f_before) e_run and the coincidence
+#   visibility V_c^run = e_run one can solve algebraically for (1–f_before).
