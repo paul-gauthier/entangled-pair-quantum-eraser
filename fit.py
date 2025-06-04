@@ -4,6 +4,7 @@ import csv
 import pandas as pd
 import numpy as np
 import sys
+import os
 from typing import Dict, List, Tuple, Any, Optional
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
@@ -335,13 +336,19 @@ if __name__ == "__main__":
             print(f"\nAverage period across all datasets: {avg_period:.2f} ± {std_period:.2f} steps per 2π")
             print(f"This corresponds to {2*np.pi/avg_period:.4f} radians per step")
 
+        # Create output directory based on CSV filename
+        csv_basename = os.path.splitext(os.path.basename(csv_filename))[0]
+        output_dir = csv_basename
+        os.makedirs(output_dir, exist_ok=True)
+
         # Plot the first successful fit as an example
         for i, result in period_results.items():
             if result is not None:
+                output_path = os.path.join(output_dir, f"piezo_period_fit_dataset_{i+1}.pdf")
                 plot_piezo_period_fit(
                     result['fit_info'],
                     dataset_name=result['dataset_name'],
-                    output_filename=f"piezo_period_fit_dataset_{i+1}.pdf",
+                    output_filename=output_path,
                     show=False
                 )
                 break
