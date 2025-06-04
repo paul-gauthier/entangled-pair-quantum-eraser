@@ -17,7 +17,7 @@
 # be 0.5 in this case, but can be set to other constants for other experimental
 # setups.
 #
-# `f_eraser` is a constant for a given experiment, not fitted from data.
+# `f_eraser` is a constant provided for each experiment, not fitted from data.
 
 # `f_after` is the fraction of signal photons lost after the eraser before reaching
 # the signal detector.
@@ -38,8 +38,14 @@
 
 # `phi` is the offset to align delta with the phase of the other arm
 #
-# phi is different for each experiment, because thermal drift can alter the relative
-# path lengths of the MZI arms.
+# phi can either be fixed across experiments or vary.
+#
+# Fixed when the data collection was interleaved so that all the datasets had their
+# piezo 0 data collected, then all datasets had their piezo 2 data collected, etc.
+#
+# Varies if we are analyzing a series of experiments where data was collected at
+# different times. Thermal variation can change the relative length of the MZI arms
+# over time.
 
 # `phi_c` is the extra phase seen only by coincidences
 #
@@ -51,17 +57,22 @@
 
 N__i = R * (
     # Signals lost before the eraser can't interfere, half go out each MZI port
-    + 1/2 * f_before * f_eraser
+    + 1/2 * f_before
+
+    # Signals lost at the eraser can't interfere, half go out each MZI port
+    + 1/2 * (1 - f_before) * f_eraser
 
     # Non-erased pairs can't interfere either, half go out each MZI port
-    + 1/2 * (1 - f_before * f_eraser) * (1 - e)
+    + 1/2 * (1 - f_before) * (1 - f_eraser) * (1 - e)
 
     # Signals that reached the eraser and were erased
     # ... their idlers will oscillate between all and none going out each MZI port
     + 1/2 * (1 - f_before * f_eraser) * e * (cos(delta + phi) + 1)
 )
 
-N_c = R * (1 - f_before * f_eraser) * (1 - f_after) * ( # signals that pass the eraser and reach the detector
+# signals that pass the eraser and reach the detector
+N_c = R * (1 - f_before) * (1 - f_eraser) * (1 - f_after) * (
+
     # Non-erased pairs can't interfere, half go out each MZI port
     + 1/2 * (1 - e)
 
@@ -76,8 +87,3 @@ N_c = R * (1 - f_before * f_eraser) * (1 - f_after) * ( # signals that pass the 
 # singles.  That is fine, but its value is irrelevant to everything
 # else; you could fix R = 2 × mean(N_i) and make the fit more stable.
 #
-# • f_before * f_eraser and f_after never appear separately in any modulation
-# depth – they enter only through the product g ≡ (1–f_before * f_eraser)(1–f_after).
-# – From N_c∕N_i one gets g directly.
-# – From the idler visibility V_i^run = (1–f_before * f_eraser) e_run and the coincidence
-#   visibility V_c^run = e_run one can solve algebraically for (1–f_before * f_eraser).
