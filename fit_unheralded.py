@@ -21,6 +21,7 @@ from __future__ import annotations
 import math
 import numpy as np
 from scipy.optimize import least_squares
+import matplotlib.pyplot as plt
 
 from plot_utils import delta_from_steps
 import unheralded  # provides piezo_steps + the TSV data blocks
@@ -148,5 +149,73 @@ def fit_parameters():
     return result
 
 
+def plot_fitted_traces(result):
+    """Plot N_i and N_c (eraser-on / eraser-off) with their best-fit curves."""
+    f_before, g, phi_c, e_on, phi_on, e_off, phi_off = result.x
+    one_minus_fb = 1.0 - f_before
+
+    # Fine grid for smooth model curves
+    delta_fine = np.linspace(delta.min(), delta.max(), 500)
+
+    # Model predictions ----------------------------------------------------
+    Ni_on_fit  = 0.5 * R_FIXED * (1 + one_minus_fb * e_on  * np.cos(delta_fine + phi_on))
+    Nc_on_fit  = 0.5 * R_FIXED * g * (1 + e_on  * np.cos(delta_fine + phi_on  + phi_c))
+    Ni_off_fit = 0.5 * R_FIXED * (1 + one_minus_fb * e_off * np.cos(delta_fine + phi_off))
+    Nc_off_fit = 0.5 * R_FIXED * g * (1 + e_off * np.cos(delta_fine + phi_off + phi_c))
+
+    # ---------------------------------------------------------------------
+    plt.rcParams.update({"font.size": 12})
+    fig, axes = plt.subplots(2, 2, figsize=(12, 8), sharex=True)
+
+    # Idler – eraser ON
+    ax = axes[0, 0]
+    ax.errorbar(delta, Ni_on, yerr=np.sqrt(Ni_on), fmt="s", color="tab:green",
+                label="N_i (eraser-on)")
+    ax.plot(delta_fine, Ni_on_fit, "--", color="tab:green")
+    ax.set_title("Idler counts – eraser ON")
+    ax.set_ylabel("Counts / s")
+    ax.grid(True, linestyle=":", alpha=0.5)
+
+    # Idler – eraser OFF
+    ax = axes[1, 0]
+    ax.errorbar(delta, Ni_off, yerr=np.sqrt(Ni_off), fmt="o", color="tab:olive",
+                label="N_i (eraser-off)")
+    ax.plot(delta_fine, Ni_off_fit, "--", color="tab:olive")
+    ax.set_title("Idler counts – eraser OFF")
+    ax.set_xlabel(r"Phase delay $\delta$ (rad)")
+    ax.set_ylabel("Counts / s")
+    ax.grid(True, linestyle=":", alpha=0.5)
+
+    # Coincidence – eraser ON
+    ax = axes[0, 1]
+    ax.errorbar(delta, Nc_on, yerr=np.sqrt(Nc_on), fmt="x", color="tab:red",
+                label="N_c (eraser-on)")
+    ax.plot(delta_fine, Nc_on_fit, "--", color="tab:red")
+    ax.set_title("Coincidences – eraser ON")
+    ax.grid(True, linestyle=":", alpha=0.5)
+
+    # Coincidence – eraser OFF
+    ax = axes[1, 1]
+    ax.errorbar(delta, Nc_off, yerr=np.sqrt(Nc_off), fmt="+", color="tab:purple",
+                label="N_c (eraser-off)")
+    ax.plot(delta_fine, Nc_off_fit, "--", color="tab:purple")
+    ax.set_title("Coincidences – eraser OFF")
+    ax.set_xlabel(r"Phase delay $\delta$ (rad)")
+    ax.grid(True, linestyle=":", alpha=0.5)
+
+    # Shared legend
+    handles, labels = axes[0, 0].get_legend_handles_labels()
+    axes[0, 0].legend(handles, labels, loc="upper right")
+
+    fig.suptitle("Unheralded data with global best-fit model", fontsize=14)
+    fig.tight_layout(rect=[0, 0, 1, 0.96])
+
+    outfile = "fit_unheralded_traces.pdf"
+    plt.savefig(outfile)
+    plt.close(fig)
+    print(f"Saved fitted-trace figure to {outfile}")
+
+
 if __name__ == "__main__":
-    fit_parameters()
+    res = fit_parameters()
+    plot_fitted_traces(res)
