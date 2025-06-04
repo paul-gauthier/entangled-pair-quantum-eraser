@@ -123,6 +123,20 @@ def fit_parameters():
         gtol=1e-12,
     )
 
+    # -------------------------------------------------------------------
+    # Estimate 1 σ uncertainties for each fitted parameter
+    #   σ² ≃ 2·cost / dof        (dof = #data − #params)
+    #   cov ≃ σ² · (JᵀJ)⁻¹
+    # -------------------------------------------------------------------
+    m, n = result.jac.shape
+    dof = max(1, m - n)
+    s_sq = 2 * result.cost / dof
+    try:
+        cov = np.linalg.inv(result.jac.T @ result.jac) * s_sq
+    except np.linalg.LinAlgError:
+        cov = np.linalg.pinv(result.jac.T @ result.jac) * s_sq
+    perr = np.sqrt(np.diag(cov))
+
     # Unpack & report -------------------------------------------------------
     f_before, g, phi_c, e_on, phi_on, e_off, phi_off = result.x
     (
