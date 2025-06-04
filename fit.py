@@ -568,6 +568,30 @@ if __name__ == "__main__":
         if phi_global is not None:
             print(f"Global phi (shared across datasets) = {phi_global:.4f} rad")
 
+        # -----  PLOTS: N_i  ---------------------------------------
+        for i, ds in enumerate(datasets):
+            period = period_results[i]["period"]
+            phi_val = ni_fit[i]["phi"]
+            amp_val = ni_fit[i]["amplitude"]
+            off_val = ni_fit[i]["offset"]
+
+            pos = np.array(sorted(ds.piezo_data))
+            cnt = np.array(
+                [ds.piezo_data[p]["N_i"] - ds.dark_counts.get("N_i", 0) for p in pos],
+                float,
+            )
+            fit_vals = amp_val * np.cos(2 * np.pi * pos / period + phi_val) + off_val
+
+            plot_counts_with_fit(
+                pos,
+                cnt,
+                fit_vals,
+                dataset_name=ds.name,
+                count_type="N_i",
+                output_filename=os.path.join(output_dir, f"Ni_fit_dataset_{i+1}.pdf"),
+                show=False,
+            )
+
         # -------------------------------------------------
         # N_c fits with global phi_c offset
         # -------------------------------------------------
@@ -585,6 +609,30 @@ if __name__ == "__main__":
                 f"R²={info['r_squared']:.4f}"
             )
         print(f"Global phi_c offset (shared) = {phi_c:.4f} rad")
+
+        # -----  PLOTS: N_c  ---------------------------------------
+        for i, ds in enumerate(datasets):
+            period = period_results[i]["period"]
+            amp_val = nc_fit[i]["amplitude"]
+            off_val = nc_fit[i]["offset"]
+            phase_total = nc_fit[i]["phi_base"] + nc_fit[i]["phi_c"]
+
+            pos = np.array(sorted(ds.piezo_data))
+            cnt = np.array(
+                [ds.piezo_data[p]["N_c"] - ds.dark_counts.get("N_c", 0) for p in pos],
+                float,
+            )
+            fit_vals = amp_val * np.cos(2 * np.pi * pos / period + phase_total) + off_val
+
+            plot_counts_with_fit(
+                pos,
+                cnt,
+                fit_vals,
+                dataset_name=ds.name,
+                count_type="N_c",
+                output_filename=os.path.join(output_dir, f"Nc_fit_dataset_{i+1}.pdf"),
+                show=False,
+            )
 
     except FileNotFoundError:
         print(f"Error: File '{csv_filename}' not found.", file=sys.stderr)
