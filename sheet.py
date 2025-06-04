@@ -14,6 +14,7 @@ import urllib.request
 import json
 import csv
 import os
+from dotenv import load_dotenv
 
 
 def extract_sheet_id_and_gid(url):
@@ -33,8 +34,16 @@ def extract_sheet_id_and_gid(url):
 
 def get_sheet_title(sheet_id, gid):
     """Get the title of the specific sheet tab."""
+    # Load environment variables
+    load_dotenv()
+    api_key = os.getenv('GOOGLE_SHEETS_API_KEY')
+    
+    if not api_key:
+        print("Warning: GOOGLE_SHEETS_API_KEY not found in .env file")
+        return 'sheet'
+    
     # Use the Google Sheets API to get sheet metadata
-    api_url = f"https://sheets.googleapis.com/v4/spreadsheets/{sheet_id}?key=AIzaSyD-9tSrke72PouQMnMX-a7EAHI-y8ek9Bg"
+    api_url = f"https://sheets.googleapis.com/v4/spreadsheets/{sheet_id}?key={api_key}"
     
     try:
         with urllib.request.urlopen(api_url) as response:
