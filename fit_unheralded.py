@@ -48,7 +48,7 @@ Ns_off, Ni_off, Nc_off = _parse_counts(unheralded.eraser_off)
 # ---------------------------------------------------------------------------
 #  Novel idler-singles data (no coincidence trace)
 # ---------------------------------------------------------------------------
-novel_f_before_scale: float = 0.5  # scaling factor applied to f_before for novel data
+novel_f_eraser: float = 1  # scaling factor applied to f_before for novel data
 Ni_novel = np.array(
     [
         float(x)
@@ -93,7 +93,7 @@ def _residuals(params: np.ndarray) -> np.ndarray:
     res_Nc_off = (Nc_off - Nc_off_model) / np.sqrt(Nc_off + 1.0)
 
     # --- novel idler singles ---------------------------------------------
-    f_before_scaled = f_before * novel_f_before_scale
+    f_before_scaled = f_before * novel_f_eraser
     one_minus_fb_scaled = 1.0 - f_before_scaled
     Ni_novel_model = 0.5 * R_FIXED * (
         1 + one_minus_fb_scaled * e_novel * np.cos(delta + phi_novel)
@@ -235,7 +235,7 @@ def fit_parameters():
     print(f"    Predicted V_i  : {(one_minus_fb * e_off):.3f}")
     print(f"    Predicted V_c  : {e_off:.3f}")
     print("  --- novel idler singles ---")
-    f_before_scaled = f_before * novel_f_before_scale
+    f_before_scaled = f_before * novel_f_eraser
     print(f"    e_novel        : {e_novel:.3f} ± {e_novel_err:.3f}")
     print(
         f"    φ_novel        : {phi_novel:.3f} ± {phi_novel_err:.3f} rad  "

@@ -30,7 +30,8 @@ import unheralded                           # provides piezo_steps & novel TSV
 # ---------------------------------------------------------------------------
 _global_result = fit_unheralded.fit_parameters()  # run / reuse existing global fit
 R_FIXED: float = fit_unheralded.R_FIXED
-f_before: float = float(_global_result.x[0])
+novel_f_before_scale = 0.5
+f_before: float = float(_global_result.x[0]) * novel_f_before_scale
 one_minus_fb: float = 1.0 - f_before
 
 # ---------------------------------------------------------------------------
