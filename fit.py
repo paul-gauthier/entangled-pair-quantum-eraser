@@ -26,6 +26,29 @@ class PhotonicsDataset:
     def __repr__(self):
         return f"PhotonicsDataset(name='{self.name}', {len(self.piezo_pos)} piezo positions)"
 
+    def print(self):
+        """Print a summary of this dataset."""
+        print(f"Dataset {self.name}:")
+        print(f"  Dark counts: {self.dark_counts}")
+        print(f"  Data points: {len(self.piezo_pos)}")
+        print(f"  Piezo range: {self.piezo_pos.min():.1f} to {self.piezo_pos.max():.1f}")
+        if self.N_s is not None:
+            print(f"  N_s range: {self.N_s.min():.0f} to {self.N_s.max():.0f} (mean: {self.N_s.mean():.1f})")
+        else:
+            print(f"  N_s: all zeros")
+
+        if self.N_i is not None:
+            print(f"  N_i range: {self.N_i.min():.0f} to {self.N_i.max():.0f} (mean: {self.N_i.mean():.1f})")
+        else:
+            print(f"  N_i: all zeros")
+
+        if self.N_c is not None:
+            print(f"  N_c range: {self.N_c.min():.0f} to {self.N_c.max():.0f} (mean: {self.N_c.mean():.1f})")
+        else:
+            print(f"  N_c: all zeros")
+        print(f"  Metadata: {self.metadata}")
+        print()
+
 
 def parse_photonics_csv(filepath: str) -> List[PhotonicsDataset]:
     """
@@ -322,27 +345,7 @@ def main():
     print()
 
     for i, dataset in enumerate(datasets):
-        # refactor this to a .print() method of the class ai!
-        print(f"Dataset {dataset.name}:")
-        print(f"  Dark counts: {dataset.dark_counts}")
-        print(f"  Data points: {len(dataset.piezo_pos)}")
-        print(f"  Piezo range: {dataset.piezo_pos.min():.1f} to {dataset.piezo_pos.max():.1f}")
-        if dataset.N_s is not None:
-            print(f"  N_s range: {dataset.N_s.min():.0f} to {dataset.N_s.max():.0f} (mean: {dataset.N_s.mean():.1f})")
-        else:
-            print(f"  N_s: all zeros")
-
-        if dataset.N_i is not None:
-            print(f"  N_i range: {dataset.N_i.min():.0f} to {dataset.N_i.max():.0f} (mean: {dataset.N_i.mean():.1f})")
-        else:
-            print(f"  N_i: all zeros")
-
-        if dataset.N_c is not None:
-            print(f"  N_c range: {dataset.N_c.min():.0f} to {dataset.N_c.max():.0f} (mean: {dataset.N_c.mean():.1f})")
-        else:
-            print(f"  N_c: all zeros")
-        print(f"  Metadata: {dataset.metadata}")
-        print()
+        dataset.print()
 
     # Fit cosine to all N_i and N_c data to estimate the piezo step change for a 2π phase shift
     try:
