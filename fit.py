@@ -220,9 +220,9 @@ def main():
         print(f"  Dark counts: {dataset.dark_counts}")
         print(f"  Data points: {len(dataset.piezo_pos)}")
         print(f"  Piezo range: {dataset.piezo_pos.min():.1f} to {dataset.piezo_pos.max():.1f}")
-        print(f"  N_s range: {dataset.N_s.min():.0f} to {dataset.N_s.max():.0f}")
-        print(f"  N_i range: {dataset.N_i.min():.0f} to {dataset.N_i.max():.0f}")
-        print(f"  N_c range: {dataset.N_c.min():.0f} to {dataset.N_c.max():.0f}")
+        print(f"  N_s range: {dataset.N_s.min():.0f} to {dataset.N_s.max():.0f} (mean: {dataset.N_s.mean():.1f})")
+        print(f"  N_i range: {dataset.N_i.min():.0f} to {dataset.N_i.max():.0f} (mean: {dataset.N_i.mean():.1f})")
+        print(f"  N_c range: {dataset.N_c.min():.0f} to {dataset.N_c.max():.0f} (mean: {dataset.N_c.mean():.1f})")
         print(f"  Metadata: {dataset.metadata}")
         print()
 
