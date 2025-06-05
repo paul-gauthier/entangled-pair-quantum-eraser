@@ -207,7 +207,7 @@ def main():
     print()
 
     for i, dataset in enumerate(datasets):
-        print(f"Dataset {i+1}:")
+        print(f"Dataset {dataset.name}:")
         print(f"  Dark counts: {dataset.dark_counts}")
         print(f"  Data points: {len(dataset.piezo_pos)}")
         print(f"  Piezo range: {dataset.piezo_pos.min():.1f} to {dataset.piezo_pos.max():.1f}")
