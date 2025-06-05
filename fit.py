@@ -322,6 +322,7 @@ def main():
     print()
 
     for i, dataset in enumerate(datasets):
+        # refactor this to a .print() method of the class ai!
         print(f"Dataset {dataset.name}:")
         print(f"  Dark counts: {dataset.dark_counts}")
         print(f"  Data points: {len(dataset.piezo_pos)}")
