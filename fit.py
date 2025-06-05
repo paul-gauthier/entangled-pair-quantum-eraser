@@ -151,6 +151,11 @@ def parse_photonics_csv(filepath: str) -> List[PhotonicsDataset]:
                 numeric_value = _parse_float(value)
                 datasets[dataset_idx].metadata[metadata_key] = numeric_value if numeric_value is not None else value
 
+    # Update dataset names using 'name' metadata if available
+    for dataset in datasets:
+        if 'name' in dataset.metadata:
+            dataset.name = str(dataset.metadata['name'])
+
     return datasets
 
 
