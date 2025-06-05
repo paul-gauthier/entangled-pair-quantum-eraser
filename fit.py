@@ -221,9 +221,8 @@ def _initial_guess(x: np.ndarray, y: np.ndarray) -> Tuple[float, float, float, f
     """Return initial guesses for A, k, phi, C."""
     C = np.mean(y)
     A = (np.max(y) - np.min(y)) / 2 if np.max(y) != np.min(y) else 1.0
-    # Rough period guess: assume ~3 oscillations across the scan span
     span = x.max() - x.min() if x.max() != x.min() else 1.0
-    guess_period = span / 3 if span > 0 else 20.0
+    guess_period = 22
     k = 2 * np.pi / guess_period
     phi = 0.0
     return A, k, phi, C
@@ -301,12 +300,12 @@ def main():
             print(f"  N_s range: {dataset.N_s.min():.0f} to {dataset.N_s.max():.0f} (mean: {dataset.N_s.mean():.1f})")
         else:
             print(f"  N_s: all zeros")
-        
+
         if dataset.N_i is not None:
             print(f"  N_i range: {dataset.N_i.min():.0f} to {dataset.N_i.max():.0f} (mean: {dataset.N_i.mean():.1f})")
         else:
             print(f"  N_i: all zeros")
-        
+
         if dataset.N_c is not None:
             print(f"  N_c range: {dataset.N_c.min():.0f} to {dataset.N_c.max():.0f} (mean: {dataset.N_c.mean():.1f})")
         else:
