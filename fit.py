@@ -207,6 +207,75 @@ def _is_numeric_or_empty(value: str) -> bool:
         return False
 
 
+# ---------- Fitting utilities ----------
+def _cos_model(x: np.ndarray, A: float, k: float, phi: float, C: float) -> np.ndarray:
+    """
+    Cosine model: y = A * cos(k * x + phi) + C
+
+    k is the angular wavenumber, k = 2π / period.
+    """
+    return A * np.cos(k * x + phi) + C
+
+
+def _initial_guess(x: np.ndarray, y: np.ndarray) -> Tuple[float, float, float, float]:
+    """Return initial guesses for A, k, phi, C."""
+    C = np.mean(y)
+    A = (np.max(y) - np.min(y)) / 2 if np.max(y) != np.min(y) else 1.0
+    # Rough period guess: assume ~3 oscillations across the scan span
+    span = x.max() - x.min() if x.max() != x.min() else 1.0
+    guess_period = span / 3 if span > 0 else 20.0
+    k = 2 * np.pi / guess_period
+    phi = 0.0
+    return A, k, phi, C
+
+
+def fit_period(datasets: List[PhotonicsDataset]) -> Tuple[float, float]:
+    """
+    Fit a cosine to all N_i and N_c counts from every dataset.
+
+    Returns
+    -------
+    period : float
+        Piezo position change corresponding to a 2π phase shift.
+    period_std : float
+        One-sigma uncertainty derived from the covariance of the fit.
+    """
+    x_all: List[np.ndarray] = []
+    y_all: List[np.ndarray] = []
+
+    for ds in datasets:
+        for attr in ("N_i", "N_c"):
+            counts = getattr(ds, attr)
+            if counts is None:
+                continue
+            x_vals = ds.piezo_pos
+            y_vals = counts
+            mask = np.isfinite(y_vals)
+            if not np.any(mask):
+                continue
+            x_all.append(x_vals[mask])
+            y_all.append(y_vals[mask])
+
+    if not x_all:
+        raise RuntimeError("No usable N_i or N_c data found for fitting.")
+
+    x = np.concatenate(x_all)
+    y = np.concatenate(y_all)
+
+    p0 = _initial_guess(x, y)
+    popt, pcov = curve_fit(_cos_model, x, y, p0=p0, maxfev=10000)
+
+    _, k_fit, _, _ = popt
+    period = 2 * np.pi / k_fit
+
+    # Uncertainty propagation
+    k_var = pcov[1, 1] if pcov.size >= 4 else np.nan
+    k_std = np.sqrt(k_var) if np.isfinite(k_var) else np.nan
+    period_std = 2 * np.pi * k_std / (k_fit ** 2) if np.isfinite(k_std) else np.nan
+
+    return period, period_std
+
+
 def main():
     """Test the CSV parser with the provided data file."""
     if len(sys.argv) > 1:
@@ -244,6 +313,13 @@ def main():
             print(f"  N_c: all zeros")
         print(f"  Metadata: {dataset.metadata}")
         print()
+
+    # Fit cosine to all N_i and N_c data to estimate the piezo step change for a 2π phase shift
+    try:
+        period, period_std = fit_period(datasets)
+        print(f"Estimated period (Δpiezo for 2π): {period:.2f} ± {period_std:.2f} (piezo steps)")
+    except RuntimeError as exc:
+        print(f"Could not determine period: {exc}")
 
 
 if __name__ == "__main__":
