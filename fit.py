@@ -130,6 +130,14 @@ def parse_photonics_csv(filepath: str) -> List[PhotonicsDataset]:
         datasets[dataset_idx].N_i = np.maximum(0, datasets[dataset_idx].N_i - dark_N_i)
         datasets[dataset_idx].N_c = np.maximum(0, datasets[dataset_idx].N_c - dark_N_c)
 
+        # Set to None if all values are zero
+        if np.all(datasets[dataset_idx].N_s == 0):
+            datasets[dataset_idx].N_s = None
+        if np.all(datasets[dataset_idx].N_i == 0):
+            datasets[dataset_idx].N_i = None
+        if np.all(datasets[dataset_idx].N_c == 0):
+            datasets[dataset_idx].N_c = None
+
     # Parse metadata rows
     metadata_start_idx = data_end_idx
     while metadata_start_idx < len(rows) and (not rows[metadata_start_idx] or rows[metadata_start_idx][0].strip() == ''):
@@ -220,9 +228,20 @@ def main():
         print(f"  Dark counts: {dataset.dark_counts}")
         print(f"  Data points: {len(dataset.piezo_pos)}")
         print(f"  Piezo range: {dataset.piezo_pos.min():.1f} to {dataset.piezo_pos.max():.1f}")
-        print(f"  N_s range: {dataset.N_s.min():.0f} to {dataset.N_s.max():.0f} (mean: {dataset.N_s.mean():.1f})")
-        print(f"  N_i range: {dataset.N_i.min():.0f} to {dataset.N_i.max():.0f} (mean: {dataset.N_i.mean():.1f})")
-        print(f"  N_c range: {dataset.N_c.min():.0f} to {dataset.N_c.max():.0f} (mean: {dataset.N_c.mean():.1f})")
+        if dataset.N_s is not None:
+            print(f"  N_s range: {dataset.N_s.min():.0f} to {dataset.N_s.max():.0f} (mean: {dataset.N_s.mean():.1f})")
+        else:
+            print(f"  N_s: all zeros")
+        
+        if dataset.N_i is not None:
+            print(f"  N_i range: {dataset.N_i.min():.0f} to {dataset.N_i.max():.0f} (mean: {dataset.N_i.mean():.1f})")
+        else:
+            print(f"  N_i: all zeros")
+        
+        if dataset.N_c is not None:
+            print(f"  N_c range: {dataset.N_c.min():.0f} to {dataset.N_c.max():.0f} (mean: {dataset.N_c.mean():.1f})")
+        else:
+            print(f"  N_c: all zeros")
         print(f"  Metadata: {dataset.metadata}")
         print()
 
