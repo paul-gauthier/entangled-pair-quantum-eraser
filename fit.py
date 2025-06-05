@@ -121,6 +121,15 @@ def parse_photonics_csv(filepath: str) -> List[PhotonicsDataset]:
         datasets[dataset_idx].N_i = np.array(N_i_values)
         datasets[dataset_idx].N_c = np.array(N_c_values)
 
+        # Subtract dark counts from data
+        dark_N_s = datasets[dataset_idx].dark_counts.get('N_s', 0) or 0
+        dark_N_i = datasets[dataset_idx].dark_counts.get('N_i', 0) or 0
+        dark_N_c = datasets[dataset_idx].dark_counts.get('N_c', 0) or 0
+
+        datasets[dataset_idx].N_s = np.maximum(0, datasets[dataset_idx].N_s - dark_N_s)
+        datasets[dataset_idx].N_i = np.maximum(0, datasets[dataset_idx].N_i - dark_N_i)
+        datasets[dataset_idx].N_c = np.maximum(0, datasets[dataset_idx].N_c - dark_N_c)
+
     # Parse metadata rows
     metadata_start_idx = data_end_idx
     while metadata_start_idx < len(rows) and (not rows[metadata_start_idx] or rows[metadata_start_idx][0].strip() == ''):
