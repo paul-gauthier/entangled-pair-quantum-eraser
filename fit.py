@@ -328,6 +328,151 @@ def fit_period(datasets: List[PhotonicsDataset]) -> Tuple[float, float]:
     return float(period_mean), float(period_std)
 
 
+def fit_phases(datasets: List[PhotonicsDataset], period: float) -> Dict[str, Any]:
+    """
+    Simultaneously fit all N_i and N_c data using shared phase parameters.
+    
+    N_i is fit to: A_i * (1 + cos(k * x + phi)) 
+    N_c is fit to: A_c * (1 + cos(k * x + phi + phi_c))
+    
+    Where k = 2π / period is fixed from the period fit.
+    
+    Parameters
+    ----------
+    datasets : List[PhotonicsDataset]
+        List of datasets containing N_i and N_c data
+    period : float
+        Period in piezo steps for 2π phase change
+        
+    Returns
+    -------
+    dict
+        Dictionary containing fit results:
+        - 'phi': global phase offset (radians)
+        - 'phi_c': coincidence phase offset (radians) 
+        - 'phi_std': uncertainty in phi
+        - 'phi_c_std': uncertainty in phi_c
+        - 'amplitudes': dict of fitted amplitudes for each series
+        - 'fit_success': boolean indicating if fit converged
+    """
+    from scipy.optimize import curve_fit
+    
+    # Fixed wavenumber from period
+    k = 2 * np.pi / period
+    
+    # Collect all data points
+    all_x = []
+    all_y = []
+    series_info = []  # (start_idx, end_idx, series_type, dataset_name)
+    
+    current_idx = 0
+    for ds in datasets:
+        for attr in ("N_i", "N_c"):
+            counts = getattr(ds, attr)
+            if counts is None:
+                continue
+                
+            # Filter out non-finite data
+            mask = np.isfinite(counts)
+            if not np.any(mask):
+                continue
+                
+            x_data = ds.piezo_pos[mask]
+            y_data = counts[mask]
+            
+            start_idx = current_idx
+            end_idx = current_idx + len(y_data)
+            
+            all_x.extend(x_data)
+            all_y.extend(y_data)
+            series_info.append((start_idx, end_idx, attr, ds.name))
+            
+            current_idx = end_idx
+    
+    if not all_x:
+        raise RuntimeError("No usable data found for phase fitting.")
+    
+    all_x = np.array(all_x)
+    all_y = np.array(all_y)
+    
+    # Create the combined model function
+    def combined_model(x, phi, phi_c, *amplitudes):
+        """
+        Combined model for all series.
+        Parameters: phi, phi_c, then one amplitude per series
+        """
+        result = np.zeros_like(x)
+        
+        for i, (start_idx, end_idx, series_type, _) in enumerate(series_info):
+            A = amplitudes[i]
+            x_segment = x[start_idx:end_idx]
+            
+            if series_type == "N_i":
+                y_segment = A * (1 + np.cos(k * x_segment + phi))
+            else:  # N_c
+                y_segment = A * (1 + np.cos(k * x_segment + phi + phi_c))
+                
+            result[start_idx:end_idx] = y_segment
+            
+        return result
+    
+    # Initial parameter guesses
+    phi_guess = 0.0
+    phi_c_guess = 0.0
+    
+    # Estimate amplitude for each series
+    amp_guesses = []
+    for start_idx, end_idx, series_type, _ in series_info:
+        y_segment = all_y[start_idx:end_idx]
+        amp_guess = np.mean(y_segment) / 2 if len(y_segment) > 0 else 1.0
+        amp_guesses.append(amp_guess)
+    
+    p0 = [phi_guess, phi_c_guess] + amp_guesses
+    
+    try:
+        # Perform the fit
+        popt, pcov = curve_fit(combined_model, all_x, all_y, p0=p0, maxfev=10000)
+        
+        phi_fit = popt[0]
+        phi_c_fit = popt[1]
+        amplitude_fits = popt[2:]
+        
+        # Extract uncertainties
+        param_stds = np.sqrt(np.diag(pcov))
+        phi_std = param_stds[0]
+        phi_c_std = param_stds[1]
+        
+        # Store amplitudes by series
+        amplitudes = {}
+        for i, (_, _, series_type, dataset_name) in enumerate(series_info):
+            key = f"{dataset_name}_{series_type}"
+            amplitudes[key] = amplitude_fits[i]
+        
+        return {
+            'phi': float(phi_fit),
+            'phi_c': float(phi_c_fit),
+            'phi_std': float(phi_std),
+            'phi_c_std': float(phi_c_std),
+            'amplitudes': amplitudes,
+            'fit_success': True,
+            'period_used': period,
+            'k_used': k
+        }
+        
+    except (RuntimeError, ValueError) as e:
+        return {
+            'phi': np.nan,
+            'phi_c': np.nan,
+            'phi_std': np.nan,
+            'phi_c_std': np.nan,
+            'amplitudes': {},
+            'fit_success': False,
+            'error': str(e),
+            'period_used': period,
+            'k_used': k
+        }
+
+
 def main():
     """Test the CSV parser with the provided data file."""
     if len(sys.argv) > 1:
@@ -351,6 +496,21 @@ def main():
     try:
         period, period_std = fit_period(datasets)
         print(f"Estimated period (Δpiezo for 2π): {period:.2f} ± {period_std:.2f} (piezo steps)")
+        
+        # Now fit the global phases using the determined period
+        phase_results = fit_phases(datasets, period)
+        
+        if phase_results['fit_success']:
+            print(f"\nGlobal phase fit results:")
+            print(f"  phi (global phase): {phase_results['phi']:.3f} ± {phase_results['phi_std']:.3f} rad")
+            print(f"  phi_c (coincidence phase): {phase_results['phi_c']:.3f} ± {phase_results['phi_c_std']:.3f} rad")
+            print(f"  Period used: {phase_results['period_used']:.2f} piezo steps")
+            print(f"\nFitted amplitudes:")
+            for series, amplitude in phase_results['amplitudes'].items():
+                print(f"    {series}: {amplitude:.1f}")
+        else:
+            print(f"\nGlobal phase fit failed: {phase_results.get('error', 'Unknown error')}")
+            
     except RuntimeError as exc:
         print(f"Could not determine period: {exc}")
 
