@@ -228,6 +228,31 @@ def _initial_guess(x: np.ndarray, y: np.ndarray) -> Tuple[float, float, float, f
     return A, k, phi, C
 
 
+def _fit_single_series(x: np.ndarray, y: np.ndarray) -> Tuple[float, float]:
+    """
+    Fit one N_i or N_c series allowing its own phase, amplitude and
+    offset, but yielding an angular wavenumber k that should be common
+    to all series.  Returns (k_fit, k_var).
+    """
+    # Keep only finite data
+    mask = np.isfinite(y)
+    if not np.any(mask):
+        return np.nan, np.nan
+
+    x = x[mask]
+    y = y[mask]
+
+    p0 = _initial_guess(x, y)
+    try:
+        popt, pcov = curve_fit(_cos_model, x, y, p0=p0, maxfev=10000)
+        k_fit = popt[1]
+        k_var = pcov[1, 1] if pcov.size >= 4 else np.nan
+        return k_fit, k_var
+    except (RuntimeError, ValueError):
+        # curve_fit failed
+        return np.nan, np.nan
+
+
 def fit_period(datasets: List[PhotonicsDataset]) -> Tuple[float, float]:
     """
     Fit a cosine to all N_i and N_c counts from every dataset.
@@ -239,40 +264,45 @@ def fit_period(datasets: List[PhotonicsDataset]) -> Tuple[float, float]:
     period_std : float
         One-sigma uncertainty derived from the covariance of the fit.
     """
-    x_all: List[np.ndarray] = []
-    y_all: List[np.ndarray] = []
+    # --- Fit each N_i and N_c series separately, allowing an
+    #     independent phase for every series but extracting its k ---
+    periods: List[float] = []
+    k_values: List[float] = []
+    k_vars: List[float] = []
 
     for ds in datasets:
         for attr in ("N_i", "N_c"):
             counts = getattr(ds, attr)
             if counts is None:
                 continue
-            x_vals = ds.piezo_pos
-            y_vals = counts
-            mask = np.isfinite(y_vals)
-            if not np.any(mask):
-                continue
-            x_all.append(x_vals[mask])
-            y_all.append(y_vals[mask])
 
-    if not x_all:
+            k_fit, k_var = _fit_single_series(ds.piezo_pos, counts)
+            if not np.isfinite(k_fit):
+                continue  # skip series that failed to fit
+
+            k_values.append(k_fit)
+            k_vars.append(k_var if np.isfinite(k_var) and k_var > 0 else np.nan)
+            periods.append(2 * np.pi / k_fit)
+
+    if not k_values:
         raise RuntimeError("No usable N_i or N_c data found for fitting.")
 
-    x = np.concatenate(x_all)
-    y = np.concatenate(y_all)
+    period_array = np.array(periods)
 
-    p0 = _initial_guess(x, y)
-    popt, pcov = curve_fit(_cos_model, x, y, p0=p0, maxfev=10000)
+    # Use inverse-variance weighting when variances are available
+    if np.all(np.isfinite(k_vars)):
+        weights = 1 / np.array(k_vars)
+        k_mean = np.average(k_values, weights=weights)
+        period_mean = 2 * np.pi / k_mean
+        # Propagate uncertainty of weighted mean
+        k_mean_var = 1 / np.sum(weights)
+        period_std = (2 * np.pi) * np.sqrt(k_mean_var) / (k_mean ** 2)
+    else:
+        # Fall back to simple mean / sample-std
+        period_mean = float(np.mean(period_array))
+        period_std = float(np.std(period_array, ddof=1)) if len(period_array) > 1 else np.nan
 
-    _, k_fit, _, _ = popt
-    period = 2 * np.pi / k_fit
-
-    # Uncertainty propagation
-    k_var = pcov[1, 1] if pcov.size >= 4 else np.nan
-    k_std = np.sqrt(k_var) if np.isfinite(k_var) else np.nan
-    period_std = 2 * np.pi * k_std / (k_fit ** 2) if np.isfinite(k_std) else np.nan
-
-    return period, period_std
+    return float(period_mean), float(period_std)
 
 
 def main():
