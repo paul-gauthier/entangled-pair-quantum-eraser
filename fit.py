@@ -501,9 +501,14 @@ def main():
         phase_results = fit_phases(datasets, period)
         
         if phase_results['fit_success']:
+            phi_deg = np.degrees(phase_results['phi'])
+            phi_std_deg = np.degrees(phase_results['phi_std'])
+            phi_c_deg = np.degrees(phase_results['phi_c'])
+            phi_c_std_deg = np.degrees(phase_results['phi_c_std'])
+            
             print(f"\nGlobal phase fit results:")
-            print(f"  phi (global phase): {phase_results['phi']:.3f} ± {phase_results['phi_std']:.3f} rad")
-            print(f"  phi_c (coincidence phase): {phase_results['phi_c']:.3f} ± {phase_results['phi_c_std']:.3f} rad")
+            print(f"  phi (global phase): {phase_results['phi']:.3f} ± {phase_results['phi_std']:.3f} rad ({phi_deg:.1f} ± {phi_std_deg:.1f}°)")
+            print(f"  phi_c (coincidence phase): {phase_results['phi_c']:.3f} ± {phase_results['phi_c_std']:.3f} rad ({phi_c_deg:.1f} ± {phi_c_std_deg:.1f}°)")
             print(f"  Period used: {phase_results['period_used']:.2f} piezo steps")
             print(f"\nFitted amplitudes:")
             for series, amplitude in phase_results['amplitudes'].items():
