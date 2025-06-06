@@ -1,76 +1,9 @@
+#!/usr/bin/env python3
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
-# Comparing Signal and Idler
-data = """
-Angle	Signal	Idler
--45	4815	782
--22.5	1609	427
-0	266	720
-22.5	1761	1393
-45	4879	1918
-67.5	8716	1938
-90	10049	1582
-112.5	8428	1046
-135	5127	621
-"""
-
-# Both runs of the idler (3sec acq, 8sec acq)
-data = """
-Angle	Idler	Idler
--45	805	782
--22.5	411	427
-0	715	720
-22.5	1263	1393
-45	1939	1918
-67.5	2020	1938
-90	1668	1582
-112.5	1110	1046
-135	600	621
-"""
-
-# idlers with upper mzi arm blocked
-data="""
-Angler Idler90 Idler0
--45	782	1990
--22.5	427	2244
-0	720	1836
-22.5	1393	1190
-45	1918	605
-67.5	1938	406
-90	1582	596
-112.5	1046	943
-135	621	1236
-"""
-
-# signal; idlers with lower mzi arm blocked
-data="""
-Angle	Signal	Idler
--45	4815	1645
--22.5	1609	1057
-0	266	252
-22.5	1761	756
-45	4879	1361
-67.5	8716	1860
-90	10049	1887
-112.5	8428	1534
-135	5127	1057
-"""
-
-# idlers: upper arm blocked, lower arm blocked (after Sahil tweaked fixed MZI HWP)
-data="""
-Angle	Idler	Idler
--45	1645	1653
--22.5	1057	803
-0	252	508
-22.5	756	826
-45	1361	1457
-67.5	1860	1946
-90	1887	1963
-112.5	1534	1607
-135	1057	1114
-"""
 
 def parse_data(data_str):
     """Parse the tab-separated data string."""
