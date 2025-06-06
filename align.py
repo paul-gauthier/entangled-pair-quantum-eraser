@@ -1,42 +1,48 @@
 #!/usr/bin/env python3
 
+import json
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
 
-def parse_data(data_str):
-    """Parse the tab-separated data string."""
-    lines = data_str.strip().split('\n')[1:]  # Skip header
-    angles, signals, idlers = [], [], []
+def read_jsonl(fname):
+    """Read data from a jsonl file."""
+    signal_lp_angles, signal_counts = [], []
+    mzi_lp_angles, idler_counts = [], []
 
-    for line in lines:
-        angle, signal, idler = line.split('\t')
-        angles.append(float(angle))
-        signals.append(float(signal))
-        idlers.append(float(idler))
+    with open(fname, 'r') as f:
+        for line in f:
+            data = json.loads(line)
+            if 'signal_lp' in data and 'N_s' in data:
+                signal_lp_angles.append(data['signal_lp'])
+                signal_counts.append(data['N_s'])
+            if 'mzi_lp' in data and 'N_i' in data:
+                mzi_lp_angles.append(data['mzi_lp'])
+                idler_counts.append(data['N_i'])
 
-    return np.array(angles), np.array(signals), np.array(idlers)
+    return (
+        np.array(signal_lp_angles),
+        np.array(signal_counts),
+        np.array(mzi_lp_angles),
+        np.array(idler_counts),
+    )
 
 def cos_squared_model(theta, A, B, phi):
     """Cosine squared model: A * cos²(theta + phi) + B"""
     return A * np.cos(np.radians(theta + phi))**2 + B
 
-def fit_and_plot():
+def fit_and_plot(signal_angles, signal_counts, mzi_angles, idler_counts):
     """Fit cosine squared curves to signal and idler data."""
-    angles, signals, idlers = parse_data(data)
-
-    # Convert angles to radians for fitting
-    angles_rad = np.radians(angles)
-
     # Initial parameter guesses
     # For signal: amplitude, offset, phase shift
-    signal_guess = [np.max(signals) - np.min(signals), np.min(signals), 0]
-    idler_guess = [np.max(idlers) - np.min(idlers), np.min(idlers), 0]
+    signal_guess = [np.max(signal_counts) - np.min(signal_counts), np.min(signal_counts), 0]
+    idler_guess = [np.max(idler_counts) - np.min(idler_counts), np.min(idler_counts), 0]
 
     # Fit the curves
-    signal_params, signal_cov = curve_fit(cos_squared_model, angles, signals, p0=signal_guess)
-    idler_params, idler_cov = curve_fit(cos_squared_model, angles, idlers, p0=idler_guess)
+    signal_params, signal_cov = curve_fit(cos_squared_model, signal_angles, signal_counts, p0=signal_guess)
+    idler_params, idler_cov = curve_fit(cos_squared_model, mzi_angles, idler_counts, p0=idler_guess)
 
     # Print fit parameters
     print("Signal fit parameters:")
@@ -52,29 +58,30 @@ def fit_and_plot():
     print()
 
     # Generate smooth curves for plotting
-    angles_smooth = np.linspace(-45, 135, 200)
-    signal_fit = cos_squared_model(angles_smooth, *signal_params)
-    idler_fit = cos_squared_model(angles_smooth, *idler_params)
+    signal_angles_smooth = np.linspace(np.min(signal_angles), np.max(signal_angles), 200)
+    mzi_angles_smooth = np.linspace(np.min(mzi_angles), np.max(mzi_angles), 200)
+    signal_fit = cos_squared_model(signal_angles_smooth, *signal_params)
+    idler_fit = cos_squared_model(mzi_angles_smooth, *idler_params)
 
     # Plot the data and fits
     plt.figure(figsize=(12, 5))
 
     plt.subplot(1, 2, 1)
-    plt.scatter(angles, signals, color='blue', label='Signal LP', alpha=0.7)
-    plt.plot(angles_smooth, signal_fit, 'b-', label=f'Fit: {signal_params[0]:.0f}cos²(θ+{signal_params[2]:.1f}°)+{signal_params[1]:.0f}')
-    plt.xlabel('Angle (degrees)')
-    plt.ylabel('Signal counts')
-    plt.title('Signal vs Linear Polarizer Angle')
+    plt.scatter(signal_angles, signal_counts, color='blue', label='Signal LP', alpha=0.7)
+    plt.plot(signal_angles_smooth, signal_fit, 'b-', label=f'Fit: {signal_params[0]:.0f}cos²(θ+{signal_params[2]:.1f}°)+{signal_params[1]:.0f}')
+    plt.xlabel('Signal LP Angle (degrees)')
+    plt.ylabel('Signal counts (N_s)')
+    plt.title('Signal vs Signal LP Angle')
     plt.xticks(np.arange(-45, 180, 45))
     plt.legend()
     plt.grid(True, alpha=0.3)
 
     plt.subplot(1, 2, 2)
-    plt.scatter(angles, idlers, color='red', label='Idler LP', alpha=0.7)
-    plt.plot(angles_smooth, idler_fit, 'r-', label=f'Fit: {idler_params[0]:.0f}cos²(θ+{idler_params[2]:.1f}°)+{idler_params[1]:.0f}')
-    plt.xlabel('Angle (degrees)')
-    plt.ylabel('Idler counts')
-    plt.title('Idler vs Linear Polarizer Angle')
+    plt.scatter(mzi_angles, idler_counts, color='red', label='MZI LP', alpha=0.7)
+    plt.plot(mzi_angles_smooth, idler_fit, 'r-', label=f'Fit: {idler_params[0]:.0f}cos²(θ+{idler_params[2]:.1f}°)+{idler_params[1]:.0f}')
+    plt.xlabel('MZI LP Angle (degrees)')
+    plt.ylabel('Idler counts (N_i)')
+    plt.title('Idler vs MZI LP Angle')
     plt.xticks(np.arange(-45, 180, 45))
     plt.legend()
     plt.grid(True, alpha=0.3)
@@ -86,4 +93,10 @@ def fit_and_plot():
     return signal_params, idler_params
 
 if __name__ == "__main__":
-    fit_and_plot()
+    if len(sys.argv) != 2:
+        print(f"Usage: {sys.argv[0]} <jsonl_file>")
+        sys.exit(1)
+
+    fname = sys.argv[1]
+    signal_angles, signal_counts, mzi_angles, idler_counts = read_jsonl(fname)
+    fit_and_plot(signal_angles, signal_counts, mzi_angles, idler_counts)
