@@ -56,7 +56,6 @@ def _initial_guess(x: np.ndarray, y: np.ndarray) -> Tuple[float, float, float, f
     """Return initial guesses for A, k, phi, C."""
     C = np.mean(y)
     A = (np.max(y) - np.min(y)) / 2 if np.max(y) != np.min(y) else 1.0
-    span = x.max() - x.min() if x.max() != x.min() else 1.0
     guess_period = 22
     k = 2 * np.pi / guess_period
     phi = 0.0
@@ -365,7 +364,7 @@ def main():
             phi_c_deg = np.degrees(phase_results["phi_c"])
             phi_c_std_deg = np.degrees(phase_results["phi_c_std"])
 
-            print(f"\nGlobal phase fit results:")
+            print("\nGlobal phase fit results:")
             print(
                 f"  phi (global phase): {phase_results['phi']:.3f} ±"
                 f" {phase_results['phi_std']:.3f} rad ({phi_deg:.1f} ± {phi_std_deg:.1f}°)"
@@ -375,7 +374,7 @@ def main():
                 f" {phase_results['phi_c_std']:.3f} rad ({phi_c_deg:.1f} ± {phi_c_std_deg:.1f}°)"
             )
             print(f"  Period used: {phase_results['period_used']:.2f} piezo steps")
-            print(f"\nFitted amplitudes:")
+            print("\nFitted amplitudes:")
             for series, amplitude in phase_results["amplitudes"].items():
                 print(f"    {series}: {amplitude:.1f}")
         else:
