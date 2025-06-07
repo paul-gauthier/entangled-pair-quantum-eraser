@@ -204,8 +204,8 @@ def plot_counts(
         A_fit_c = -A_fit_c
         phi_fit_c += np.pi  # keep model invariant
         C0_fit_c -= A_fit_c  # compensate offset to preserve model
-    # Wrap phase into (−π, π]
-    phi_fit_c = (phi_fit_c + np.pi) % (2 * np.pi) - np.pi
+    # Wrap phase into [0, 2π)
+    phi_fit_c = phi_fit_c % (2 * np.pi)
 
     # ------------------------------------------------------------------
     # Fit idler counts with ½(1+cos(δ+φ)) model
@@ -229,8 +229,8 @@ def plot_counts(
         A_fit_i = -A_fit_i
         phi_fit_i += np.pi  # keep model invariant
         C0_fit_i -= A_fit_i  # compensate offset to preserve model
-    # Wrap phase into (−π, π]
-    phi_fit_i = (phi_fit_i + np.pi) % (2 * np.pi) - np.pi
+    # Wrap phase into [0, 2π)
+    phi_fit_i = phi_fit_i % (2 * np.pi)
 
     delta_fine = np.linspace(delta.min(), delta.max(), 500)
     Nc_fit = _cos_model(delta_fine, A_fit_c, C0_fit_c, phi_fit_c)
@@ -449,7 +449,7 @@ def plot_coincidence_counts_only(
         A_fit = -A_fit
         phi_fit += np.pi  # keep model invariant
         C0_fit -= A_fit  # compensate offset to preserve model
-    phi_fit = (phi_fit + np.pi) % (2 * np.pi) - np.pi  # Wrap phase into (−π, π]
+    phi_fit = phi_fit % (2 * np.pi)  # Wrap phase into [0, 2π)
 
     delta_fine = np.linspace(delta.min(), delta.max(), 500)
     Nc_fit_curve = _cos_model(delta_fine, A_fit, C0_fit, phi_fit)
