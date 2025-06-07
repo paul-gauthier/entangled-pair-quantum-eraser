@@ -210,11 +210,19 @@ def plot_counts(
         (2 * C0_fit_i / denom_i * A_err_i) ** 2 + (-2 * A_fit_i / denom_i * C0_err_i) ** 2
     )
 
+    # Calculate average counts (C0 + A/2) and uncertainties
+    avg_c = C0_fit_c + A_fit_c / 2
+    avg_i = C0_fit_i + A_fit_i / 2
+    # Error propagation for average: d(avg)/dC0 = 1, d(avg)/dA = 1/2
+    avg_err_c = np.sqrt(C0_err_c**2 + (A_err_c / 2)**2)
+    avg_err_i = np.sqrt(C0_err_i**2 + (A_err_i / 2)**2)
+
     # Print fitted parameters
     print(f"Fit results for {output_filename}:")
     print("  Coincidence counts:")
     print(f"    C0 = {C0_fit_c:.2f} ± {C0_err_c:.2f}")
     print(f"    A = {A_fit_c:.2f} ± {A_err_c:.2f}")
+    print(f"    Average = {avg_c:.2f} ± {avg_err_c:.2f}")
     print(
         f"    phi = {phi_fit_c:.2f} ± {phi_err_c:.2f} rad ({np.degrees(phi_fit_c):.1f} ±"
         f" {np.degrees(phi_err_c):.1f}°)"
@@ -223,6 +231,7 @@ def plot_counts(
     print("  Idler counts:")
     print(f"    C0 = {C0_fit_i:.2f} ± {C0_err_i:.2f}")
     print(f"    A = {A_fit_i:.2f} ± {A_err_i:.2f}")
+    print(f"    Average = {avg_i:.2f} ± {avg_err_i:.2f}")
     print(
         f"    phi = {phi_fit_i:.2f} ± {phi_err_i:.2f} rad ({np.degrees(phi_fit_i):.1f} ±"
         f" {np.degrees(phi_err_i):.1f}°)"
@@ -270,6 +279,7 @@ def plot_counts(
     textstr_i = (
         f"$C_0 = {C0_fit_i:.1f} \\pm {C0_err_i:.1f}$\n"
         f"$A = {A_fit_i:.1f} \\pm {A_err_i:.1f}$\n"
+        f"$\\mathrm{{Avg}} = {avg_i:.1f} \\pm {avg_err_i:.1f}$\n"
         f"$\\phi = {phi_fit_i:.2f} \\pm {phi_err_i:.2f}$ rad\n"
         f"$\\phi = {np.degrees(phi_fit_i):.1f} \\pm {np.degrees(phi_err_i):.1f}°$\n"
         f"$V = {V_vis_i:.3f} \\pm {V_err_i:.3f}$"
@@ -313,6 +323,7 @@ def plot_counts(
     textstr_c = (
         f"$C_0 = {C0_fit_c:.1f} \\pm {C0_err_c:.1f}$\n"
         f"$A = {A_fit_c:.1f} \\pm {A_err_c:.1f}$\n"
+        f"$\\mathrm{{Avg}} = {avg_c:.1f} \\pm {avg_err_c:.1f}$\n"
         f"$\\phi = {phi_fit_c:.2f} \\pm {phi_err_c:.2f}$ rad\n"
         f"$\\phi = {np.degrees(phi_fit_c):.1f} \\pm {np.degrees(phi_err_c):.1f}°$\n"
         f"$V = {V_vis_c:.3f} \\pm {V_err_c:.3f}$"
