@@ -215,12 +215,12 @@ def plot_counts(
     print("  Coincidence counts:")
     print(f"    C0 = {C0_fit_c:.2f} ± {C0_err_c:.2f}")
     print(f"    A = {A_fit_c:.2f} ± {A_err_c:.2f}")
-    print(f"    phi = {phi_fit_c:.2f} ± {phi_err_c:.2f} rad ({np.degrees(phi_fit_c):.1f}°)")
+    print(f"    phi = {phi_fit_c:.2f} ± {phi_err_c:.2f} rad ({np.degrees(phi_fit_c):.1f} ± {np.degrees(phi_err_c):.1f}°)")
     print(f"    Visibility V = {V_vis_c:.3f} ± {V_err_c:.3f}")
     print("  Idler counts:")
     print(f"    C0 = {C0_fit_i:.2f} ± {C0_err_i:.2f}")
     print(f"    A = {A_fit_i:.2f} ± {A_err_i:.2f}")
-    print(f"    phi = {phi_fit_i:.2f} ± {phi_err_i:.2f} rad ({np.degrees(phi_fit_i):.1f}°)")
+    print(f"    phi = {phi_fit_i:.2f} ± {phi_err_i:.2f} rad ({np.degrees(phi_fit_i):.1f} ± {np.degrees(phi_err_i):.1f}°)")
     print(f"    Visibility V = {V_vis_i:.3f} ± {V_err_i:.3f}")
     print(
         f"  LaTeX: Coincidence: $C_0 = {C0_fit_c:.2f},  A = {A_fit_c:.2f},  \\phi ="
@@ -273,6 +273,7 @@ def plot_counts(
         f"$C_0 = {C0_fit_i:.1f} \\pm {C0_err_i:.1f}$\n"
         f"$A = {A_fit_i:.1f} \\pm {A_err_i:.1f}$\n"
         f"$\\phi = {phi_fit_i:.2f} \\pm {phi_err_i:.2f}$ rad\n"
+        f"$\\phi = {np.degrees(phi_fit_i):.1f} \\pm {np.degrees(phi_err_i):.1f}°$\n"
         f"$V = {V_vis_i:.3f} \\pm {V_err_i:.3f}$"
     )
     props = dict(boxstyle="round", facecolor="wheat", alpha=0.8)
@@ -315,6 +316,7 @@ def plot_counts(
         f"$C_0 = {C0_fit_c:.1f} \\pm {C0_err_c:.1f}$\n"
         f"$A = {A_fit_c:.1f} \\pm {A_err_c:.1f}$\n"
         f"$\\phi = {phi_fit_c:.2f} \\pm {phi_err_c:.2f}$ rad\n"
+        f"$\\phi = {np.degrees(phi_fit_c):.1f} \\pm {np.degrees(phi_err_c):.1f}°$\n"
         f"$V = {V_vis_c:.3f} \\pm {V_err_c:.3f}$"
     )
     props = dict(boxstyle="round", facecolor="lightblue", alpha=0.8)
