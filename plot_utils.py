@@ -228,14 +228,6 @@ def plot_counts(
         f" {np.degrees(phi_err_i):.1f}°)"
     )
     print(f"    Visibility V = {V_vis_i:.3f} ± {V_err_i:.3f}")
-    print(
-        f"  LaTeX: Coincidence: $C_0 = {C0_fit_c:.2f},  A = {A_fit_c:.2f},  \\phi ="
-        f" {phi_fit_c:.2f}\\,\\text{{rad}}$. and $V = {V_vis_c:.3f}$"
-    )
-    print(
-        f"  LaTeX: Idler: $C_0 = {C0_fit_i:.2f},  A = {A_fit_i:.2f},  \\phi = {phi_fit_i:.2f}\\,"
-        f"\\text{{rad}}$. and $V = {V_vis_i:.3f}$"
-    )
 
     # Style ------------------------------------------------------------------
     plt.rcParams.update({"font.size": 16})
