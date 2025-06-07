@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import curve_fit
 
+
 def delta_from_steps(steps: np.ndarray | float, steps_per_2pi: float) -> np.ndarray | float:
     """Convert piezo steps → phase delay δ (radians)."""
     return steps * (2 * np.pi / steps_per_2pi)
@@ -89,8 +90,6 @@ def fit_steps_per_2pi(datasets):
 
     except Exception as e:
         raise RuntimeError(f"Could not fit STEPS_PER_2PI: {e}")
-
-
 
 
 # ---------------------------------------------------------------------------
