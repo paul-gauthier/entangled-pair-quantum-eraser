@@ -3,10 +3,9 @@
 import numpy as np
 import sys
 import os
+import json
 from typing import Dict, List, Tuple, Any
 from scipy.optimize import curve_fit
-
-from readcsv import PhotonicsDataset, parse_photonics_csv
 
 
 # ---------- Fitting utilities ----------
@@ -252,20 +251,64 @@ def fit_phases(datasets: List[PhotonicsDataset], period: float) -> Dict[str, Any
         }
 
 
-def main():
-    """Test the CSV parser with the provided data file."""
-    if len(sys.argv) > 1:
-        filepath = sys.argv[1]
-    else:
-        filepath = "2025-06-02.csv"
+def load_jsonl_dataset(filepath: str) -> 'PhotonicsDataset':
+    """Load a single dataset from a JSONL file."""
+    data = []
+    with open(filepath, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                data.append(json.loads(line))
+    
+    if not data:
+        raise ValueError(f"No data found in {filepath}")
+    
+    # Extract arrays from the data
+    steps = np.array([entry['step'] for entry in data])
+    N_s = np.array([entry['N_s'] for entry in data])
+    N_i = np.array([entry['N_i'] for entry in data])
+    N_c = np.array([entry['N_c'] for entry in data])
+    
+    # Create dataset with filename as name
+    dataset_name = os.path.basename(filepath).replace('.jsonl', '')
+    dataset = PhotonicsDataset(name=dataset_name)
+    dataset.piezo_pos = steps
+    dataset.N_s = N_s
+    dataset.N_i = N_i
+    dataset.N_c = N_c
+    
+    return dataset
 
-    if not os.path.exists(filepath):
-        print(f"File {filepath} not found.")
+
+def main():
+    """Load and fit multiple JSONL files provided on command line."""
+    if len(sys.argv) < 2:
+        print("Usage: python fit.py <file1.jsonl> [file2.jsonl] ...")
+        print("Example: python fit.py data/2025-06-06-18-01-22--eraser-stage-on.jsonl data/2025-06-06-18-01-22--eraser-stage-off.jsonl")
         return
 
-    datasets = parse_photonics_csv(filepath)
+    filepaths = sys.argv[1:]
+    
+    # Load all datasets
+    datasets = []
+    for filepath in filepaths:
+        if not os.path.exists(filepath):
+            print(f"File {filepath} not found.")
+            continue
+        
+        try:
+            dataset = load_jsonl_dataset(filepath)
+            datasets.append(dataset)
+            print(f"Loaded dataset '{dataset.name}' with {len(dataset.piezo_pos)} data points")
+        except Exception as e:
+            print(f"Error loading {filepath}: {e}")
+            continue
+    
+    if not datasets:
+        print("No valid datasets loaded.")
+        return
 
-    print(f"Parsed {len(datasets)} datasets from {filepath}")
+    print(f"\nLoaded {len(datasets)} datasets")
     print()
 
     for i, dataset in enumerate(datasets):
