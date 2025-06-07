@@ -19,18 +19,24 @@ from scipy.optimize import curve_fit
 # ---------------------------------------------------------------------------
 # Conversions between piezo stage steps, phase delay δ, and nanometres (nm)
 # ---------------------------------------------------------------------------
-STEPS_PER_2PI = 22.0          # 22 piezo steps correspond to 2π phase change
+# Default values - will be updated by fitting
+STEPS_PER_2PI = 22.0          # Will be fitted from data
 NM_PER_STEP = 26.03           # Piezo stage moves 26.03 nm per step
+
+# Global variable to store the fitted value
+_fitted_steps_per_2pi = None
 
 
 def delta_from_steps(steps: np.ndarray | float) -> np.ndarray | float:
     """Convert piezo steps → phase delay δ (radians)."""
-    return steps * (2 * np.pi / STEPS_PER_2PI)
+    steps_per_2pi = _fitted_steps_per_2pi if _fitted_steps_per_2pi is not None else STEPS_PER_2PI
+    return steps * (2 * np.pi / steps_per_2pi)
 
 
 def steps_from_delta(delta: np.ndarray | float) -> np.ndarray | float:
     """Convert phase delay δ (radians) → piezo steps."""
-    return delta * STEPS_PER_2PI / (2 * np.pi)
+    steps_per_2pi = _fitted_steps_per_2pi if _fitted_steps_per_2pi is not None else STEPS_PER_2PI
+    return delta * steps_per_2pi / (2 * np.pi)
 
 
 def steps_to_nm(steps: np.ndarray | float) -> np.ndarray | float:
@@ -59,6 +65,73 @@ def nm_to_delta(nm: np.ndarray | float) -> np.ndarray | float:
 def _cos_model(d, A, C0, phi):
     """Cosine model for fitting interference patterns."""
     return C0 + A * (1 + np.cos(d + phi)) / 2
+
+
+def _cos_model_with_period(steps, A, C0, phi, steps_per_2pi):
+    """Cosine model with variable period for fitting STEPS_PER_2PI."""
+    delta = steps * (2 * np.pi / steps_per_2pi)
+    return C0 + A * (1 + np.cos(delta + phi)) / 2
+
+
+def fit_steps_per_2pi(datasets):
+    """
+    Fit STEPS_PER_2PI from multiple datasets.
+    
+    Parameters
+    ----------
+    datasets : list of tuples
+        Each tuple should be (piezo_steps, counts) where counts can be Ni or Nc
+        
+    Returns
+    -------
+    float
+        The fitted STEPS_PER_2PI value
+    """
+    global _fitted_steps_per_2pi
+    
+    all_steps = []
+    all_counts = []
+    all_weights = []
+    
+    for piezo_steps, counts in datasets:
+        all_steps.extend(piezo_steps)
+        all_counts.extend(counts)
+        all_weights.extend(1.0 / np.sqrt(np.maximum(counts, 1)))  # Poisson weights
+    
+    all_steps = np.array(all_steps)
+    all_counts = np.array(all_counts)
+    all_weights = np.array(all_weights)
+    
+    # Initial guess
+    p0 = [np.ptp(all_counts), np.min(all_counts), 0.0, 22.0]
+    
+    try:
+        popt, _ = curve_fit(
+            _cos_model_with_period,
+            all_steps,
+            all_counts,
+            p0=p0,
+            sigma=all_weights,
+            absolute_sigma=True,
+            bounds=([0, 0, -np.pi, 10], [np.inf, np.inf, np.pi, 50])
+        )
+        
+        _, _, _, fitted_steps_per_2pi = popt
+        _fitted_steps_per_2pi = fitted_steps_per_2pi
+        
+        print(f"Fitted STEPS_PER_2PI = {fitted_steps_per_2pi:.3f}")
+        return fitted_steps_per_2pi
+        
+    except Exception as e:
+        print(f"Warning: Could not fit STEPS_PER_2PI, using default value {STEPS_PER_2PI}. Error: {e}")
+        _fitted_steps_per_2pi = STEPS_PER_2PI
+        return STEPS_PER_2PI
+
+
+def set_steps_per_2pi(value):
+    """Manually set the STEPS_PER_2PI value."""
+    global _fitted_steps_per_2pi
+    _fitted_steps_per_2pi = value
 
 
 # ---------------------------------------------------------------------------
