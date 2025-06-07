@@ -12,16 +12,16 @@ Example
 """
 from __future__ import annotations
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from scipy.optimize import curve_fit
 
 # ---------------------------------------------------------------------------
 # Conversions between piezo stage steps, phase delay δ, and nanometres (nm)
 # ---------------------------------------------------------------------------
 # Default values - will be updated by fitting
-STEPS_PER_2PI = 22.0          # Will be fitted from data
-NM_PER_STEP = 26.03           # Piezo stage moves 26.03 nm per step
+STEPS_PER_2PI = 22.0  # Will be fitted from data
+NM_PER_STEP = 26.03  # Piezo stage moves 26.03 nm per step
 
 # Global variable to store the fitted value
 _fitted_steps_per_2pi = None
@@ -76,35 +76,35 @@ def _cos_model_with_period(steps, A, C0, phi, steps_per_2pi):
 def fit_steps_per_2pi(datasets):
     """
     Fit STEPS_PER_2PI from multiple datasets.
-    
+
     Parameters
     ----------
     datasets : list of tuples
         Each tuple should be (piezo_steps, counts) where counts can be Ni or Nc
-        
+
     Returns
     -------
     float
         The fitted STEPS_PER_2PI value
     """
     global _fitted_steps_per_2pi
-    
+
     all_steps = []
     all_counts = []
     all_weights = []
-    
+
     for piezo_steps, counts in datasets:
         all_steps.extend(piezo_steps)
         all_counts.extend(counts)
         all_weights.extend(1.0 / np.sqrt(np.maximum(counts, 1)))  # Poisson weights
-    
+
     all_steps = np.array(all_steps)
     all_counts = np.array(all_counts)
     all_weights = np.array(all_weights)
-    
+
     # Initial guess
     p0 = [np.ptp(all_counts), np.min(all_counts), 0.0, 22.0]
-    
+
     try:
         popt, _ = curve_fit(
             _cos_model_with_period,
@@ -113,17 +113,19 @@ def fit_steps_per_2pi(datasets):
             p0=p0,
             sigma=all_weights,
             absolute_sigma=True,
-            bounds=([0, 0, -np.pi, 10], [np.inf, np.inf, np.pi, 50])
+            bounds=([0, 0, -np.pi, 10], [np.inf, np.inf, np.pi, 50]),
         )
-        
+
         _, _, _, fitted_steps_per_2pi = popt
         _fitted_steps_per_2pi = fitted_steps_per_2pi
-        
+
         print(f"Fitted STEPS_PER_2PI = {fitted_steps_per_2pi:.3f}")
         return fitted_steps_per_2pi
-        
+
     except Exception as e:
-        print(f"Warning: Could not fit STEPS_PER_2PI, using default value {STEPS_PER_2PI}. Error: {e}")
+        print(
+            f"Warning: Could not fit STEPS_PER_2PI, using default value {STEPS_PER_2PI}. Error: {e}"
+        )
         _fitted_steps_per_2pi = STEPS_PER_2PI
         return STEPS_PER_2PI
 
@@ -198,10 +200,10 @@ def plot_counts(
     # Convert optimiser output to physically meaningful parameters (Nc)
     # ------------------------------------------------------------------
     A_fit_c, C0_fit_c, phi_fit_c = popt_c
-    if A_fit_c < 0:               # enforce non-negative modulation depth
+    if A_fit_c < 0:  # enforce non-negative modulation depth
         A_fit_c = -A_fit_c
-        phi_fit_c += np.pi        # keep model invariant
-        C0_fit_c -= A_fit_c         # compensate offset to preserve model
+        phi_fit_c += np.pi  # keep model invariant
+        C0_fit_c -= A_fit_c  # compensate offset to preserve model
     # Wrap phase into (−π, π]
     phi_fit_c = (phi_fit_c + np.pi) % (2 * np.pi) - np.pi
 
@@ -222,10 +224,10 @@ def plot_counts(
     # Convert optimiser output to physically meaningful parameters (Ni)
     # ------------------------------------------------------------------
     A_fit_i, C0_fit_i, phi_fit_i = popt_i
-    if A_fit_i < 0:               # enforce non-negative modulation depth
+    if A_fit_i < 0:  # enforce non-negative modulation depth
         A_fit_i = -A_fit_i
-        phi_fit_i += np.pi        # keep model invariant
-        C0_fit_i -= A_fit_i         # compensate offset to preserve model
+        phi_fit_i += np.pi  # keep model invariant
+        C0_fit_i -= A_fit_i  # compensate offset to preserve model
     # Wrap phase into (−π, π]
     phi_fit_i = (phi_fit_i + np.pi) % (2 * np.pi) - np.pi
 
@@ -247,10 +249,14 @@ def plot_counts(
     print(f"    phi = {phi_fit_i:.2f} rad ({np.degrees(phi_fit_i):.1f}°)")
     V_vis_i = A_fit_i / (A_fit_i + 2 * C0_fit_i)
     print(f"    Visibility V = {V_vis_i:.3f}")
-    print(f"  LaTeX: Coincidence: $C_0 = {C0_fit_c:.2f},  A = {A_fit_c:.2f},  \\phi = {phi_fit_c:.2f}\\," \
-          f"\\text{{rad}}$. and $V = {V_vis_c:.3f}$")
-    print(f"  LaTeX: Idler: $C_0 = {C0_fit_i:.2f},  A = {A_fit_i:.2f},  \\phi = {phi_fit_i:.2f}\\," \
-          f"\\text{{rad}}$. and $V = {V_vis_i:.3f}$")
+    print(
+        f"  LaTeX: Coincidence: $C_0 = {C0_fit_c:.2f},  A = {A_fit_c:.2f},  \\phi ="
+        f" {phi_fit_c:.2f}\\,\\text{{rad}}$. and $V = {V_vis_c:.3f}$"
+    )
+    print(
+        f"  LaTeX: Idler: $C_0 = {C0_fit_i:.2f},  A = {A_fit_i:.2f},  \\phi = {phi_fit_i:.2f}\\,"
+        f"\\text{{rad}}$. and $V = {V_vis_i:.3f}$"
+    )
 
     # Style ------------------------------------------------------------------
     plt.rcParams.update({"font.size": 16})
@@ -275,8 +281,8 @@ def plot_counts(
         yerr=Ni_err,
         fmt="s",
         color=color_ni,
-        #linestyle=":",
-        label=fr"Idler ($N_{{i,{label_suffix}}}$, $V={V_vis_i:.3f}$) with fit",
+        # linestyle=":",
+        label=rf"Idler ($N_{{i,{label_suffix}}}$, $V={V_vis_i:.3f}$) with fit",
         capsize=3,
     )
     # Overlay best-fit cosine curve for idler
@@ -298,8 +304,8 @@ def plot_counts(
         yerr=Nc_err,
         fmt="x",
         color=color_nc,
-        #linestyle="--",
-        label=fr"Coincidence ($N_{{c,{label_suffix}}}$, $V={V_vis_c:.3f}$) with fit",
+        # linestyle="--",
+        label=rf"Coincidence ($N_{{c,{label_suffix}}}$, $V={V_vis_c:.3f}$) with fit",
         capsize=3,
     )
     # Overlay best-fit cosine curve
@@ -312,7 +318,7 @@ def plot_counts(
     )
     ax2.grid(True, linestyle=":", alpha=0.7)
     ax2.set_xlabel(r"Phase Delay $\delta$ (rad)", fontsize=18)
-    ax2.legend(loc='upper right')
+    ax2.legend(loc="upper right")
 
     # Shared x-axis tick labels ---------------------------------------------
     xticks = np.arange(0, np.max(delta) + np.pi / 2, np.pi)
@@ -406,8 +412,10 @@ def plot_coincidence_counts_only(
     print(f"  phi = {phi_fit:.2f} rad ({np.degrees(phi_fit):.1f}°)")
     V_vis = A_fit / (A_fit + 2 * C0_fit) if (A_fit + 2 * C0_fit) != 0 else 0
     print(f"  Visibility V = {V_vis:.3f}")
-    print(f"  LaTeX: $C_0 = {C0_fit:.2f},  A = {A_fit:.2f},  \\phi = {phi_fit:.2f}\\," \
-          f"\\text{{rad}}$. and $V = {V_vis:.3f}$")
+    print(
+        f"  LaTeX: $C_0 = {C0_fit:.2f},  A = {A_fit:.2f},  \\phi = {phi_fit:.2f}\\,"
+        f"\\text{{rad}}$. and $V = {V_vis:.3f}$"
+    )
 
     # Style
     plt.rcParams.update({"font.size": 16})
@@ -430,13 +438,13 @@ def plot_coincidence_counts_only(
         yerr=Nc_err,
         fmt="x",
         color=color_nc,
-        label=fr"{label_suffix}, $V={V_vis:.3f}$ with fit",
+        label=rf"{label_suffix}, $V={V_vis:.3f}$ with fit",
         capsize=3,
     )
     ax.plot(delta_fine, Nc_fit_curve, linestyle="--", color=color_nc, lw=1)
     ax.grid(True, linestyle=":", alpha=0.7)
     ax.set_xlabel(r"Phase Delay $\delta$ (rad)", fontsize=18)
-    ax.legend(loc='upper right')
+    ax.legend(loc="upper right")
 
     xticks = np.arange(0, np.max(delta) + np.pi / 2, np.pi)
     xticklabels = ["0"] + [f"{i}$\\pi$" for i in range(1, len(xticks))]
@@ -447,7 +455,7 @@ def plot_coincidence_counts_only(
     ax_nm = ax.secondary_xaxis("top", functions=(delta_to_nm, nm_to_delta))
     ax_nm.set_xlabel("Piezo Displacement (nm)", fontsize=16)
 
-    fig.tight_layout(rect=[0, 0, 1, 0.96]) # Adjust rect for suptitle
+    fig.tight_layout(rect=[0, 0, 1, 0.96])  # Adjust rect for suptitle
     plt.savefig(output_filename)
     if show:
         plt.show()

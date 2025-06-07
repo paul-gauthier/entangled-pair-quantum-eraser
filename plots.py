@@ -6,7 +6,7 @@ import sys
 
 import numpy as np
 
-from plot_utils import plot_counts, fit_steps_per_2pi
+from plot_utils import fit_steps_per_2pi, plot_counts
 
 
 def load_jsonl_data(filename):
@@ -37,24 +37,24 @@ def main():
     # First pass: collect all data for fitting STEPS_PER_2PI
     print("Collecting data to fit STEPS_PER_2PI...")
     datasets_for_fitting = []
-    
+
     for jsonl_filename in sys.argv[1:]:
         if not os.path.exists(jsonl_filename):
             print(f"Warning: File {jsonl_filename} not found, skipping.")
             continue
-            
+
         piezo_steps, Ns, Ni, Nc = load_jsonl_data(jsonl_filename)
         # Use coincidence counts for fitting as they typically have the clearest oscillation
         datasets_for_fitting.append((piezo_steps, Nc))
-    
+
     if not datasets_for_fitting:
         print("No valid data files found!")
         sys.exit(1)
-    
+
     # Fit STEPS_PER_2PI from all datasets
     fitted_steps_per_2pi = fit_steps_per_2pi(datasets_for_fitting)
     print(f"Using STEPS_PER_2PI = {fitted_steps_per_2pi:.3f} for all plots\n")
-    
+
     # Second pass: generate plots with fitted parameter
     for jsonl_filename in sys.argv[1:]:
         if not os.path.exists(jsonl_filename):
