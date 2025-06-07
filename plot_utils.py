@@ -280,7 +280,7 @@ def plot_counts(
         fmt="s",
         color=color_ni,
         # linestyle=":",
-        label=rf"N_i",
+        label=r"N_i",
         capsize=3,
     )
     # Overlay best-fit cosine curve for idler
@@ -319,7 +319,7 @@ def plot_counts(
         fmt="x",
         color=color_nc,
         # linestyle="--",
-        label=rf"N_c",
+        label=r"N_c",
         capsize=3,
     )
     # Overlay best-fit cosine curve
