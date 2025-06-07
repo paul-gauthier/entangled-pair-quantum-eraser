@@ -186,7 +186,7 @@ def plot_counts(
     # Fit coincidence counts with ½(1+cos(δ+φ)) model
     # ------------------------------------------------------------------
     p0_c = [np.ptp(Nc), np.min(Nc), 0.0]  # initial guesses
-    popt_c, _ = curve_fit(
+    popt_c, pcov_c = curve_fit(
         _cos_model,
         delta,
         Nc,
@@ -199,6 +199,7 @@ def plot_counts(
     # Convert optimiser output to physically meaningful parameters (Nc)
     # ------------------------------------------------------------------
     A_fit_c, C0_fit_c, phi_fit_c = popt_c
+    A_err_c, C0_err_c, phi_err_c = np.sqrt(np.diag(pcov_c))
     if A_fit_c < 0:  # enforce non-negative modulation depth
         A_fit_c = -A_fit_c
         phi_fit_c += np.pi  # keep model invariant
@@ -210,7 +211,7 @@ def plot_counts(
     # Fit idler counts with ½(1+cos(δ+φ)) model
     # ------------------------------------------------------------------
     p0_i = [np.ptp(Ni), np.min(Ni), 0.0]  # initial guesses
-    popt_i, _ = curve_fit(
+    popt_i, pcov_i = curve_fit(
         _cos_model,
         delta,
         Ni,
@@ -223,6 +224,7 @@ def plot_counts(
     # Convert optimiser output to physically meaningful parameters (Ni)
     # ------------------------------------------------------------------
     A_fit_i, C0_fit_i, phi_fit_i = popt_i
+    A_err_i, C0_err_i, phi_err_i = np.sqrt(np.diag(pcov_i))
     if A_fit_i < 0:  # enforce non-negative modulation depth
         A_fit_i = -A_fit_i
         phi_fit_i += np.pi  # keep model invariant
@@ -234,20 +236,29 @@ def plot_counts(
     Nc_fit = _cos_model(delta_fine, A_fit_c, C0_fit_c, phi_fit_c)
     Ni_fit = _cos_model(delta_fine, A_fit_i, C0_fit_i, phi_fit_i)
 
+    # Calculate visibility uncertainties using error propagation
+    V_vis_c = A_fit_c / (A_fit_c + 2 * C0_fit_c)
+    V_vis_i = A_fit_i / (A_fit_i + 2 * C0_fit_i)
+    
+    # Error propagation for visibility V = A/(A + 2*C0)
+    # dV/dA = 2*C0/(A + 2*C0)^2, dV/dC0 = -2*A/(A + 2*C0)^2
+    denom_c = (A_fit_c + 2 * C0_fit_c) ** 2
+    denom_i = (A_fit_i + 2 * C0_fit_i) ** 2
+    V_err_c = np.sqrt((2 * C0_fit_c / denom_c * A_err_c) ** 2 + (-2 * A_fit_c / denom_c * C0_err_c) ** 2)
+    V_err_i = np.sqrt((2 * C0_fit_i / denom_i * A_err_i) ** 2 + (-2 * A_fit_i / denom_i * C0_err_i) ** 2)
+
     # Print fitted parameters
     print(f"Fit results for {output_filename}:")
     print("  Coincidence counts:")
-    print(f"    C0 = {C0_fit_c:.2f}")
-    print(f"    A = {A_fit_c:.2f}")
-    print(f"    phi = {phi_fit_c:.2f} rad ({np.degrees(phi_fit_c):.1f}°)")
-    V_vis_c = A_fit_c / (A_fit_c + 2 * C0_fit_c)
-    print(f"    Visibility V = {V_vis_c:.3f}")
+    print(f"    C0 = {C0_fit_c:.2f} ± {C0_err_c:.2f}")
+    print(f"    A = {A_fit_c:.2f} ± {A_err_c:.2f}")
+    print(f"    phi = {phi_fit_c:.2f} ± {phi_err_c:.2f} rad ({np.degrees(phi_fit_c):.1f}°)")
+    print(f"    Visibility V = {V_vis_c:.3f} ± {V_err_c:.3f}")
     print("  Idler counts:")
-    print(f"    C0 = {C0_fit_i:.2f}")
-    print(f"    A = {A_fit_i:.2f}")
-    print(f"    phi = {phi_fit_i:.2f} rad ({np.degrees(phi_fit_i):.1f}°)")
-    V_vis_i = A_fit_i / (A_fit_i + 2 * C0_fit_i)
-    print(f"    Visibility V = {V_vis_i:.3f}")
+    print(f"    C0 = {C0_fit_i:.2f} ± {C0_err_i:.2f}")
+    print(f"    A = {A_fit_i:.2f} ± {A_err_i:.2f}")
+    print(f"    phi = {phi_fit_i:.2f} ± {phi_err_i:.2f} rad ({np.degrees(phi_fit_i):.1f}°)")
+    print(f"    Visibility V = {V_vis_i:.3f} ± {V_err_i:.3f}")
     print(
         f"  LaTeX: Coincidence: $C_0 = {C0_fit_c:.2f},  A = {A_fit_c:.2f},  \\phi ="
         f" {phi_fit_c:.2f}\\,\\text{{rad}}$. and $V = {V_vis_c:.3f}$"
@@ -296,8 +307,10 @@ def plot_counts(
 
     # Add fit parameters text box for idler
     textstr_i = (
-        f"$C_0 = {C0_fit_i:.1f}$\n$A = {A_fit_i:.1f}$\n$\\phi = {phi_fit_i:.2f}$ rad\n$V ="
-        f" {V_vis_i:.3f}$"
+        f"$C_0 = {C0_fit_i:.1f} \\pm {C0_err_i:.1f}$\n"
+        f"$A = {A_fit_i:.1f} \\pm {A_err_i:.1f}$\n"
+        f"$\\phi = {phi_fit_i:.2f} \\pm {phi_err_i:.2f}$ rad\n"
+        f"$V = {V_vis_i:.3f} \\pm {V_err_i:.3f}$"
     )
     props = dict(boxstyle="round", facecolor="wheat", alpha=0.8)
     ax1.text(
@@ -336,8 +349,10 @@ def plot_counts(
 
     # Add fit parameters text box for coincidence
     textstr_c = (
-        f"$C_0 = {C0_fit_c:.1f}$\n$A = {A_fit_c:.1f}$\n$\\phi = {phi_fit_c:.2f}$ rad\n$V ="
-        f" {V_vis_c:.3f}$"
+        f"$C_0 = {C0_fit_c:.1f} \\pm {C0_err_c:.1f}$\n"
+        f"$A = {A_fit_c:.1f} \\pm {A_err_c:.1f}$\n"
+        f"$\\phi = {phi_fit_c:.2f} \\pm {phi_err_c:.2f}$ rad\n"
+        f"$V = {V_vis_c:.3f} \\pm {V_err_c:.3f}$"
     )
     props = dict(boxstyle="round", facecolor="lightblue", alpha=0.8)
     ax2.text(
