@@ -214,8 +214,8 @@ def plot_counts(
     avg_c = C0_fit_c + A_fit_c / 2
     avg_i = C0_fit_i + A_fit_i / 2
     # Error propagation for average: d(avg)/dC0 = 1, d(avg)/dA = 1/2
-    avg_err_c = np.sqrt(C0_err_c**2 + (A_err_c / 2)**2)
-    avg_err_i = np.sqrt(C0_err_i**2 + (A_err_i / 2)**2)
+    avg_err_c = np.sqrt(C0_err_c**2 + (A_err_c / 2) ** 2)
+    avg_err_i = np.sqrt(C0_err_i**2 + (A_err_i / 2) ** 2)
 
     # Print fitted parameters
     print(f"Fit results for {output_filename}:")
