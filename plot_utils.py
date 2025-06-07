@@ -280,7 +280,7 @@ def plot_counts(
         fmt="s",
         color=color_ni,
         # linestyle=":",
-        label=rf"Idler ($N_{{i,{label_suffix}}}$, $V={V_vis_i:.3f}$) with fit",
+        label=rf"N_i",
         capsize=3,
     )
     # Overlay best-fit cosine curve for idler
@@ -303,7 +303,7 @@ def plot_counts(
         fmt="x",
         color=color_nc,
         # linestyle="--",
-        label=rf"Coincidence ($N_{{c,{label_suffix}}}$, $V={V_vis_c:.3f}$) with fit",
+        label=rf"N_c",
         capsize=3,
     )
     # Overlay best-fit cosine curve
