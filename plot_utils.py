@@ -176,7 +176,6 @@ def plot_counts(
     print()
 
     # Poisson (√N) uncertainties
-    Ns_err = np.sqrt(Ns)
     Ni_err = np.sqrt(Ni)
     Nc_err = np.sqrt(Nc)
 
@@ -237,13 +236,13 @@ def plot_counts(
 
     # Print fitted parameters
     print(f"Fit results for {output_filename}:")
-    print(f"  Coincidence counts:")
+    print("  Coincidence counts:")
     print(f"    C0 = {C0_fit_c:.2f}")
     print(f"    A = {A_fit_c:.2f}")
     print(f"    phi = {phi_fit_c:.2f} rad ({np.degrees(phi_fit_c):.1f}°)")
     V_vis_c = A_fit_c / (A_fit_c + 2 * C0_fit_c)
     print(f"    Visibility V = {V_vis_c:.3f}")
-    print(f"  Idler counts:")
+    print("  Idler counts:")
     print(f"    C0 = {C0_fit_i:.2f}")
     print(f"    A = {A_fit_i:.2f}")
     print(f"    phi = {phi_fit_i:.2f} rad ({np.degrees(phi_fit_i):.1f}°)")
@@ -260,18 +259,17 @@ def plot_counts(
 
     # Style ------------------------------------------------------------------
     plt.rcParams.update({"font.size": 16})
-    color_ns, color_nc, color_ni = "tab:blue", "tab:red", "tab:green"
+    color_nc, color_ni = "tab:red", "tab:green"
 
     # Figure & axes ----------------------------------------------------------
     fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=(10, 8))
 
     # Add title
     if label_suffix:
-        if label_suffix:
-            title = label_suffix
-        else:
-            title = "Counts vs Phase Delay"
-        fig.suptitle(title, fontsize=20)
+        title = label_suffix
+    else:
+        title = "Counts vs Phase Delay"
+    fig.suptitle(title, fontsize=20)
 
     # Top panel: Ni only -----------------------------------------------------
     ax1.set_ylabel(r"Counts/sec", fontsize=18)
