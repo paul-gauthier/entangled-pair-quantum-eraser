@@ -293,6 +293,12 @@ def plot_counts(
     )
     ax1.grid(True, linestyle=":", alpha=0.7)
     ax1.legend(loc="center right")
+    
+    # Add fit parameters text box for idler
+    textstr_i = f'$C_0 = {C0_fit_i:.1f}$\n$A = {A_fit_i:.1f}$\n$\\phi = {phi_fit_i:.2f}$ rad\n$V = {V_vis_i:.3f}$'
+    props = dict(boxstyle='round', facecolor='wheat', alpha=0.8)
+    ax1.text(0.02, 0.98, textstr_i, transform=ax1.transAxes, fontsize=12,
+             verticalalignment='top', bbox=props)
 
     # Bottom panel: Nc -------------------------------------------------------
     ax2.set_ylabel(r"Counts/sec", fontsize=18)
@@ -317,6 +323,12 @@ def plot_counts(
     ax2.grid(True, linestyle=":", alpha=0.7)
     ax2.set_xlabel(r"Phase Delay $\delta$ (rad)", fontsize=18)
     ax2.legend(loc="upper right")
+    
+    # Add fit parameters text box for coincidence
+    textstr_c = f'$C_0 = {C0_fit_c:.1f}$\n$A = {A_fit_c:.1f}$\n$\\phi = {phi_fit_c:.2f}$ rad\n$V = {V_vis_c:.3f}$'
+    props = dict(boxstyle='round', facecolor='lightblue', alpha=0.8)
+    ax2.text(0.02, 0.98, textstr_c, transform=ax2.transAxes, fontsize=12,
+             verticalalignment='top', bbox=props)
 
     # Shared x-axis tick labels ---------------------------------------------
     xticks = np.arange(0, np.max(delta) + np.pi / 2, np.pi)
