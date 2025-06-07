@@ -307,7 +307,7 @@ def plot_counts(
         lw=1,
     )
     ax1.grid(True, linestyle=":", alpha=0.7)
-    ax1.legend(loc="center right")
+    ax1.legend(loc="upper right")
 
     # Add fit parameters text box for idler
     textstr_i = (
