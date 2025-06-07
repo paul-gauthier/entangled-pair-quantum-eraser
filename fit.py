@@ -8,6 +8,33 @@ from typing import Dict, List, Tuple, Any
 from scipy.optimize import curve_fit
 
 
+# Import PhotonicsDataset class definition
+class PhotonicsDataset:
+    """Represents a single dataset with N_s, N_i, N_c columns."""
+
+    def __init__(self, name: str = ""):
+        self.name = name
+        self.piezo_pos = None
+        self.N_s = None
+        self.N_i = None
+        self.N_c = None
+
+    def __repr__(self):
+        return f"PhotonicsDataset(name='{self.name}', points={len(self.piezo_pos) if self.piezo_pos is not None else 0})"
+
+    def print(self):
+        print(f"Dataset: {self.name}")
+        if self.piezo_pos is not None:
+            print(f"  Piezo positions: {len(self.piezo_pos)} points, range [{self.piezo_pos.min():.1f}, {self.piezo_pos.max():.1f}]")
+        if self.N_s is not None:
+            print(f"  N_s: mean={np.mean(self.N_s):.1f}, std={np.std(self.N_s):.1f}")
+        if self.N_i is not None:
+            print(f"  N_i: mean={np.mean(self.N_i):.1f}, std={np.std(self.N_i):.1f}")
+        if self.N_c is not None:
+            print(f"  N_c: mean={np.mean(self.N_c):.1f}, std={np.std(self.N_c):.1f}")
+        print()
+
+
 # ---------- Fitting utilities ----------
 def _cos_model(x: np.ndarray, A: float, k: float, phi: float, C: float) -> np.ndarray:
     """
