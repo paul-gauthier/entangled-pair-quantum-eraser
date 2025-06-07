@@ -19,8 +19,6 @@ from scipy.optimize import curve_fit
 # ---------------------------------------------------------------------------
 # Conversions between piezo stage steps, phase delay δ, and nanometres (nm)
 # ---------------------------------------------------------------------------
-# Default values - will be updated by fitting
-STEPS_PER_2PI = 22.0  # Will be fitted from data
 NM_PER_STEP = 26.03  # Piezo stage moves 26.03 nm per step
 
 # Global variable to store the fitted value
@@ -29,14 +27,16 @@ _fitted_steps_per_2pi = None
 
 def delta_from_steps(steps: np.ndarray | float) -> np.ndarray | float:
     """Convert piezo steps → phase delay δ (radians)."""
-    steps_per_2pi = _fitted_steps_per_2pi if _fitted_steps_per_2pi is not None else STEPS_PER_2PI
-    return steps * (2 * np.pi / steps_per_2pi)
+    if _fitted_steps_per_2pi is None:
+        raise ValueError("STEPS_PER_2PI has not been fitted. Call fit_steps_per_2pi() first.")
+    return steps * (2 * np.pi / _fitted_steps_per_2pi)
 
 
 def steps_from_delta(delta: np.ndarray | float) -> np.ndarray | float:
     """Convert phase delay δ (radians) → piezo steps."""
-    steps_per_2pi = _fitted_steps_per_2pi if _fitted_steps_per_2pi is not None else STEPS_PER_2PI
-    return delta * steps_per_2pi / (2 * np.pi)
+    if _fitted_steps_per_2pi is None:
+        raise ValueError("STEPS_PER_2PI has not been fitted. Call fit_steps_per_2pi() first.")
+    return delta * _fitted_steps_per_2pi / (2 * np.pi)
 
 
 def steps_to_nm(steps: np.ndarray | float) -> np.ndarray | float:
@@ -123,11 +123,7 @@ def fit_steps_per_2pi(datasets):
         return fitted_steps_per_2pi
 
     except Exception as e:
-        print(
-            f"Warning: Could not fit STEPS_PER_2PI, using default value {STEPS_PER_2PI}. Error: {e}"
-        )
-        _fitted_steps_per_2pi = STEPS_PER_2PI
-        return STEPS_PER_2PI
+        raise RuntimeError(f"Could not fit STEPS_PER_2PI: {e}")
 
 
 def set_steps_per_2pi(value):
