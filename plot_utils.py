@@ -239,13 +239,17 @@ def plot_counts(
     # Calculate visibility uncertainties using error propagation
     V_vis_c = A_fit_c / (A_fit_c + 2 * C0_fit_c)
     V_vis_i = A_fit_i / (A_fit_i + 2 * C0_fit_i)
-    
+
     # Error propagation for visibility V = A/(A + 2*C0)
     # dV/dA = 2*C0/(A + 2*C0)^2, dV/dC0 = -2*A/(A + 2*C0)^2
     denom_c = (A_fit_c + 2 * C0_fit_c) ** 2
     denom_i = (A_fit_i + 2 * C0_fit_i) ** 2
-    V_err_c = np.sqrt((2 * C0_fit_c / denom_c * A_err_c) ** 2 + (-2 * A_fit_c / denom_c * C0_err_c) ** 2)
-    V_err_i = np.sqrt((2 * C0_fit_i / denom_i * A_err_i) ** 2 + (-2 * A_fit_i / denom_i * C0_err_i) ** 2)
+    V_err_c = np.sqrt(
+        (2 * C0_fit_c / denom_c * A_err_c) ** 2 + (-2 * A_fit_c / denom_c * C0_err_c) ** 2
+    )
+    V_err_i = np.sqrt(
+        (2 * C0_fit_i / denom_i * A_err_i) ** 2 + (-2 * A_fit_i / denom_i * C0_err_i) ** 2
+    )
 
     # Print fitted parameters
     print(f"Fit results for {output_filename}:")
