@@ -16,22 +16,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import curve_fit
 
-# Global variable to store the fitted value
-_fitted_steps_per_2pi = None
-
-
-def delta_from_steps(steps: np.ndarray | float) -> np.ndarray | float:
+def delta_from_steps(steps: np.ndarray | float, steps_per_2pi: float) -> np.ndarray | float:
     """Convert piezo steps → phase delay δ (radians)."""
-    if _fitted_steps_per_2pi is None:
-        raise ValueError("STEPS_PER_2PI has not been fitted. Call fit_steps_per_2pi() first.")
-    return steps * (2 * np.pi / _fitted_steps_per_2pi)
+    return steps * (2 * np.pi / steps_per_2pi)
 
 
-def steps_from_delta(delta: np.ndarray | float) -> np.ndarray | float:
+def steps_from_delta(delta: np.ndarray | float, steps_per_2pi: float) -> np.ndarray | float:
     """Convert phase delay δ (radians) → piezo steps."""
-    if _fitted_steps_per_2pi is None:
-        raise ValueError("STEPS_PER_2PI has not been fitted. Call fit_steps_per_2pi() first.")
-    return delta * _fitted_steps_per_2pi / (2 * np.pi)
+    return delta * steps_per_2pi / (2 * np.pi)
 
 
 # ---------------------------------------------------------------------------
@@ -62,7 +54,6 @@ def fit_steps_per_2pi(datasets):
     float
         The fitted STEPS_PER_2PI value
     """
-    global _fitted_steps_per_2pi
 
     all_steps = []
     all_counts = []
@@ -92,7 +83,6 @@ def fit_steps_per_2pi(datasets):
         )
 
         _, _, _, fitted_steps_per_2pi = popt
-        _fitted_steps_per_2pi = fitted_steps_per_2pi
 
         print(f"Fitted STEPS_PER_2PI = {fitted_steps_per_2pi:.3f}")
         return fitted_steps_per_2pi
@@ -101,10 +91,6 @@ def fit_steps_per_2pi(datasets):
         raise RuntimeError(f"Could not fit STEPS_PER_2PI: {e}")
 
 
-def set_steps_per_2pi(value):
-    """Manually set the STEPS_PER_2PI value."""
-    global _fitted_steps_per_2pi
-    _fitted_steps_per_2pi = value
 
 
 # ---------------------------------------------------------------------------
@@ -115,6 +101,7 @@ def plot_counts(
     Ns: np.ndarray,
     Ni: np.ndarray,
     Nc: np.ndarray,
+    steps_per_2pi: float,
     *,
     output_filename: str = "counts_vs_phase_delay.pdf",
     label_suffix: str = "",
@@ -130,6 +117,8 @@ def plot_counts(
     Ns, Ni, Nc :
         Arrays of signal, idler, and coincidence counts (same length as
         ``piezo_steps``).
+    steps_per_2pi :
+        Conversion factor from piezo steps to 2π phase delay.
     output_filename :
         Path where the PDF/PNG will be written.
     label_suffix :
@@ -151,7 +140,7 @@ def plot_counts(
     Nc_err = np.sqrt(Nc)
 
     # Phase delay for x-axis
-    delta = delta_from_steps(piezo_steps)
+    delta = delta_from_steps(piezo_steps, steps_per_2pi)
 
     # ------------------------------------------------------------------
     # Fit coincidence counts with ½(1+cos(δ+φ)) model

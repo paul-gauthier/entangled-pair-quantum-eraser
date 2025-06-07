@@ -78,6 +78,7 @@ def main():
             Ns,
             Ni,
             Nc,
+            fitted_steps_per_2pi,
             output_filename=output_filename,
             label_suffix=basename,
         )
