@@ -152,21 +152,31 @@ def plot_counts(
     # ------------------------------------------------------------------
     # Fit coincidence counts with ½(1+cos(δ+φ)) model
     # ------------------------------------------------------------------
-    p0_c = [np.ptp(Nc), np.min(Nc), 0.0]  # initial guesses
-    bounds_c = ([0, 0, -np.inf], [np.inf, np.inf, np.inf])
     if nc_phi is not None:
-        p0_c[2] = nc_phi
-        bounds_c = ([0, 0, nc_phi], [np.inf, np.inf, nc_phi])
 
-    popt_c, pcov_c = curve_fit(
-        _cos_model,
-        delta,
-        Nc,
-        p0=p0_c,
-        sigma=Nc_err,
-        absolute_sigma=True,
-        bounds=bounds_c,
-    )
+        def model_c(d, A, C0):
+            return _cos_model(d, A, C0, nc_phi)
+
+        p0_c = [np.ptp(Nc), np.min(Nc)]
+        bounds_c = ([0, 0], [np.inf, np.inf])
+        popt_c_fit, pcov_c_fit = curve_fit(
+            model_c, delta, Nc, p0=p0_c, sigma=Nc_err, absolute_sigma=True, bounds=bounds_c
+        )
+        popt_c = [popt_c_fit[0], popt_c_fit[1], nc_phi]
+        pcov_c = np.zeros((3, 3))
+        pcov_c[:2, :2] = pcov_c_fit
+    else:
+        p0_c = [np.ptp(Nc), np.min(Nc), 0.0]  # initial guesses
+        bounds_c = ([0, 0, -np.inf], [np.inf, np.inf, np.inf])
+        popt_c, pcov_c = curve_fit(
+            _cos_model,
+            delta,
+            Nc,
+            p0=p0_c,
+            sigma=Nc_err,
+            absolute_sigma=True,
+            bounds=bounds_c,
+        )
 
     # ------------------------------------------------------------------
     # Convert optimiser output to physically meaningful parameters (Nc)
@@ -179,21 +189,31 @@ def plot_counts(
     # ------------------------------------------------------------------
     # Fit idler counts with ½(1+cos(δ+φ)) model
     # ------------------------------------------------------------------
-    p0_i = [np.ptp(Ni), np.min(Ni), 0.0]  # initial guesses
-    bounds_i = ([0, 0, -np.inf], [np.inf, np.inf, np.inf])
     if ni_phi is not None:
-        p0_i[2] = ni_phi
-        bounds_i = ([0, 0, ni_phi], [np.inf, np.inf, ni_phi])
 
-    popt_i, pcov_i = curve_fit(
-        _cos_model,
-        delta,
-        Ni,
-        p0=p0_i,
-        sigma=Ni_err,
-        absolute_sigma=True,
-        bounds=bounds_i,
-    )
+        def model_i(d, A, C0):
+            return _cos_model(d, A, C0, ni_phi)
+
+        p0_i = [np.ptp(Ni), np.min(Ni)]
+        bounds_i = ([0, 0], [np.inf, np.inf])
+        popt_i_fit, pcov_i_fit = curve_fit(
+            model_i, delta, Ni, p0=p0_i, sigma=Ni_err, absolute_sigma=True, bounds=bounds_i
+        )
+        popt_i = [popt_i_fit[0], popt_i_fit[1], ni_phi]
+        pcov_i = np.zeros((3, 3))
+        pcov_i[:2, :2] = pcov_i_fit
+    else:
+        p0_i = [np.ptp(Ni), np.min(Ni), 0.0]  # initial guesses
+        bounds_i = ([0, 0, -np.inf], [np.inf, np.inf, np.inf])
+        popt_i, pcov_i = curve_fit(
+            _cos_model,
+            delta,
+            Ni,
+            p0=p0_i,
+            sigma=Ni_err,
+            absolute_sigma=True,
+            bounds=bounds_i,
+        )
 
     # ------------------------------------------------------------------
     # Convert optimiser output to physically meaningful parameters (Ni)
