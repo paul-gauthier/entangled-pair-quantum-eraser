@@ -32,9 +32,7 @@ def load_jsonl_data(filename):
 
 def main():
     parser = argparse.ArgumentParser(description="Plot Mach-Zehnder interferometer data.")
-    parser.add_argument(
-        "jsonl_files", nargs="+", help="One or more JSONL data files to process."
-    )
+    parser.add_argument("jsonl_files", nargs="+", help="One or more JSONL data files to process.")
     parser.add_argument(
         "--max-phase",
         type=float,
