@@ -210,6 +210,19 @@ def plot_counts(
         (2 * C0_fit_i / denom_i * A_err_i) ** 2 + (-2 * A_fit_i / denom_i * C0_err_i) ** 2
     )
 
+    # ------------------------------------------------------------------
+    # Goodness-of-fit: reduced χ² for each data series
+    # ------------------------------------------------------------------
+    resid_c = (Nc - _cos_model(delta, *popt_c)) / Nc_err
+    chi2_c = np.sum(resid_c**2)
+    dof_c = len(Nc) - len(popt_c)
+    red_chi2_c = chi2_c / dof_c
+
+    resid_i = (Ni - _cos_model(delta, *popt_i)) / Ni_err
+    chi2_i = np.sum(resid_i**2)
+    dof_i = len(Ni) - len(popt_i)
+    red_chi2_i = chi2_i / dof_i
+
     # Calculate average counts (C0 + A/2) and uncertainties
     avg_c = C0_fit_c + A_fit_c / 2
     avg_i = C0_fit_i + A_fit_i / 2
@@ -236,6 +249,7 @@ def plot_counts(
         f"    Visibility V = {V_vis_c:.4f} ± {V_err_c:.4f}  [{V_vis_c - V_err_c:.4f},"
         f" {V_vis_c + V_err_c:.4f}]"
     )
+    print(f"    reduced χ² = {red_chi2_c:.2f}")
     print("  Idler counts:")
     print(f"    C0 = {C0_fit_i:.2f} ± {C0_err_i:.2f}")
     print(
@@ -250,6 +264,7 @@ def plot_counts(
         f"    Visibility V = {V_vis_i:.4f} ± {V_err_i:.4f}  [{V_vis_i - V_err_i:.4f},"
         f" {V_vis_i + V_err_i:.4f}]"
     )
+    print(f"    reduced χ² = {red_chi2_i:.2f}")
 
     # Style ------------------------------------------------------------------
     plt.rcParams.update({"font.size": 16})
