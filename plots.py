@@ -99,7 +99,6 @@ def load_and_correct_datasets(jsonl_files):
     - 'Ni_corr', 'Nc_corr': Dark-corrected data arrays.
     """
     supplied_files = set(jsonl_files)
-    dark_cache = {}  # cache of filename → (steps, Ns_dark, Ni_dark)
     datasets = []
 
     main_files = [f for f in jsonl_files if "-dark-" not in os.path.basename(f)]
@@ -122,14 +121,12 @@ def load_and_correct_datasets(jsonl_files):
 
         dark_data = None
         if dark_filename:
-            if dark_filename not in dark_cache:
-                try:
-                    dark_cache[dark_filename] = _load_dark_data(dark_filename)
-                    print(f"  Using dark data from {dark_filename} for {jsonl_filename}")
-                except FileNotFoundError:
-                    print(f"  Warning: dark file {dark_filename} missing – no correction.")
-                    dark_cache[dark_filename] = None
-            dark_data = dark_cache[dark_filename]
+            try:
+                dark_data = _load_dark_data(dark_filename)
+                print(f"  Using dark data from {dark_filename} for {jsonl_filename}")
+            except FileNotFoundError:
+                print(f"  Warning: dark file {dark_filename} missing – no correction.")
+                dark_data = None
         else:
             print(f"  Warning: no matching dark file for {jsonl_filename}")
 
