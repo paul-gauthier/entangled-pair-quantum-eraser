@@ -224,7 +224,7 @@ def plot_counts(
     print(f"  {num_points} data points spanning {delta_range_pi:.2f}π radians.")
     print("  Coincidence counts:")
     print(f"    C0 = {C0_fit_c:.2f} ± {C0_err_c:.2f}")
-    print(f"    A = {A_fit_c:.2f} ± {A_err_c:.2f}")
+    print(f"    A = {A_fit_c:.2f} ± {A_err_c:.2f}  [{A_fit_c - A_err_c:.2f}, {A_fit_c + A_err_c:.2f}]")
     print(f"    Average = {avg_c:.2f} ± {avg_err_c:.2f}")
     print(
         f"    phi = {phi_fit_c:.2f} ± {phi_err_c:.2f} rad ({np.degrees(phi_fit_c):.1f} ±"
@@ -236,7 +236,7 @@ def plot_counts(
     )
     print("  Idler counts:")
     print(f"    C0 = {C0_fit_i:.2f} ± {C0_err_i:.2f}")
-    print(f"    A = {A_fit_i:.2f} ± {A_err_i:.2f}")
+    print(f"    A = {A_fit_i:.2f} ± {A_err_i:.2f}  [{A_fit_i - A_err_i:.2f}, {A_fit_i + A_err_i:.2f}]")
     print(f"    Average = {avg_i:.2f} ± {avg_err_i:.2f}")
     print(
         f"    phi = {phi_fit_i:.2f} ± {phi_err_i:.2f} rad ({np.degrees(phi_fit_i):.1f} ±"
