@@ -39,28 +39,37 @@ def main():
         metavar="X",
         help="Only use data up to a phase delay of X*π.",
     )
+    parser.add_argument(
+        "--steps-per-two-pi",
+        type=float,
+        help="Use this value for STEPS_PER_2PI instead of fitting it from the data.",
+    )
     args = parser.parse_args()
 
-    # First pass: collect all data for fitting STEPS_PER_2PI
-    print("Collecting data to fit STEPS_PER_2PI...")
-    datasets_for_fitting = []
+    if args.steps_per_two_pi:
+        steps_per_2pi = args.steps_per_two_pi
+        print(f"Using provided STEPS_PER_2PI = {steps_per_2pi:.3f} for all plots\n")
+    else:
+        # First pass: collect all data for fitting STEPS_PER_2PI
+        print("Collecting data to fit STEPS_PER_2PI...")
+        datasets_for_fitting = []
 
-    for jsonl_filename in args.jsonl_files:
-        if not os.path.exists(jsonl_filename):
-            print(f"Warning: File {jsonl_filename} not found, skipping.")
-            continue
+        for jsonl_filename in args.jsonl_files:
+            if not os.path.exists(jsonl_filename):
+                print(f"Warning: File {jsonl_filename} not found, skipping.")
+                continue
 
-        piezo_steps, Ns, Ni, Nc = load_jsonl_data(jsonl_filename)
-        # Use coincidence counts for fitting as they typically have the clearest oscillation
-        datasets_for_fitting.append((piezo_steps, Nc))
+            piezo_steps, Ns, Ni, Nc = load_jsonl_data(jsonl_filename)
+            # Use coincidence counts for fitting as they typically have the clearest oscillation
+            datasets_for_fitting.append((piezo_steps, Nc))
 
-    if not datasets_for_fitting:
-        print("No valid data files found!")
-        sys.exit(1)
+        if not datasets_for_fitting:
+            print("No valid data files found!")
+            sys.exit(1)
 
-    # Fit STEPS_PER_2PI from all datasets
-    fitted_steps_per_2pi = fit_steps_per_2pi(datasets_for_fitting)
-    print(f"Using STEPS_PER_2PI = {fitted_steps_per_2pi:.3f} for all plots\n")
+        # Fit STEPS_PER_2PI from all datasets
+        steps_per_2pi = fit_steps_per_2pi(datasets_for_fitting)
+        print(f"Using STEPS_PER_2PI = {steps_per_2pi:.3f} for all plots\n")
 
     # Second pass: generate plots with fitted parameter
     for jsonl_filename in args.jsonl_files:
@@ -74,7 +83,7 @@ def main():
         piezo_steps, Ns, Ni, Nc = load_jsonl_data(jsonl_filename)
 
         if args.max_phase is not None:
-            delta = delta_from_steps(piezo_steps, fitted_steps_per_2pi)
+            delta = delta_from_steps(piezo_steps, steps_per_2pi)
             mask = delta <= args.max_phase * np.pi
 
             if not np.any(mask):
@@ -105,7 +114,7 @@ def main():
             Ns,
             Ni,
             Nc,
-            fitted_steps_per_2pi,
+            steps_per_2pi,
             output_filename=output_filename,
             label_suffix=basename,
         )
