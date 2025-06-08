@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
+import argparse
 import json
 import os
 import sys
 
 import numpy as np
 
-from plot_utils import fit_steps_per_2pi, plot_counts
+from plot_utils import delta_from_steps, fit_steps_per_2pi, plot_counts
 
 
 def load_jsonl_data(filename):
@@ -30,15 +31,23 @@ def load_jsonl_data(filename):
 
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: python plots.py <jsonl_file1> [jsonl_file2] ...")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description="Plot Mach-Zehnder interferometer data.")
+    parser.add_argument(
+        "jsonl_files", nargs="+", help="One or more JSONL data files to process."
+    )
+    parser.add_argument(
+        "--max-phase",
+        type=float,
+        metavar="X",
+        help="Only use data up to a phase delay of X*π.",
+    )
+    args = parser.parse_args()
 
     # First pass: collect all data for fitting STEPS_PER_2PI
     print("Collecting data to fit STEPS_PER_2PI...")
     datasets_for_fitting = []
 
-    for jsonl_filename in sys.argv[1:]:
+    for jsonl_filename in args.jsonl_files:
         if not os.path.exists(jsonl_filename):
             print(f"Warning: File {jsonl_filename} not found, skipping.")
             continue
@@ -56,7 +65,7 @@ def main():
     print(f"Using STEPS_PER_2PI = {fitted_steps_per_2pi:.3f} for all plots\n")
 
     # Second pass: generate plots with fitted parameter
-    for jsonl_filename in sys.argv[1:]:
+    for jsonl_filename in args.jsonl_files:
         if not os.path.exists(jsonl_filename):
             print(f"Warning: File {jsonl_filename} not found, skipping.")
             continue
@@ -65,6 +74,26 @@ def main():
 
         # Load data from JSONL file
         piezo_steps, Ns, Ni, Nc = load_jsonl_data(jsonl_filename)
+
+        if args.max_phase is not None:
+            delta = delta_from_steps(piezo_steps, fitted_steps_per_2pi)
+            mask = delta <= args.max_phase * np.pi
+
+            if not np.any(mask):
+                print(
+                    f"  Warning: --max-phase filter removed all data from {jsonl_filename}."
+                    " Skipping plot."
+                )
+                continue
+
+            piezo_steps = piezo_steps[mask]
+            Ns = Ns[mask]
+            Ni = Ni[mask]
+            Nc = Nc[mask]
+            print(
+                f"  Filtered data to max phase {args.max_phase}π, {len(piezo_steps)} points"
+                " remaining."
+            )
 
         # Generate output filename by replacing .jsonl with .pdf
         output_filename = os.path.splitext(jsonl_filename)[0] + ".pdf"
