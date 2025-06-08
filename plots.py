@@ -88,6 +88,65 @@ def load_jsonl_data(filename):
     return piezo_steps, Ns, Ni, Nc
 
 
+def load_and_correct_datasets(jsonl_files):
+    """
+    Load datasets from JSONL files and apply dark count corrections.
+
+    Returns a list of dictionaries, one for each main (non-dark) dataset.
+    Each dictionary contains:
+    - 'filename': The original filename of the dataset.
+    - 'piezo_steps', 'Ns': Raw data arrays.
+    - 'Ni_corr', 'Nc_corr': Dark-corrected data arrays.
+    """
+    supplied_files = set(jsonl_files)
+    dark_cache = {}  # cache of filename → (steps, Ns_dark, Ni_dark)
+    datasets = []
+
+    main_files = [f for f in jsonl_files if "-dark-" not in os.path.basename(f)]
+
+    for jsonl_filename in main_files:
+        if not os.path.exists(jsonl_filename):
+            print(f"Warning: File {jsonl_filename} not found, skipping.")
+            continue
+
+        piezo_steps, Ns, Ni, Nc = load_jsonl_data(jsonl_filename)
+
+        # Locate a matching dark file (must also have been supplied).
+        dark_filename = None
+        if jsonl_filename.endswith("-on.jsonl"):
+            cand = jsonl_filename.replace("-on.jsonl", "-dark-on.jsonl")
+            dark_filename = cand if cand in supplied_files else None
+        elif jsonl_filename.endswith("-off.jsonl"):
+            cand = jsonl_filename.replace("-off.jsonl", "-dark-off.jsonl")
+            dark_filename = cand if cand in supplied_files else None
+
+        dark_data = None
+        if dark_filename:
+            if dark_filename not in dark_cache:
+                try:
+                    dark_cache[dark_filename] = _load_dark_data(dark_filename)
+                    print(f"  Using dark data from {dark_filename} for {jsonl_filename}")
+                except FileNotFoundError:
+                    print(f"  Warning: dark file {dark_filename} missing – no correction.")
+                    dark_cache[dark_filename] = None
+            dark_data = dark_cache[dark_filename]
+        else:
+            print(f"  Warning: no matching dark file for {jsonl_filename}")
+
+        Ni_corr, Nc_corr = apply_dark_correction(piezo_steps, Ns, Ni, Nc, dark_data)
+
+        datasets.append(
+            {
+                "filename": jsonl_filename,
+                "piezo_steps": piezo_steps,
+                "Ns": Ns,
+                "Ni_corr": Ni_corr,
+                "Nc_corr": Nc_corr,
+            }
+        )
+    return datasets
+
+
 def main():
     parser = argparse.ArgumentParser(description="Plot Mach-Zehnder interferometer data.")
     parser.add_argument("jsonl_files", nargs="+", help="One or more JSONL data files to process.")
@@ -110,91 +169,33 @@ def main():
     )
     args = parser.parse_args()
 
+    datasets = load_and_correct_datasets(args.jsonl_files)
+    if not datasets:
+        print("No valid data files found!")
+        sys.exit(1)
+
     if args.steps_per_two_pi:
         steps_per_2pi = args.steps_per_two_pi
         print(f"Using provided STEPS_PER_2PI = {steps_per_2pi:.3f} for all plots\n")
     else:
         # First pass: collect all data for fitting STEPS_PER_2PI
         print("Collecting data to fit STEPS_PER_2PI...")
-        datasets_for_fitting = []
-
-        # Build a quick lookup of any dark files that were supplied on the
-        # command line so that we can correct every *main* dataset before
-        # doing the global STEPS_PER_2PI fit.
-        supplied_files = set(args.jsonl_files)
-        dark_cache = {}  # cache of filename → (steps, Ns_dark, Ni_dark)
-
-        for jsonl_filename in args.jsonl_files:
-            if not os.path.exists(jsonl_filename):
-                print(f"Warning: File {jsonl_filename} not found, skipping.")
-                continue
-
-            # Skip dark files during the main fit; they are used only for
-            # corrections.
-            if "-dark-" in os.path.basename(jsonl_filename):
-                continue
-
-            piezo_steps, Ns, Ni, Nc = load_jsonl_data(jsonl_filename)
-
-            # Locate a matching dark file (must also have been supplied).
-            dark_filename = None
-            if jsonl_filename.endswith("-on.jsonl"):
-                cand = jsonl_filename.replace("-on.jsonl", "-dark-on.jsonl")
-                dark_filename = cand if cand in supplied_files else None
-            elif jsonl_filename.endswith("-off.jsonl"):
-                cand = jsonl_filename.replace("-off.jsonl", "-dark-off.jsonl")
-                dark_filename = cand if cand in supplied_files else None
-
-            dark_data = None
-            if dark_filename:
-                if dark_filename not in dark_cache:
-                    try:
-                        dark_cache[dark_filename] = _load_dark_data(dark_filename)
-                        print(f"  Using dark data from {dark_filename} for {jsonl_filename}")
-                    except FileNotFoundError:
-                        print(f"  Warning: dark file {dark_filename} missing – no correction.")
-                        dark_cache[dark_filename] = None
-                dark_data = dark_cache[dark_filename]
-            else:
-                print(f"  Warning: no matching dark file for {jsonl_filename}")
-
-            # Apply dark-count correction *before* using this trace in the
-            # STEPS_PER_2PI fit.
-            Ni_corr, Nc_corr = apply_dark_correction(piezo_steps, Ns, Ni, Nc, dark_data)
-
-            # Coincidence counts are clearest for the period fit
-            datasets_for_fitting.append((piezo_steps, Nc_corr))
-
-        if not datasets_for_fitting:
-            print("No valid data files found!")
-            sys.exit(1)
+        datasets_for_fitting = [(ds["piezo_steps"], ds["Nc_corr"]) for ds in datasets]
 
         # Fit STEPS_PER_2PI from all datasets
         steps_per_2pi = fit_steps_per_2pi(datasets_for_fitting)
         print(f"Using STEPS_PER_2PI = {steps_per_2pi:.3f} for all plots\n")
 
     # Second pass: generate plots with fitted parameter
-    for jsonl_filename in args.jsonl_files:
-        # Skip any dark files – they are *only* used for corrections.
-        if "-dark-" in os.path.basename(jsonl_filename):
-            continue
-        if not os.path.exists(jsonl_filename):
-            print(f"Warning: File {jsonl_filename} not found, skipping.")
-            continue
-
+    for ds in datasets:
+        jsonl_filename = ds["filename"]
         print(f"Processing {jsonl_filename}...")
 
-        # Load data from JSONL file
-        piezo_steps, Ns, Ni, Nc = load_jsonl_data(jsonl_filename)
-
-        # Retrieve matching dark data (if any) prepared earlier
-        dark_data = None
-        if jsonl_filename.endswith("-on.jsonl"):
-            dark_data = dark_cache.get(jsonl_filename.replace("-on.jsonl", "-dark-on.jsonl"))
-        elif jsonl_filename.endswith("-off.jsonl"):
-            dark_data = dark_cache.get(jsonl_filename.replace("-off.jsonl", "-dark-off.jsonl"))
-
-        Ni_corr, Nc_corr = apply_dark_correction(piezo_steps, Ns, Ni, Nc, dark_data)
+        # Make copies to avoid modifying the dict in place
+        piezo_steps = ds["piezo_steps"].copy()
+        Ns = ds["Ns"].copy()
+        Ni_corr = ds["Ni_corr"].copy()
+        Nc_corr = ds["Nc_corr"].copy()
 
         if args.max_phase is not None:
             delta = delta_from_steps(piezo_steps, steps_per_2pi)
@@ -209,8 +210,8 @@ def main():
 
             piezo_steps = piezo_steps[mask]
             Ns = Ns[mask]
-            Ni = Ni[mask]
-            Nc = Nc[mask]
+            Ni_corr = Ni_corr[mask]
+            Nc_corr = Nc_corr[mask]
             print(
                 f"  Filtered data to max phase {args.max_phase}π, {len(piezo_steps)} points"
                 " remaining."
