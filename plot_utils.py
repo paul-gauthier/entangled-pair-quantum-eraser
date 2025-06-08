@@ -105,6 +105,8 @@ def plot_counts(
     output_filename: str = "counts_vs_phase_delay.pdf",
     label_suffix: str = "",
     show: bool = False,
+    nc_phi: float | None = None,
+    ni_phi: float | None = None,
 ) -> str:
     """
     Plot Ns, Ni, and Nc versus phase delay and save the figure.
@@ -125,6 +127,12 @@ def plot_counts(
         multiple datasets on shared axes.
     show :
         If ``True`` also display the figure interactively.
+    nc_phi :
+        If provided, fix the phase of the coincidence count fit to this
+        value (in radians).
+    ni_phi :
+        If provided, fix the phase of the idler count fit to this value
+        (in radians).
 
     Returns
     -------
@@ -145,6 +153,11 @@ def plot_counts(
     # Fit coincidence counts with ½(1+cos(δ+φ)) model
     # ------------------------------------------------------------------
     p0_c = [np.ptp(Nc), np.min(Nc), 0.0]  # initial guesses
+    bounds_c = ([0, 0, -np.inf], [np.inf, np.inf, np.inf])
+    if nc_phi is not None:
+        p0_c[2] = nc_phi
+        bounds_c = ([0, 0, nc_phi], [np.inf, np.inf, nc_phi])
+
     popt_c, pcov_c = curve_fit(
         _cos_model,
         delta,
@@ -152,6 +165,7 @@ def plot_counts(
         p0=p0_c,
         sigma=Nc_err,
         absolute_sigma=True,
+        bounds=bounds_c,
     )
 
     # ------------------------------------------------------------------
@@ -159,10 +173,6 @@ def plot_counts(
     # ------------------------------------------------------------------
     A_fit_c, C0_fit_c, phi_fit_c = popt_c
     A_err_c, C0_err_c, phi_err_c = np.sqrt(np.diag(pcov_c))
-    if A_fit_c < 0:  # enforce non-negative modulation depth
-        A_fit_c = -A_fit_c
-        phi_fit_c += np.pi  # keep model invariant
-        C0_fit_c -= A_fit_c  # compensate offset to preserve model
     # Wrap phase into [0, 2π)
     phi_fit_c = phi_fit_c % (2 * np.pi)
 
@@ -170,6 +180,11 @@ def plot_counts(
     # Fit idler counts with ½(1+cos(δ+φ)) model
     # ------------------------------------------------------------------
     p0_i = [np.ptp(Ni), np.min(Ni), 0.0]  # initial guesses
+    bounds_i = ([0, 0, -np.inf], [np.inf, np.inf, np.inf])
+    if ni_phi is not None:
+        p0_i[2] = ni_phi
+        bounds_i = ([0, 0, ni_phi], [np.inf, np.inf, ni_phi])
+
     popt_i, pcov_i = curve_fit(
         _cos_model,
         delta,
@@ -177,6 +192,7 @@ def plot_counts(
         p0=p0_i,
         sigma=Ni_err,
         absolute_sigma=True,
+        bounds=bounds_i,
     )
 
     # ------------------------------------------------------------------
@@ -184,10 +200,6 @@ def plot_counts(
     # ------------------------------------------------------------------
     A_fit_i, C0_fit_i, phi_fit_i = popt_i
     A_err_i, C0_err_i, phi_err_i = np.sqrt(np.diag(pcov_i))
-    if A_fit_i < 0:  # enforce non-negative modulation depth
-        A_fit_i = -A_fit_i
-        phi_fit_i += np.pi  # keep model invariant
-        C0_fit_i -= A_fit_i  # compensate offset to preserve model
     # Wrap phase into [0, 2π)
     phi_fit_i = phi_fit_i % (2 * np.pi)
 

@@ -44,6 +44,12 @@ def main():
         type=float,
         help="Use this value for STEPS_PER_2PI instead of fitting it from the data.",
     )
+    parser.add_argument(
+        "--nc-phi", type=float, help="Fix the phase phi for the Nc fit (in radians)."
+    )
+    parser.add_argument(
+        "--ni-phi", type=float, help="Fix the phase phi for the Ni fit (in radians)."
+    )
     args = parser.parse_args()
 
     if args.steps_per_two_pi:
@@ -117,6 +123,8 @@ def main():
             steps_per_2pi,
             output_filename=output_filename,
             label_suffix=basename,
+            nc_phi=args.nc_phi,
+            ni_phi=args.ni_phi,
         )
 
 
