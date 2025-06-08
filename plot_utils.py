@@ -230,7 +230,7 @@ def plot_counts(
         f"    phi = {phi_fit_c:.2f} ± {phi_err_c:.2f} rad ({np.degrees(phi_fit_c):.1f} ±"
         f" {np.degrees(phi_err_c):.1f}°)"
     )
-    print(f"    Visibility V = {V_vis_c:.3f} ± {V_err_c:.3f}")
+    print(f"    Visibility V = {V_vis_c:.4f} ± {V_err_c:.4f}")
     print("  Idler counts:")
     print(f"    C0 = {C0_fit_i:.2f} ± {C0_err_i:.2f}")
     print(f"    A = {A_fit_i:.2f} ± {A_err_i:.2f}")
@@ -239,7 +239,7 @@ def plot_counts(
         f"    phi = {phi_fit_i:.2f} ± {phi_err_i:.2f} rad ({np.degrees(phi_fit_i):.1f} ±"
         f" {np.degrees(phi_err_i):.1f}°)"
     )
-    print(f"    Visibility V = {V_vis_i:.3f} ± {V_err_i:.3f}")
+    print(f"    Visibility V = {V_vis_i:.4f} ± {V_err_i:.4f}")
 
     # Style ------------------------------------------------------------------
     plt.rcParams.update({"font.size": 16})
@@ -285,7 +285,7 @@ def plot_counts(
         f"$\\mathrm{{Avg}} = {avg_i:.1f} \\pm {avg_err_i:.1f}$\n"
         f"$\\phi = {phi_fit_i:.2f} \\pm {phi_err_i:.2f}$ rad\n"
         f"$\\phi = {np.degrees(phi_fit_i):.1f} \\pm {np.degrees(phi_err_i):.1f}°$\n"
-        f"$V = {V_vis_i:.3f} \\pm {V_err_i:.3f}$"
+        f"$V = {V_vis_i:.4f} \\pm {V_err_i:.4f}$"
     )
     props = dict(boxstyle="round", facecolor="wheat", alpha=0.8)
     ax1.text(
@@ -329,7 +329,7 @@ def plot_counts(
         f"$\\mathrm{{Avg}} = {avg_c:.1f} \\pm {avg_err_c:.1f}$\n"
         f"$\\phi = {phi_fit_c:.2f} \\pm {phi_err_c:.2f}$ rad\n"
         f"$\\phi = {np.degrees(phi_fit_c):.1f} \\pm {np.degrees(phi_err_c):.1f}°$\n"
-        f"$V = {V_vis_c:.3f} \\pm {V_err_c:.3f}$"
+        f"$V = {V_vis_c:.4f} \\pm {V_err_c:.4f}$"
     )
     props = dict(boxstyle="round", facecolor="lightblue", alpha=0.8)
     ax2.text(
