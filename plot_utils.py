@@ -219,6 +219,9 @@ def plot_counts(
 
     # Print fitted parameters
     print(f"Fit results for {output_filename}:")
+    num_points = len(piezo_steps)
+    delta_range_pi = (np.max(delta) - np.min(delta)) / np.pi
+    print(f"  {num_points} data points spanning {delta_range_pi:.2f}π radians.")
     print("  Coincidence counts:")
     print(f"    C0 = {C0_fit_c:.2f} ± {C0_err_c:.2f}")
     print(f"    A = {A_fit_c:.2f} ± {A_err_c:.2f}")
