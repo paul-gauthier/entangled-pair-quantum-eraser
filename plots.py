@@ -77,10 +77,10 @@ def load_jsonl_data(filename):
                 data.append(json.loads(line))
 
     # Sort by step to ensure proper ordering
-    data.sort(key=lambda x: x["step"])
+    data.sort(key=lambda x: x.get("stage_position", x.get("step")))
 
     # Extract arrays
-    piezo_steps = np.array([d["step"] for d in data])
+    piezo_steps = np.array([d.get("stage_position", d.get("step")) for d in data])
     Ns = np.array([d["N_s"] for d in data])
     Ni = np.array([d["N_i"] for d in data])
     Nc = np.array([d["N_c"] for d in data])
