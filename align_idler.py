@@ -52,6 +52,12 @@ def fit_idler_data(angles, counts):
             p0=guess,
             #bounds=([0, -np.inf, -180], [np.inf, np.inf, 180]),
         )
+        A, B, phi = params
+        if A < 0:  # flip sign → add 90° to the phase
+            A = -A
+            phi += 90
+        phi = (phi + 180) % 360 - 180  # wrap to 180…180 for consistency
+        params = (A, B, phi)
         return params
     except RuntimeError:
         # Fit failed
