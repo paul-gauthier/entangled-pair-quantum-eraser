@@ -43,8 +43,14 @@ def fit_idler_data(angles, counts):
     guess = [np.max(counts) - np.min(counts), np.min(counts), 0]
 
     try:
-        # Fit the curve
-        params, cov = curve_fit(cos_squared_model, angles, counts, p0=guess)
+        # Fit the curve with A ≥ 0 so that φ is uniquely defined
+        params, cov = curve_fit(
+            cos_squared_model,
+            angles,
+            counts,
+            p0=guess,
+            bounds=([0, -np.inf, -180], [np.inf, np.inf, 180]),
+        )
         return params
     except RuntimeError:
         # Fit failed
