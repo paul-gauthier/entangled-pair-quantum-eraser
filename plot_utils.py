@@ -400,9 +400,21 @@ def plot_counts(
     )
 
     # Shared x-axis tick labels ---------------------------------------------
-    xticks = np.arange(0, np.max(delta) + np.pi / 2, np.pi)
-    xticklabels = ["0"] + [f"{i}$\\pi$" for i in range(1, len(xticks))]
-    xticklabels = [s.replace("1$\\pi$", "$\\pi$") for s in xticklabels]
+    start_tick = np.ceil(np.min(delta) / np.pi) * np.pi
+    xticks = np.arange(start_tick, np.max(delta) + np.pi / 2, np.pi)
+
+    xticklabels = []
+    for tick in xticks:
+        multiple = int(round(tick / np.pi))
+        if multiple == 0:
+            xticklabels.append("0")
+        elif multiple == 1:
+            xticklabels.append("$\\pi$")
+        elif multiple == -1:
+            xticklabels.append("$-\\pi$")
+        else:
+            xticklabels.append(f"{multiple}$\\pi$")
+
     ax2.set_xticks(xticks)
     ax2.set_xticklabels(xticklabels)
 
