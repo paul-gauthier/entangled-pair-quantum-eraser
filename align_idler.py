@@ -38,7 +38,7 @@ def fit_idler_data(angles, counts):
 
     # Initial parameter guesses
     # For idler: amplitude, offset, phase shift
-    if np.all(counts == counts[0]): # All counts are the same, no curve to fit
+    if np.all(counts == counts[0]):  # All counts are the same, no curve to fit
         return None
     guess = [np.max(counts) - np.min(counts), np.min(counts), 0]
 
