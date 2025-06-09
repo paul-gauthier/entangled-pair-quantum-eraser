@@ -8,6 +8,7 @@ from collections import defaultdict
 import numpy as np
 from scipy.optimize import curve_fit
 
+from dump import dump
 
 def read_jsonl(fname):
     """Read idler data from a jsonl file."""
@@ -49,7 +50,7 @@ def fit_idler_data(angles, counts):
             angles,
             counts,
             p0=guess,
-            bounds=([0, -np.inf, -180], [np.inf, np.inf, 180]),
+            #bounds=([0, -np.inf, -180], [np.inf, np.inf, 180]),
         )
         return params
     except RuntimeError:
@@ -80,6 +81,7 @@ def main():
     # Process each group and print results
     print(f"{'hwpoff':>6s}, {'lpoff':>6s}, {'phi(hwp0)':>10s}, {'phi(hwp45)':>10s}")
     for (hwpoff, lpoff), hwp_files in sorted(file_groups.items()):
+
         phi0, phi45 = float("nan"), float("nan")
 
         if 0 in hwp_files:
