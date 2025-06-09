@@ -60,14 +60,14 @@ def main():
 
     # Group files by (hwpoff, lpoff)
     file_groups = defaultdict(dict)
-    pattern = re.compile(r"hwp(0|45)-hwpoff(-?\d+)-lpoff(-?\d+)")
+    pattern = re.compile(r"hwp(0|45)-hwpoff(-?[\d.]+)-lpoff(-?\d+)")
 
     for fname in files:
         match = pattern.search(fname)
         if match:
             hwp, hwpoff, lpoff = match.groups()
             hwp = int(hwp)
-            hwpoff = int(hwpoff)
+            hwpoff = float(hwpoff)
             lpoff = int(lpoff)
             file_groups[(hwpoff, lpoff)][hwp] = fname
 
@@ -91,7 +91,7 @@ def main():
         phi0_str = f"{phi0:10.1f}" if not np.isnan(phi0) else ""
         phi45_str = f"{phi45:10.1f}" if not np.isnan(phi45) else ""
 
-        print(f"{hwpoff:6d}, {lpoff:6d}, {phi0_str:>10s}, {phi45_str:>10s}")
+        print(f"{hwpoff:6.1f}, {lpoff:6d}, {phi0_str:>10s}, {phi45_str:>10s}")
 
 
 if __name__ == "__main__":
