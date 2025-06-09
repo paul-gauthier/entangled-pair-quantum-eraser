@@ -75,6 +75,10 @@ def main():
     # Group files by (hwpoff, lpoff)
     file_groups = defaultdict(dict)
     pattern = re.compile(r"hwp(0|45)-hwpoff(-?[\d.]+)-lpoff(-?\d+)")
+    
+    # Collect (hwpoff, phi) pairs for linear fitting
+    phi0_data = []
+    phi45_data = []
 
     for fname in files:
         match = pattern.search(fname)
@@ -106,7 +110,40 @@ def main():
         phi45_str = f"{phi45:10.1f}" if not np.isnan(phi45) else ""
 
         print(f"{hwpoff:6.1f}, {lpoff:6d}, {phi0_str:>10s}, {phi45_str:>10s}")
+        
+        # Store data for later analysis
+        if not np.isnan(phi0):
+            phi0_data.append((hwpoff, phi0))
+        if not np.isnan(phi45):
+            phi45_data.append((hwpoff, phi45))
+
+    # Finished processing all file groups
+    return phi0_data, phi45_data
 
 
 if __name__ == "__main__":
-    main()
+    phi0_data, phi45_data = main()
+
+    # Post-process the collected phase data to suggest alignment offsets
+    phi0_data = np.array(phi0_data)
+    phi45_data = np.array(phi45_data)
+
+    # Need at least two (hwpoff, phi) points for each series
+    if phi0_data.size >= 4 and phi45_data.size >= 4:
+        # Linear fits: phi = m * hwpoff + b
+        m0, b0 = np.polyfit(phi0_data[:, 0], phi0_data[:, 1], 1)
+        m45, b45 = np.polyfit(phi45_data[:, 0], phi45_data[:, 1], 1)
+
+        target_phi0, target_phi45 = 0.0, 90.0
+        if abs(m45 - m0) > 1e-9:
+            reco_hwpoff = (target_phi45 - target_phi0 - (b45 - b0)) / (m45 - m0)
+            # Assume lp offset shifts both phases equally (1°/°)
+            reco_lpoff = target_phi0 - (b0 + m0 * reco_hwpoff)
+
+            print("\nSuggested alignment offsets:")
+            print(f"  hwp offset ≈ {reco_hwpoff:+.2f}°")
+            print(f"  lp offset  ≈ {reco_lpoff:+.2f}° (assuming 1:1 coupling)\n")
+
+        print("Linear fits (phi = m * hwpoff + b):")
+        print(f"  phi(hwp0)  : m = {m0:+.3f}, b = {b0:+.3f}")
+        print(f"  phi(hwp45) : m = {m45:+.3f}, b = {b45:+.3f}")
