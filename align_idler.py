@@ -74,21 +74,24 @@ def main():
     # Process each group and print results
     print(f"{'hwpoff':>6s}, {'lpoff':>6s}, {'phi(hwp0)':>10s}, {'phi(hwp45)':>10s}")
     for (hwpoff, lpoff), hwp_files in sorted(file_groups.items()):
-        if 0 in hwp_files and 45 in hwp_files:
-            fname0 = hwp_files[0]
-            fname45 = hwp_files[45]
+        phi0, phi45 = float("nan"), float("nan")
 
-            # Fit for hwp0
-            angles0, counts0 = read_jsonl(fname0)
+        if 0 in hwp_files:
+            angles0, counts0 = read_jsonl(hwp_files[0])
             params0 = fit_idler_data(angles0, counts0)
-            phi0 = params0[2] if params0 is not None else float("nan")
+            if params0 is not None:
+                phi0 = params0[2]
 
-            # Fit for hwp45
-            angles45, counts45 = read_jsonl(fname45)
+        if 45 in hwp_files:
+            angles45, counts45 = read_jsonl(hwp_files[45])
             params45 = fit_idler_data(angles45, counts45)
-            phi45 = params45[2] if params45 is not None else float("nan")
+            if params45 is not None:
+                phi45 = params45[2]
 
-            print(f"{hwpoff:6d}, {lpoff:6d}, {phi0:10.1f}, {phi45:10.1f}")
+        phi0_str = f"{phi0:10.1f}" if not np.isnan(phi0) else ""
+        phi45_str = f"{phi45:10.1f}" if not np.isnan(phi45) else ""
+
+        print(f"{hwpoff:6d}, {lpoff:6d}, {phi0_str:>10s}, {phi45_str:>10s}")
 
 
 if __name__ == "__main__":
