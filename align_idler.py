@@ -72,7 +72,7 @@ def main():
             file_groups[(hwpoff, lpoff)][hwp] = fname
 
     # Process each group and print results
-    print("hwpoff, lpoff, phi(hwp0), phi(hwp45)")
+    print(f"{'hwpoff':>6s}, {'lpoff':>6s}, {'phi(hwp0)':>10s}, {'phi(hwp45)':>10s}")
     for (hwpoff, lpoff), hwp_files in sorted(file_groups.items()):
         if 0 in hwp_files and 45 in hwp_files:
             fname0 = hwp_files[0]
