@@ -90,7 +90,9 @@ def main():
             file_groups[(hwpoff, lpoff)][hwp] = fname
 
     # Process each group and print results
-    print(f"{'hwpoff':>6s}, {'lpoff':>6s}, {'phi(hwp0)':>10s}, {'phi(hwp45)':>10s}")
+    print(
+        f"{'hwpoff':>6s}, {'lpoff':>6s}, {'phi(hwp0)':>10s}, {'phi(hwp45)':>10s}, {'phi(hwp45)-90':>14s}"
+    )
     for (hwpoff, lpoff), hwp_files in sorted(file_groups.items()):
         phi0, phi45 = float("nan"), float("nan")
 
@@ -108,8 +110,11 @@ def main():
 
         phi0_str = f"{phi0:10.1f}" if not np.isnan(phi0) else ""
         phi45_str = f"{phi45:10.1f}" if not np.isnan(phi45) else ""
+        phi45_minus_90_str = f"{phi45 - 90:14.1f}" if not np.isnan(phi45) else ""
 
-        print(f"{hwpoff:6.1f}, {lpoff:6d}, {phi0_str:>10s}, {phi45_str:>10s}")
+        print(
+            f"{hwpoff:6.1f}, {lpoff:6d}, {phi0_str:>10s}, {phi45_str:>10s}, {phi45_minus_90_str:>14s}"
+        )
 
         # Store data for later analysis
         if not np.isnan(phi0):
