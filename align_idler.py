@@ -75,7 +75,7 @@ def main():
     # Group files by (hwpoff, lpoff)
     file_groups = defaultdict(dict)
     pattern = re.compile(r"hwp(0|45)-hwpoff(-?[\d.]+)-lpoff(-?\d+)")
-    
+
     # Collect (hwpoff, phi) pairs for linear fitting
     phi0_data = []
     phi45_data = []
@@ -110,7 +110,7 @@ def main():
         phi45_str = f"{phi45:10.1f}" if not np.isnan(phi45) else ""
 
         print(f"{hwpoff:6.1f}, {lpoff:6d}, {phi0_str:>10s}, {phi45_str:>10s}")
-        
+
         # Store data for later analysis
         if not np.isnan(phi0):
             phi0_data.append((hwpoff, phi0))
