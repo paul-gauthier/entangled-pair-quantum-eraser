@@ -313,7 +313,7 @@ def plot_counts(
     fig.suptitle(title, fontsize=20)
 
     # Top panel: Ni only -----------------------------------------------------
-    ax1.set_ylabel(r"Counts/sec", fontsize=18)
+    ax1.set_ylabel(r"Counts", fontsize=18)
     ax1.errorbar(
         delta,
         Ni,
@@ -356,7 +356,7 @@ def plot_counts(
     )
 
     # Bottom panel: Nc -------------------------------------------------------
-    ax2.set_ylabel(r"Counts/sec", fontsize=18)
+    ax2.set_ylabel(r"Counts", fontsize=18)
     ax2.errorbar(
         delta,
         Nc,
