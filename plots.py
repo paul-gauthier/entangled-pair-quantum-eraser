@@ -160,12 +160,6 @@ def main():
         type=float,
         help="Use this value for STEPS_PER_2PI instead of fitting it from the data.",
     )
-    parser.add_argument(
-        "--nc-phi", type=float, help="Fix the phase phi for the Nc fit (in radians)."
-    )
-    parser.add_argument(
-        "--ni-phi", type=float, help="Fix the phase phi for the Ni fit (in radians)."
-    )
     args = parser.parse_args()
 
     datasets = load_and_correct_datasets(args.jsonl_files)
@@ -196,26 +190,6 @@ def main():
         Ni_corr = ds["Ni_corr"].copy()
         Nc_corr = ds["Nc_corr"].copy()
 
-        if args.max_phase is not None:
-            delta = delta_from_steps(piezo_steps, steps_per_2pi)
-            mask = delta <= args.max_phase * np.pi
-
-            if not np.any(mask):
-                print(
-                    f"  Warning: --max-phase filter removed all data from {jsonl_filename}."
-                    " Skipping plot."
-                )
-                continue
-
-            piezo_steps = piezo_steps[mask]
-            Ns = Ns[mask]
-            Ni_corr = Ni_corr[mask]
-            Nc_corr = Nc_corr[mask]
-            print(
-                f"  Filtered data to max phase {args.max_phase}π, {len(piezo_steps)} points"
-                " remaining."
-            )
-
         # Generate output filename by replacing .jsonl with .pdf
         output_filename = os.path.splitext(jsonl_filename)[0] + ".pdf"
 
@@ -231,8 +205,6 @@ def main():
             steps_per_2pi,
             output_filename=output_filename,
             label_suffix=basename,
-            nc_phi=args.nc_phi,
-            ni_phi=args.ni_phi,
         )
 
 
