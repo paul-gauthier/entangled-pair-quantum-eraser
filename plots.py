@@ -200,6 +200,8 @@ def main():
             steps_per_2pi,
             output_filename=output_filename,
             label_suffix=label_suffix,
+            Nc_raw=ds["Nc"],
+            Ni_raw=ds["Ni"],
         )
 
 
