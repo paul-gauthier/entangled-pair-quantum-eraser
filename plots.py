@@ -192,23 +192,26 @@ def main():
         basename = os.path.splitext(os.path.basename(jsonl_filename))[0]
         label_suffix = f"{basename}_dataset_{dataset_index}"
 
-        # Plot and save, collecting visibility metrics
-        _, metrics = plot_counts(
-            piezo_steps,
-            Ns,
-            Ni_corr,
-            Nc_corr,
-            steps_per_2pi,
-            output_filename=output_filename,
-            label_suffix=label_suffix,
-            Nc_raw=ds["Nc"],
-            Ni_raw=ds["Ni"],
-            return_metrics=True,
-        )
-        V_i_list.append(metrics["V_vis_i"])
-        V_i_err_list.append(metrics["V_err_i"])
-        V_c_list.append(metrics["V_vis_c"])
-        V_c_err_list.append(metrics["V_err_c"])
+        try:
+            # Plot and save, collecting visibility metrics
+            _, metrics = plot_counts(
+                piezo_steps,
+                Ns,
+                Ni_corr,
+                Nc_corr,
+                steps_per_2pi,
+                output_filename=output_filename,
+                label_suffix=label_suffix,
+                Nc_raw=ds["Nc"],
+                Ni_raw=ds["Ni"],
+                return_metrics=True,
+            )
+            V_i_list.append(metrics["V_vis_i"])
+            V_i_err_list.append(metrics["V_err_i"])
+            V_c_list.append(metrics["V_vis_c"])
+            V_c_err_list.append(metrics["V_err_c"])
+        except RuntimeError:
+            print("Failed to fit dataset, skipping")
 
     # ------------------------------------------------------------------
     # Combine visibilities across all datasets using inverse-variance weighting
