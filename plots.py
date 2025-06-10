@@ -217,9 +217,11 @@ def main():
         weights = 1.0 / np.square(errors)
         mean = float(np.sum(weights * values) / np.sum(weights))
         err = float(1.0 / np.sqrt(np.sum(weights)))
-        red_chi2 = float(
-            np.sum(weights * np.square(values - mean)) / (len(values) - 1)
-        ) if len(values) > 1 else float("nan")
+        red_chi2 = (
+            float(np.sum(weights * np.square(values - mean)) / (len(values) - 1))
+            if len(values) > 1
+            else float("nan")
+        )
         return mean, err, red_chi2
 
     if V_i_list:
@@ -232,10 +234,12 @@ def main():
 
         print("\nCombined visibility estimates (inverse-variance weighted):")
         print(
-            f"  Idler:       V = {V_i_comb:.4f} ± {V_i_comb_err:.4f}   (reduced χ² = {red_chi2_i:.2f})"
+            f"  Idler:       V = {V_i_comb:.4f} ± {V_i_comb_err:.4f}   (reduced χ² ="
+            f" {red_chi2_i:.2f})"
         )
         print(
-            f"  Coincidence: V = {V_c_comb:.4f} ± {V_c_comb_err:.4f}   (reduced χ² = {red_chi2_c:.2f})"
+            f"  Coincidence: V = {V_c_comb:.4f} ± {V_c_comb_err:.4f}   (reduced χ² ="
+            f" {red_chi2_c:.2f})"
         )
 
 
