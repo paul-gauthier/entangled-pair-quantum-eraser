@@ -15,7 +15,6 @@ from plot_utils import fit_steps_per_2pi, plot_counts
 ACCIDENTAL_WINDOW = 25e-9  # 25 ns coincidence window
 
 
-
 def load_and_correct_datasets(jsonl_filename):
     """
     Load datasets from a single JSONL file and apply dark count corrections.
@@ -167,7 +166,10 @@ def main():
         weights = 1.0 / np.square(sp2pi_errs)
         steps_per_2pi = float(np.sum(weights * sp2pi_vals) / np.sum(weights))
         combined_err = float(1.0 / np.sqrt(np.sum(weights)))
-        print(f"Using weighted STEPS_PER_2PI = {steps_per_2pi:.3f} ± {combined_err:.3f} for all plots\n")
+        print(
+            f"Using weighted STEPS_PER_2PI = {steps_per_2pi:.3f} ± {combined_err:.3f} for all"
+            " plots\n"
+        )
 
     # Second pass: generate plots with fitted parameter
     for ds in datasets:
