@@ -15,7 +15,6 @@ from plot_utils import delta_from_steps, fit_steps_per_2pi, plot_counts
 ACCIDENTAL_WINDOW = 25e-9  # 25 ns coincidence window
 
 
-
 def load_jsonl_data(filename):
     """Load data from a JSONL file and return arrays of piezo steps and counts."""
     data = []
@@ -39,7 +38,7 @@ def load_jsonl_data(filename):
 def load_and_correct_datasets(jsonl_filename):
     """
     Load datasets from a single JSONL file and apply dark count corrections.
-    
+
     The file contains multiple datasets separated by dark count records with dark=True.
     Each dataset is corrected using the dark record that immediately follows it.
 
@@ -72,7 +71,7 @@ def load_and_correct_datasets(jsonl_filename):
     # Split into datasets at dark=True records
     datasets = []
     current_dataset = []
-    
+
     for record in data:
         if record.get("dark", False):
             # Found a dark record - save current dataset if it exists
@@ -81,7 +80,7 @@ def load_and_correct_datasets(jsonl_filename):
                 current_dataset = []
         else:
             current_dataset.append(record)
-    
+
     # Discard any final records after the last dark=True
     if current_dataset:
         print(f"  Warning: Discarding {len(current_dataset)} records after last dark measurement")
@@ -94,52 +93,59 @@ def load_and_correct_datasets(jsonl_filename):
     first_dataset_data, _ = datasets[0]
     first_dataset_data.sort(key=lambda x: x.get("stage_position", x.get("step")))
     reference_positions = [d.get("stage_position", d.get("step")) for d in first_dataset_data]
-    
+
     print(f"  Found {len(datasets)} datasets in {jsonl_filename}")
-    print(f"  Reference dataset has {len(reference_positions)} stage positions: {reference_positions}")
+    print(
+        f"  Reference dataset has {len(reference_positions)} stage positions: {reference_positions}"
+    )
 
     corrected_datasets = []
-    
+
     for dataset_index, (dataset_data, dark_record) in enumerate(datasets):
         # Sort dataset by stage position
         dataset_data.sort(key=lambda x: x.get("stage_position", x.get("step")))
-        
+
         # Check if this dataset has the same stage positions as the first
         positions = [d.get("stage_position", d.get("step")) for d in dataset_data]
-        
+
         if positions != reference_positions:
             print(f"  Warning: Dataset {dataset_index} has different stage positions, skipping")
             print(f"    Expected: {reference_positions}")
             print(f"    Got: {positions}")
             continue
-        
+
         # Extract arrays from this dataset
         piezo_steps = np.array(positions)
         Ns = np.array([d["N_s"] for d in dataset_data])
         Ni = np.array([d["N_i"] for d in dataset_data])
         Nc = np.array([d["N_c"] for d in dataset_data])
-        
+
         # Apply dark correction using the dark record
         Ni_dark = dark_record["N_i"]
         Ns_dark = dark_record["N_s"]
-        
+
         Ni_corr = np.clip(Ni - Ni_dark, 0, None)
         accidental = Ns_dark * Ni_dark * ACCIDENTAL_WINDOW
         Nc_corr = np.clip(Nc - accidental, 0, None)
-        
-        corrected_datasets.append({
-            "filename": jsonl_filename,
-            "dataset_index": dataset_index,
-            "piezo_steps": piezo_steps,
-            "Ns": Ns,
-            "Ni": Ni,
-            "Nc": Nc,
-            "Ni_corr": Ni_corr,
-            "Nc_corr": Nc_corr,
-        })
-        
-        print(f"  Dataset {dataset_index}: Applied dark correction (Ni_dark={Ni_dark}, Ns_dark={Ns_dark})")
-    
+
+        corrected_datasets.append(
+            {
+                "filename": jsonl_filename,
+                "dataset_index": dataset_index,
+                "piezo_steps": piezo_steps,
+                "Ns": Ns,
+                "Ni": Ni,
+                "Nc": Nc,
+                "Ni_corr": Ni_corr,
+                "Nc_corr": Nc_corr,
+            }
+        )
+
+        print(
+            f"  Dataset {dataset_index}: Applied dark correction (Ni_dark={Ni_dark},"
+            f" Ns_dark={Ns_dark})"
+        )
+
     return corrected_datasets
 
 
