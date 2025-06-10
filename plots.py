@@ -160,9 +160,7 @@ def main():
         sp2pi_vals = []
         sp2pi_errs = []
         for ds in datasets:
-            sp2pi, sp2pi_err = fit_steps_per_2pi(
-                ds["piezo_steps"], ds["Nc_corr"], ds["Nc"]
-            )
+            sp2pi, sp2pi_err = fit_steps_per_2pi(ds["piezo_steps"], ds["Nc_corr"], ds["Nc"])
             sp2pi_vals.append(sp2pi)
             sp2pi_errs.append(sp2pi_err)
         weights = 1.0 / np.square(sp2pi_errs)
