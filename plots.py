@@ -15,25 +15,6 @@ from plot_utils import fit_steps_per_2pi, plot_counts
 ACCIDENTAL_WINDOW = 25e-9  # 25 ns coincidence window
 
 
-def load_jsonl_data(filename):
-    """Load data from a JSONL file and return arrays of piezo steps and counts."""
-    data = []
-    with open(filename, "r") as f:
-        for line in f:
-            if line.strip():
-                data.append(json.loads(line))
-
-    # Sort by step to ensure proper ordering
-    data.sort(key=lambda x: x.get("stage_position", x.get("step")))
-
-    # Extract arrays
-    piezo_steps = np.array([d.get("stage_position", d.get("step")) for d in data])
-    Ns = np.array([d["N_s"] for d in data])
-    Ni = np.array([d["N_i"] for d in data])
-    Nc = np.array([d["N_c"] for d in data])
-
-    return piezo_steps, Ns, Ni, Nc
-
 
 def load_and_correct_datasets(jsonl_filename):
     """
@@ -143,7 +124,7 @@ def load_and_correct_datasets(jsonl_filename):
 
         print(
             f"  Dataset {dataset_index}: Applied dark correction (Ni_dark={Ni_dark},"
-            f" Ns_dark={Ns_dark})"
+            f" Ns_dark={Ns_dark}, Nc_accidental={accidental:.2f})"
         )
 
     return corrected_datasets

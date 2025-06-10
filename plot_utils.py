@@ -105,8 +105,6 @@ def plot_counts(
     output_filename: str = "counts_vs_phase_delay.pdf",
     label_suffix: str = "",
     show: bool = False,
-    nc_phi: float | None = None,
-    ni_phi: float | None = None,
 ) -> str:
     """
     Plot Ns, Ni, and Nc versus phase delay and save the figure.
@@ -127,12 +125,6 @@ def plot_counts(
         multiple datasets on shared axes.
     show :
         If ``True`` also display the figure interactively.
-    nc_phi :
-        If provided, fix the phase of the coincidence count fit to this
-        value (in radians).
-    ni_phi :
-        If provided, fix the phase of the idler count fit to this value
-        (in radians).
 
     Returns
     -------
@@ -152,31 +144,17 @@ def plot_counts(
     # ------------------------------------------------------------------
     # Fit coincidence counts with ½(1+cos(δ+φ)) model
     # ------------------------------------------------------------------
-    if nc_phi is not None:
-
-        def model_c(d, A, C0):
-            return _cos_model(d, A, C0, nc_phi)
-
-        p0_c = [np.ptp(Nc), np.min(Nc)]
-        bounds_c = ([0, 0], [np.inf, np.inf])
-        popt_c_fit, pcov_c_fit = curve_fit(
-            model_c, delta, Nc, p0=p0_c, sigma=Nc_err, absolute_sigma=True, bounds=bounds_c
-        )
-        popt_c = [popt_c_fit[0], popt_c_fit[1], nc_phi]
-        pcov_c = np.zeros((3, 3))
-        pcov_c[:2, :2] = pcov_c_fit
-    else:
-        p0_c = [np.ptp(Nc), np.min(Nc), 0.0]  # initial guesses
-        bounds_c = ([0, 0, -np.inf], [np.inf, np.inf, np.inf])
-        popt_c, pcov_c = curve_fit(
-            _cos_model,
-            delta,
-            Nc,
-            p0=p0_c,
-            sigma=Nc_err,
-            absolute_sigma=True,
-            bounds=bounds_c,
-        )
+    p0_c = [np.ptp(Nc), np.min(Nc), 0.0]  # initial guesses
+    bounds_c = ([0, 0, -np.inf], [np.inf, np.inf, np.inf])
+    popt_c, pcov_c = curve_fit(
+        _cos_model,
+        delta,
+        Nc,
+        p0=p0_c,
+        sigma=Nc_err,
+        absolute_sigma=True,
+        bounds=bounds_c,
+    )
 
     # ------------------------------------------------------------------
     # Convert optimiser output to physically meaningful parameters (Nc)
@@ -189,31 +167,17 @@ def plot_counts(
     # ------------------------------------------------------------------
     # Fit idler counts with ½(1+cos(δ+φ)) model
     # ------------------------------------------------------------------
-    if ni_phi is not None:
-
-        def model_i(d, A, C0):
-            return _cos_model(d, A, C0, ni_phi)
-
-        p0_i = [np.ptp(Ni), np.min(Ni)]
-        bounds_i = ([0, 0], [np.inf, np.inf])
-        popt_i_fit, pcov_i_fit = curve_fit(
-            model_i, delta, Ni, p0=p0_i, sigma=Ni_err, absolute_sigma=True, bounds=bounds_i
-        )
-        popt_i = [popt_i_fit[0], popt_i_fit[1], ni_phi]
-        pcov_i = np.zeros((3, 3))
-        pcov_i[:2, :2] = pcov_i_fit
-    else:
-        p0_i = [np.ptp(Ni), np.min(Ni), 0.0]  # initial guesses
-        bounds_i = ([0, 0, -np.inf], [np.inf, np.inf, np.inf])
-        popt_i, pcov_i = curve_fit(
-            _cos_model,
-            delta,
-            Ni,
-            p0=p0_i,
-            sigma=Ni_err,
-            absolute_sigma=True,
-            bounds=bounds_i,
-        )
+    p0_i = [np.ptp(Ni), np.min(Ni), 0.0]  # initial guesses
+    bounds_i = ([0, 0, -np.inf], [np.inf, np.inf, np.inf])
+    popt_i, pcov_i = curve_fit(
+        _cos_model,
+        delta,
+        Ni,
+        p0=p0_i,
+        sigma=Ni_err,
+        absolute_sigma=True,
+        bounds=bounds_i,
+    )
 
     # ------------------------------------------------------------------
     # Convert optimiser output to physically meaningful parameters (Ni)
