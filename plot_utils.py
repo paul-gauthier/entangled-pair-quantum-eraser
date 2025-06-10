@@ -16,6 +16,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import curve_fit
 
+# Maximum number of function evaluations allowed in each curve_fit call.
+# Increase this if you still encounter “Optimal parameters not found”.
+MAXFEV = 20_000
+
 
 def delta_from_steps(steps: np.ndarray | float, steps_per_2pi: float) -> np.ndarray | float:
     """Convert piezo steps → phase delay δ (radians)."""
@@ -165,6 +169,7 @@ def plot_counts(
         sigma=Nc_err,
         absolute_sigma=True,
         bounds=bounds_c,
+        maxfev=MAXFEV,
     )
 
     # ------------------------------------------------------------------
@@ -188,6 +193,7 @@ def plot_counts(
         sigma=Ni_err,
         absolute_sigma=True,
         bounds=bounds_i,
+        maxfev=MAXFEV,
     )
 
     # ------------------------------------------------------------------
