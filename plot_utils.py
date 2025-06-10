@@ -41,7 +41,11 @@ def _cos_model_with_period(steps, A, C0, phi, steps_per_2pi):
     return C0 + A * (1 + np.cos(delta + phi)) / 2
 
 
-def fit_steps_per_2pi(piezo_steps: np.ndarray, counts: np.ndarray) -> tuple[float, float]:
+def fit_steps_per_2pi(
+    piezo_steps: np.ndarray,
+    counts_corr: np.ndarray,
+    counts_raw: np.ndarray | None = None,
+) -> tuple[float, float]:
     """
     Fit the phase-delay calibration (STEPS_PER_2PI) for a *single* dataset.
 
@@ -49,8 +53,12 @@ def fit_steps_per_2pi(piezo_steps: np.ndarray, counts: np.ndarray) -> tuple[floa
     ----------
     piezo_steps :
         1-D array of piezo stage positions (integer steps).
-    counts :
-        1-D array of *raw* coincidence counts (use uncorrected N_c).
+    counts_corr :
+        1-D array of dark / accidental-corrected coincidence counts.
+    counts_raw :
+        Optional 1-D array of *raw* coincidence counts used only for
+        Poisson uncertainties (σ = √N).  If ``None``, ``counts_corr`` is
+        also used for σ.
 
     Returns
     -------
@@ -58,16 +66,18 @@ def fit_steps_per_2pi(piezo_steps: np.ndarray, counts: np.ndarray) -> tuple[floa
         (fitted_steps_per_2pi, one_sigma_uncertainty)
     """
 
-    # Poisson σ = √N  (shot-noise) using *raw* counts
-    sigma = np.sqrt(np.maximum(counts, 1))
+    # Poisson σ = √N (shot-noise) taken from *raw* counts
+    if counts_raw is None:
+        counts_raw = counts_corr
+    sigma = np.sqrt(np.maximum(counts_raw, 1))
 
     # Initial guess: [amplitude, offset, phase, steps_per_2pi]
-    p0 = [np.ptp(counts), np.min(counts), 0.0, 22.0]
+    p0 = [np.ptp(counts_corr), np.min(counts_corr), 0.0, 22.0]
 
     popt, pcov = curve_fit(
         _cos_model_with_period,
         piezo_steps,
-        counts,
+        counts_corr,
         p0=p0,
         sigma=sigma,
         absolute_sigma=True,
