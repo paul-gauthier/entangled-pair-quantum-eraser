@@ -137,6 +137,8 @@ def load_and_correct_datasets(jsonl_files):
                 "filename": jsonl_filename,
                 "piezo_steps": piezo_steps,
                 "Ns": Ns,
+                "Ni": Ni,
+                "Nc": Nc,
                 "Ni_corr": Ni_corr,
                 "Nc_corr": Nc_corr,
             }
