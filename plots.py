@@ -236,12 +236,12 @@ def main():
 
         print("\nCombined visibility estimates (inverse-variance weighted):")
         print(
-            f"  Idler:       Vi = {V_i_comb:.4f} ± {V_i_comb_err:.4f}   (reduced χ² ="
-            f" {red_chi2_i:.2f})"
+            f"  Idler:       Vi = {V_i_comb:.4f} ± {V_i_comb_err:.4f}  [{V_i_comb - V_i_comb_err:.4f},"
+            f" {V_i_comb + V_i_comb_err:.4f}]   (reduced χ² = {red_chi2_i:.2f})"
         )
         print(
-            f"  Coincidence: Vc = {V_c_comb:.4f} ± {V_c_comb_err:.4f}   (reduced χ² ="
-            f" {red_chi2_c:.2f})"
+            f"  Coincidence: Vc = {V_c_comb:.4f} ± {V_c_comb_err:.4f}  [{V_c_comb - V_c_comb_err:.4f},"
+            f" {V_c_comb + V_c_comb_err:.4f}]   (reduced χ² = {red_chi2_c:.2f})"
         )
 
 
