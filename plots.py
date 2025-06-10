@@ -150,26 +150,28 @@ def main():
         print("No valid datasets found!")
         sys.exit(1)
 
+
+    # Fit STEPS_PER_2PI for each dataset individually (using raw Nc) and
+    # combine the results with a 1/σ²-weighted average
+    print("Fitting STEPS_PER_2PI for each dataset ...")
+    sp2pi_vals = []
+    sp2pi_errs = []
+    for ds in datasets:
+        sp2pi, sp2pi_err = fit_steps_per_2pi(ds["piezo_steps"], ds["Nc_corr"], ds["Nc"])
+        sp2pi_vals.append(sp2pi)
+        sp2pi_errs.append(sp2pi_err)
+    weights = 1.0 / np.square(sp2pi_errs)
+    steps_per_2pi = float(np.sum(weights * sp2pi_vals) / np.sum(weights))
+    combined_err = float(1.0 / np.sqrt(np.sum(weights)))
+    print(
+        f"Computed weighted STEPS_PER_2PI = {steps_per_2pi:.3f} ± {combined_err:.3f} for all"
+        " plots\n"
+    )
+
     if args.steps_per_two_pi:
         steps_per_2pi = args.steps_per_two_pi
         print(f"Using provided STEPS_PER_2PI = {steps_per_2pi:.3f} for all plots\n")
-    else:
-        # Fit STEPS_PER_2PI for each dataset individually (using raw Nc) and
-        # combine the results with a 1/σ²-weighted average
-        print("Fitting STEPS_PER_2PI for each dataset ...")
-        sp2pi_vals = []
-        sp2pi_errs = []
-        for ds in datasets:
-            sp2pi, sp2pi_err = fit_steps_per_2pi(ds["piezo_steps"], ds["Nc_corr"], ds["Nc"])
-            sp2pi_vals.append(sp2pi)
-            sp2pi_errs.append(sp2pi_err)
-        weights = 1.0 / np.square(sp2pi_errs)
-        steps_per_2pi = float(np.sum(weights * sp2pi_vals) / np.sum(weights))
-        combined_err = float(1.0 / np.sqrt(np.sum(weights)))
-        print(
-            f"Using weighted STEPS_PER_2PI = {steps_per_2pi:.3f} ± {combined_err:.3f} for all"
-            " plots\n"
-        )
+
 
     # Second pass: generate plots with fitted parameter and collect visibilities
     V_i_list, V_i_err_list, V_c_list, V_c_err_list = [], [], [], []
@@ -234,11 +236,11 @@ def main():
 
         print("\nCombined visibility estimates (inverse-variance weighted):")
         print(
-            f"  Idler:       V = {V_i_comb:.4f} ± {V_i_comb_err:.4f}   (reduced χ² ="
+            f"  Idler:       Vi = {V_i_comb:.4f} ± {V_i_comb_err:.4f}   (reduced χ² ="
             f" {red_chi2_i:.2f})"
         )
         print(
-            f"  Coincidence: V = {V_c_comb:.4f} ± {V_c_comb_err:.4f}   (reduced χ² ="
+            f"  Coincidence: Vc = {V_c_comb:.4f} ± {V_c_comb_err:.4f}   (reduced χ² ="
             f" {red_chi2_c:.2f})"
         )
 
