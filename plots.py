@@ -171,7 +171,8 @@ def main():
             " plots\n"
         )
 
-    # Second pass: generate plots with fitted parameter
+    # Second pass: generate plots with fitted parameter and collect visibilities
+    V_i_list, V_i_err_list, V_c_list, V_c_err_list = [], [], [], []
     for ds in datasets:
         jsonl_filename = ds["filename"]
         dataset_index = ds["dataset_index"]
@@ -191,8 +192,8 @@ def main():
         basename = os.path.splitext(os.path.basename(jsonl_filename))[0]
         label_suffix = f"{basename}_dataset_{dataset_index}"
 
-        # Plot and save
-        plot_counts(
+        # Plot and save, collecting visibility metrics
+        _, metrics = plot_counts(
             piezo_steps,
             Ns,
             Ni_corr,
@@ -202,6 +203,39 @@ def main():
             label_suffix=label_suffix,
             Nc_raw=ds["Nc"],
             Ni_raw=ds["Ni"],
+            return_metrics=True,
+        )
+        V_i_list.append(metrics["V_vis_i"])
+        V_i_err_list.append(metrics["V_err_i"])
+        V_c_list.append(metrics["V_vis_c"])
+        V_c_err_list.append(metrics["V_err_c"])
+
+    # ------------------------------------------------------------------
+    # Combine visibilities across all datasets using inverse-variance weighting
+    # ------------------------------------------------------------------
+    def _weighted_mean(values: np.ndarray, errors: np.ndarray) -> tuple[float, float, float]:
+        weights = 1.0 / np.square(errors)
+        mean = float(np.sum(weights * values) / np.sum(weights))
+        err = float(1.0 / np.sqrt(np.sum(weights)))
+        red_chi2 = float(
+            np.sum(weights * np.square(values - mean)) / (len(values) - 1)
+        ) if len(values) > 1 else float("nan")
+        return mean, err, red_chi2
+
+    if V_i_list:
+        V_i_comb, V_i_comb_err, red_chi2_i = _weighted_mean(
+            np.array(V_i_list), np.array(V_i_err_list)
+        )
+        V_c_comb, V_c_comb_err, red_chi2_c = _weighted_mean(
+            np.array(V_c_list), np.array(V_c_err_list)
+        )
+
+        print("\nCombined visibility estimates (inverse-variance weighted):")
+        print(
+            f"  Idler:       V = {V_i_comb:.4f} ± {V_i_comb_err:.4f}   (reduced χ² = {red_chi2_i:.2f})"
+        )
+        print(
+            f"  Coincidence: V = {V_c_comb:.4f} ± {V_c_comb_err:.4f}   (reduced χ² = {red_chi2_c:.2f})"
         )
 
 

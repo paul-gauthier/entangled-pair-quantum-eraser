@@ -110,7 +110,8 @@ def plot_counts(
     show: bool = False,
     Nc_raw: np.ndarray | None = None,
     Ni_raw: np.ndarray | None = None,
-) -> str:
+    return_metrics: bool = False,
+) -> str | tuple[str, dict]:
     """
     Plot Ns, Ni, and Nc versus phase delay and save the figure.
 
@@ -136,11 +137,17 @@ def plot_counts(
         multiple datasets on shared axes.
     show :
         If ``True`` also display the figure interactively.
+    return_metrics :
+        If ``True`` also return a dict containing the fitted visibilities
+        and their 1σ uncertainties.
 
     Returns
     -------
-    str
-        The `output_filename` path for convenience.
+    str | tuple[str, dict]
+        If ``return_metrics`` is ``False`` returns just the output
+        filename. Otherwise returns ``(output_filename, metrics_dict)``
+        where ``metrics_dict`` contains ``V_vis_c``, ``V_err_c``,
+        ``V_vis_i``, and ``V_err_i``.
     """
 
     print()
@@ -415,4 +422,11 @@ def plot_counts(
     plt.close(fig)
 
     print(f"Plot saved as {output_filename}")
+    if return_metrics:
+        return output_filename, {
+            "V_vis_c": V_vis_c,
+            "V_err_c": V_err_c,
+            "V_vis_i": V_vis_i,
+            "V_err_i": V_err_i,
+        }
     return output_filename
