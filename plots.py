@@ -155,13 +155,19 @@ def main():
         steps_per_2pi = args.steps_per_two_pi
         print(f"Using provided STEPS_PER_2PI = {steps_per_2pi:.3f} for all plots\n")
     else:
-        # First pass: collect all data for fitting STEPS_PER_2PI
-        print("Collecting data to fit STEPS_PER_2PI...")
-        datasets_for_fitting = [(ds["piezo_steps"], ds["Nc_corr"]) for ds in datasets]
-
-        # Fit STEPS_PER_2PI from all datasets
-        steps_per_2pi = fit_steps_per_2pi(datasets_for_fitting)
-        print(f"Using STEPS_PER_2PI = {steps_per_2pi:.3f} for all plots\n")
+        # Fit STEPS_PER_2PI for each dataset individually (using raw Nc) and
+        # combine the results with a 1/σ²-weighted average
+        print("Fitting STEPS_PER_2PI for each dataset ...")
+        sp2pi_vals = []
+        sp2pi_errs = []
+        for ds in datasets:
+            sp2pi, sp2pi_err = fit_steps_per_2pi(ds["piezo_steps"], ds["Nc"])
+            sp2pi_vals.append(sp2pi)
+            sp2pi_errs.append(sp2pi_err)
+        weights = 1.0 / np.square(sp2pi_errs)
+        steps_per_2pi = float(np.sum(weights * sp2pi_vals) / np.sum(weights))
+        combined_err = float(1.0 / np.sqrt(np.sum(weights)))
+        print(f"Using weighted STEPS_PER_2PI = {steps_per_2pi:.3f} ± {combined_err:.3f} for all plots\n")
 
     # Second pass: generate plots with fitted parameter
     for ds in datasets:

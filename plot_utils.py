@@ -41,55 +41,44 @@ def _cos_model_with_period(steps, A, C0, phi, steps_per_2pi):
     return C0 + A * (1 + np.cos(delta + phi)) / 2
 
 
-def fit_steps_per_2pi(datasets):
+def fit_steps_per_2pi(piezo_steps: np.ndarray, counts: np.ndarray) -> tuple[float, float]:
     """
-    Fit STEPS_PER_2PI from multiple datasets.
+    Fit the phase-delay calibration (STEPS_PER_2PI) for a *single* dataset.
 
     Parameters
     ----------
-    datasets : list of tuples
-        Each tuple should be (piezo_steps, counts) where counts can be Ni or Nc
+    piezo_steps :
+        1-D array of piezo stage positions (integer steps).
+    counts :
+        1-D array of *raw* coincidence counts (use uncorrected N_c).
 
     Returns
     -------
-    float
-        The fitted STEPS_PER_2PI value
+    tuple
+        (fitted_steps_per_2pi, one_sigma_uncertainty)
     """
 
-    all_steps = []
-    all_counts = []
-    all_weights = []
+    # Poisson σ = √N  (shot-noise) using *raw* counts
+    sigma = np.sqrt(np.maximum(counts, 1))
 
-    for piezo_steps, counts in datasets:
-        all_steps.extend(piezo_steps)
-        all_counts.extend(counts)
-        all_weights.extend(1.0 / np.sqrt(np.maximum(counts, 1)))  # Poisson weights
+    # Initial guess: [amplitude, offset, phase, steps_per_2pi]
+    p0 = [np.ptp(counts), np.min(counts), 0.0, 22.0]
 
-    all_steps = np.array(all_steps)
-    all_counts = np.array(all_counts)
-    all_weights = np.array(all_weights)
+    popt, pcov = curve_fit(
+        _cos_model_with_period,
+        piezo_steps,
+        counts,
+        p0=p0,
+        sigma=sigma,
+        absolute_sigma=True,
+        bounds=([0, 0, -np.pi, 10], [np.inf, np.inf, np.pi, 50]),
+    )
 
-    # Initial guess
-    p0 = [np.ptp(all_counts), np.min(all_counts), 0.0, 22.0]
+    fitted_steps_per_2pi = popt[3]
+    se_steps_per_2pi = np.sqrt(pcov[3, 3])
 
-    try:
-        popt, _ = curve_fit(
-            _cos_model_with_period,
-            all_steps,
-            all_counts,
-            p0=p0,
-            sigma=all_weights,
-            absolute_sigma=True,
-            bounds=([0, 0, -np.pi, 10], [np.inf, np.inf, np.pi, 50]),
-        )
-
-        _, _, _, fitted_steps_per_2pi = popt
-
-        print(f"Fitted STEPS_PER_2PI = {fitted_steps_per_2pi:.3f}")
-        return fitted_steps_per_2pi
-
-    except Exception as e:
-        raise RuntimeError(f"Could not fit STEPS_PER_2PI: {e}")
+    print(f"  Fitted STEPS_PER_2PI = {fitted_steps_per_2pi:.3f} ± {se_steps_per_2pi:.3f}")
+    return fitted_steps_per_2pi, se_steps_per_2pi
 
 
 # ---------------------------------------------------------------------------
