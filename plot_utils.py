@@ -168,9 +168,7 @@ def global_cosine_fit(
     # -------- Visibility and its uncertainty ------------------------------
     V = A_fit / (A_fit + 2 * C0_fit)
     denom = (A_fit + 2 * C0_fit) ** 2
-    V_err = np.sqrt(
-        (2 * C0_fit / denom * A_err) ** 2 + (-2 * A_fit / denom * C0_err) ** 2
-    )
+    V_err = np.sqrt((2 * C0_fit / denom * A_err) ** 2 + (-2 * A_fit / denom * C0_err) ** 2)
 
     print(f"\nGlobal {label} fit (shared A, C0 across {m} datasets):")
     print(f"  A  = {A_fit:.2f} ± {A_err:.2f}")
