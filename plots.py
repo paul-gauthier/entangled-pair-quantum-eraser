@@ -261,7 +261,7 @@ def main():
         try:
             from plot_utils import global_cosine_fit
 
-            global_idler = global_cosine_fit(
+            global_cosine_fit(
                 datasets,
                 steps_per_2pi,
                 counts_key="Ni_corr",
@@ -269,7 +269,7 @@ def main():
                 label="Idler",
             )
 
-            global_coinc = global_cosine_fit(
+            global_cosine_fit(
                 datasets,
                 steps_per_2pi,
                 counts_key="Nc_corr",
