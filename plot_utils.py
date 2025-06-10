@@ -104,6 +104,8 @@ def plot_counts(
     output_filename: str = "counts_vs_phase_delay.pdf",
     label_suffix: str = "",
     show: bool = False,
+    Nc_raw: np.ndarray | None = None,
+    Ni_raw: np.ndarray | None = None,
 ) -> str:
     """
     Plot Ns, Ni, and Nc versus phase delay and save the figure.
@@ -115,6 +117,12 @@ def plot_counts(
     Ns, Ni, Nc :
         Arrays of signal, idler, and coincidence counts (same length as
         ``piezo_steps``).
+    Nc_raw :
+        Optional array of *raw* coincidence counts used only for
+        Poisson uncertainties (σ = √N).  Defaults to ``Nc``.
+    Ni_raw :
+        Optional array of *raw* idler counts used only for
+        Poisson uncertainties (σ = √N).  Defaults to ``Ni``.
     steps_per_2pi :
         Conversion factor from piezo steps to 2π phase delay.
     output_filename :
@@ -133,9 +141,13 @@ def plot_counts(
 
     print()
 
-    # Poisson (√N) uncertainties
-    Ni_err = np.sqrt(Ni)
-    Nc_err = np.sqrt(Nc)
+    # Poisson (√N) uncertainties from raw counts
+    if Ni_raw is None:
+        Ni_raw = Ni
+    if Nc_raw is None:
+        Nc_raw = Nc
+    Ni_err = np.sqrt(np.maximum(Ni_raw, 1))
+    Nc_err = np.sqrt(np.maximum(Nc_raw, 1))
 
     # Phase delay for x-axis
     delta = delta_from_steps(piezo_steps, steps_per_2pi)
