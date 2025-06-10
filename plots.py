@@ -15,58 +15,6 @@ from plot_utils import delta_from_steps, fit_steps_per_2pi, plot_counts
 ACCIDENTAL_WINDOW = 25e-9  # 25 ns coincidence window
 
 
-def _load_dark_data(filename):
-    """
-    Load a *dark* JSONL file and return three 1-D numpy arrays:
-    piezo_steps_dark, Ns_dark, Ni_dark.
-    """
-    piezo_steps_d, Ns_d, Ni_d, _ = load_jsonl_data(filename)
-    return piezo_steps_d, Ns_d, Ni_d
-
-
-def _nearest_dark(idx_step, dark_steps):
-    """Return index of the dark-data row whose step is closest to `idx_step`."""
-    return int(np.abs(dark_steps - idx_step).argmin())
-
-
-def apply_dark_correction(piezo_steps, Ns, Ni, Nc, dark_data):
-    """
-    Subtract dark counts from Ni and accidental coincidences from Nc.
-
-    Parameters
-    ----------
-    piezo_steps, Ns, Ni, Nc : np.ndarray
-        Raw experimental data.
-    dark_data : tuple | None
-        (piezo_steps_dark, Ns_dark, Ni_dark) or ``None``.
-
-    Returns
-    -------
-    Ni_corr, Nc_corr : np.ndarray
-        Dark-subtracted arrays (Ns is returned unchanged).
-    """
-    if dark_data is None:
-        # No dark file – return originals unchanged
-        return Ni.copy(), Nc.copy()
-
-    dark_steps, Ns_dark, Ni_dark = dark_data
-    Ni_corr = np.empty_like(Ni, dtype=float)
-    Nc_corr = np.empty_like(Nc, dtype=float)
-
-    for i, step in enumerate(piezo_steps):
-        j = _nearest_dark(step, dark_steps)
-        Ni_dark_val = Ni_dark[j]
-        Ns_dark_val = Ns_dark[j]
-
-        Ni_corr[i] = Ni[i] - Ni_dark_val
-        accidental = Ns_dark_val * Ni_dark_val * ACCIDENTAL_WINDOW
-        Nc_corr[i] = Nc[i] - accidental
-
-    # Clip any negative values to zero
-    Ni_corr = np.clip(Ni_corr, 0, None)
-    Nc_corr = np.clip(Nc_corr, 0, None)
-    return Ni_corr, Nc_corr
-
 
 def load_jsonl_data(filename):
     """Load data from a JSONL file and return arrays of piezo steps and counts."""
@@ -88,67 +36,116 @@ def load_jsonl_data(filename):
     return piezo_steps, Ns, Ni, Nc
 
 
-def load_and_correct_datasets(jsonl_files):
+def load_and_correct_datasets(jsonl_filename):
     """
-    Load datasets from JSONL files and apply dark count corrections.
+    Load datasets from a single JSONL file and apply dark count corrections.
+    
+    The file contains multiple datasets separated by dark count records with dark=True.
+    Each dataset is corrected using the dark record that immediately follows it.
 
-    Returns a list of dictionaries, one for each main (non-dark) dataset.
-    Each dictionary contains:
-    - 'filename': The original filename of the dataset.
-    - 'piezo_steps', 'Ns': Raw data arrays.
-    - 'Ni_corr', 'Nc_corr': Dark-corrected data arrays.
+    Parameters
+    ----------
+    jsonl_filename : str
+        Path to the JSONL file containing multiple datasets.
+
+    Returns
+    -------
+    list of dict
+        List of dictionaries, one for each dataset.
+        Each dictionary contains:
+        - 'filename': The original filename of the dataset.
+        - 'dataset_index': Index of the dataset within the file.
+        - 'piezo_steps', 'Ns': Raw data arrays.
+        - 'Ni_corr', 'Nc_corr': Dark-corrected data arrays.
     """
-    supplied_files = set(jsonl_files)
+    if not os.path.exists(jsonl_filename):
+        print(f"Warning: File {jsonl_filename} not found.")
+        return []
+
+    # Load all records from the file
+    data = []
+    with open(jsonl_filename, "r") as f:
+        for line in f:
+            if line.strip():
+                data.append(json.loads(line))
+
+    # Split into datasets at dark=True records
     datasets = []
-
-    main_files = [f for f in jsonl_files if "-dark-" not in os.path.basename(f)]
-
-    for jsonl_filename in main_files:
-        if not os.path.exists(jsonl_filename):
-            print(f"Warning: File {jsonl_filename} not found, skipping.")
-            continue
-
-        piezo_steps, Ns, Ni, Nc = load_jsonl_data(jsonl_filename)
-
-        # Locate a matching dark file (must also have been supplied).
-        dark_filename = None
-        if jsonl_filename.endswith("-on.jsonl"):
-            cand = jsonl_filename.replace("-on.jsonl", "-dark-on.jsonl")
-            dark_filename = cand if cand in supplied_files else None
-        elif jsonl_filename.endswith("-off.jsonl"):
-            cand = jsonl_filename.replace("-off.jsonl", "-dark-off.jsonl")
-            dark_filename = cand if cand in supplied_files else None
-
-        dark_data = None
-        if dark_filename:
-            try:
-                dark_data = _load_dark_data(dark_filename)
-                print(f"  Using dark data from {dark_filename} for {jsonl_filename}")
-            except FileNotFoundError:
-                print(f"  Warning: dark file {dark_filename} missing – no correction.")
-                dark_data = None
+    current_dataset = []
+    
+    for record in data:
+        if record.get("dark", False):
+            # Found a dark record - save current dataset if it exists
+            if current_dataset:
+                datasets.append((current_dataset, record))
+                current_dataset = []
         else:
-            print(f"  Warning: no matching dark file for {jsonl_filename}")
+            current_dataset.append(record)
+    
+    # Discard any final records after the last dark=True
+    if current_dataset:
+        print(f"  Warning: Discarding {len(current_dataset)} records after last dark measurement")
 
-        Ni_corr, Nc_corr = apply_dark_correction(piezo_steps, Ns, Ni, Nc, dark_data)
+    if not datasets:
+        print(f"  Warning: No datasets found in {jsonl_filename}")
+        return []
 
-        datasets.append(
-            {
-                "filename": jsonl_filename,
-                "piezo_steps": piezo_steps,
-                "Ns": Ns,
-                "Ni": Ni,
-                "Nc": Nc,
-                "Ni_corr": Ni_corr,
-                "Nc_corr": Nc_corr,
-            }
-        )
-    return datasets
+    # Get reference stage positions from first dataset
+    first_dataset_data, _ = datasets[0]
+    first_dataset_data.sort(key=lambda x: x.get("stage_position", x.get("step")))
+    reference_positions = [d.get("stage_position", d.get("step")) for d in first_dataset_data]
+    
+    print(f"  Found {len(datasets)} datasets in {jsonl_filename}")
+    print(f"  Reference dataset has {len(reference_positions)} stage positions: {reference_positions}")
+
+    corrected_datasets = []
+    
+    for dataset_index, (dataset_data, dark_record) in enumerate(datasets):
+        # Sort dataset by stage position
+        dataset_data.sort(key=lambda x: x.get("stage_position", x.get("step")))
+        
+        # Check if this dataset has the same stage positions as the first
+        positions = [d.get("stage_position", d.get("step")) for d in dataset_data]
+        
+        if positions != reference_positions:
+            print(f"  Warning: Dataset {dataset_index} has different stage positions, skipping")
+            print(f"    Expected: {reference_positions}")
+            print(f"    Got: {positions}")
+            continue
+        
+        # Extract arrays from this dataset
+        piezo_steps = np.array(positions)
+        Ns = np.array([d["N_s"] for d in dataset_data])
+        Ni = np.array([d["N_i"] for d in dataset_data])
+        Nc = np.array([d["N_c"] for d in dataset_data])
+        
+        # Apply dark correction using the dark record
+        Ni_dark = dark_record["N_i"]
+        Ns_dark = dark_record["N_s"]
+        
+        Ni_corr = np.clip(Ni - Ni_dark, 0, None)
+        accidental = Ns_dark * Ni_dark * ACCIDENTAL_WINDOW
+        Nc_corr = np.clip(Nc - accidental, 0, None)
+        
+        corrected_datasets.append({
+            "filename": jsonl_filename,
+            "dataset_index": dataset_index,
+            "piezo_steps": piezo_steps,
+            "Ns": Ns,
+            "Ni": Ni,
+            "Nc": Nc,
+            "Ni_corr": Ni_corr,
+            "Nc_corr": Nc_corr,
+        })
+        
+        print(f"  Dataset {dataset_index}: Applied dark correction (Ni_dark={Ni_dark}, Ns_dark={Ns_dark})")
+    
+    return corrected_datasets
 
 
 def main():
     parser = argparse.ArgumentParser(description="Plot Mach-Zehnder interferometer data.")
-    parser.add_argument("jsonl_files", nargs="+", help="One or more JSONL data files to process.")
+    parser.add_argument("jsonl_file", help="JSONL data file to process.")
     parser.add_argument(
         "--max-phase",
         type=float,
@@ -162,9 +159,9 @@ def main():
     )
     args = parser.parse_args()
 
-    datasets = load_and_correct_datasets(args.jsonl_files)
+    datasets = load_and_correct_datasets(args.jsonl_file)
     if not datasets:
-        print("No valid data files found!")
+        print("No valid datasets found!")
         sys.exit(1)
 
     if args.steps_per_two_pi:
@@ -182,7 +179,8 @@ def main():
     # Second pass: generate plots with fitted parameter
     for ds in datasets:
         jsonl_filename = ds["filename"]
-        print(f"Processing {jsonl_filename}...")
+        dataset_index = ds["dataset_index"]
+        print(f"Processing dataset {dataset_index} from {jsonl_filename}...")
 
         # Make copies to avoid modifying the dict in place
         piezo_steps = ds["piezo_steps"].copy()
@@ -190,11 +188,13 @@ def main():
         Ni_corr = ds["Ni_corr"].copy()
         Nc_corr = ds["Nc_corr"].copy()
 
-        # Generate output filename by replacing .jsonl with .pdf
-        output_filename = os.path.splitext(jsonl_filename)[0] + ".pdf"
+        # Generate output filename by replacing .jsonl with .pdf and adding dataset index
+        base_filename = os.path.splitext(jsonl_filename)[0]
+        output_filename = f"{base_filename}_dataset_{dataset_index}.pdf"
 
-        # Extract a label from the filename (remove path and extension)
+        # Extract a label from the filename (remove path and extension) and add dataset index
         basename = os.path.splitext(os.path.basename(jsonl_filename))[0]
+        label_suffix = f"{basename}_dataset_{dataset_index}"
 
         # Plot and save
         plot_counts(
@@ -204,7 +204,7 @@ def main():
             Nc_corr,
             steps_per_2pi,
             output_filename=output_filename,
-            label_suffix=basename,
+            label_suffix=label_suffix,
         )
 
 
