@@ -156,9 +156,21 @@ def main():
     sp2pi_vals = []
     sp2pi_errs = []
     for ds in datasets:
-        sp2pi, sp2pi_err = fit_steps_per_2pi(ds["piezo_steps"], ds["Nc_corr"], ds["Nc"])
-        sp2pi_vals.append(sp2pi)
-        sp2pi_errs.append(sp2pi_err)
+        try:
+            sp2pi, sp2pi_err = fit_steps_per_2pi(
+                ds["piezo_steps"], ds["Nc_corr"], ds["Nc"]
+            )
+            sp2pi_vals.append(sp2pi)
+            sp2pi_errs.append(sp2pi_err)
+        except RuntimeError:
+            print(
+                f"  Failed to fit STEPS_PER_2PI for dataset {ds['dataset_index']}, skipping."
+            )
+
+    if not sp2pi_vals:
+        print("\nCould not fit STEPS_PER_2PI for any dataset. Exiting.")
+        sys.exit(1)
+
     weights = 1.0 / np.square(sp2pi_errs)
     steps_per_2pi = float(np.sum(weights * sp2pi_vals) / np.sum(weights))
     combined_err = float(1.0 / np.sqrt(np.sum(weights)))
