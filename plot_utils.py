@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.optimize import curve_fit
+from scipy.optimize import curve_fit, least_squares
 
 # Maximum number of function evaluations allowed in each curve_fit call.
 # Increase this if you still encounter “Optimal parameters not found”.
@@ -93,6 +93,102 @@ def fit_steps_per_2pi(
 
     print(f"  Fitted STEPS_PER_2PI = {fitted_steps_per_2pi:.3f} ± {se_steps_per_2pi:.3f}")
     return fitted_steps_per_2pi, se_steps_per_2pi
+
+
+# ---------------------------------------------------------------------------
+# Global (hierarchical) cosine fit across multiple datasets
+# ---------------------------------------------------------------------------
+def global_cosine_fit(
+    datasets: list[dict],
+    steps_per_2pi: float,
+    *,
+    counts_key: str,
+    raw_key: str,
+    label: str = "Series",
+) -> dict[str, float]:
+    """
+    Simultaneously fit all datasets with shared amplitude ``A`` and offset
+    ``C0`` while allowing each dataset its own phase shift ``φ_k``.
+
+    The model for each point *j* in dataset *k* is::
+
+        y_j = C0 + A * (1 + cos(δ_j + φ_k)) / 2
+
+    Poisson shot-noise (σ = √N) from the *raw* counts is used for weighting.
+
+    Returns a dictionary containing the best-fit parameters, their
+    1 σ errors, the derived visibility and the reduced χ² of the fit.
+    """
+    # -------- Flatten all scans into one big array ------------------------
+    deltas, y, sigma, idx = [], [], [], []
+    for k, ds in enumerate(datasets):
+        δ = delta_from_steps(ds["piezo_steps"], steps_per_2pi)
+        y_k = ds[counts_key]
+        σ_k = np.sqrt(np.maximum(ds[raw_key], 1))
+        n_k = len(y_k)
+
+        deltas.append(δ)
+        y.append(y_k)
+        sigma.append(σ_k)
+        idx.append(np.full(n_k, k, dtype=int))
+
+    delta_all = np.concatenate(deltas)
+    y_all = np.concatenate(y)
+    sigma_all = np.concatenate(sigma)
+    idx_all = np.concatenate(idx)
+
+    m = len(datasets)  # number of individual phase parameters
+
+    # -------- Residual function for least-squares -------------------------
+    def _residuals(p):
+        A, C0 = p[0], p[1]
+        phis = p[2:]
+        model = C0 + A * (1 + np.cos(delta_all + phis[idx_all])) / 2
+        return (y_all - model) / sigma_all
+
+    # Initial guesses & bounds
+    p0 = [np.ptp(y_all) / 2, np.mean(y_all)] + [0.0] * m
+    lower = [0.0, 0.0] + [-2 * np.pi] * m
+    upper = [np.inf, np.inf] + [2 * np.pi] * m
+
+    res = least_squares(_residuals, p0, bounds=(lower, upper), max_nfev=MAXFEV)
+    if not res.success:
+        raise RuntimeError(res.message)
+
+    # -------- Covariance & parameter errors --------------------------------
+    J = res.jac
+    dof = y_all.size - J.shape[1]
+    chi2 = np.sum(res.fun**2)
+    red_chi2 = chi2 / dof if dof > 0 else float("nan")
+    cov = np.linalg.inv(J.T @ J) * chi2 / dof
+
+    A_fit, C0_fit = res.x[:2]
+    A_err, C0_err = np.sqrt(np.diag(cov)[:2])
+
+    # -------- Visibility and its uncertainty ------------------------------
+    V = A_fit / (A_fit + 2 * C0_fit)
+    denom = (A_fit + 2 * C0_fit) ** 2
+    V_err = np.sqrt(
+        (2 * C0_fit / denom * A_err) ** 2 + (-2 * A_fit / denom * C0_err) ** 2
+    )
+
+    print(f"\nGlobal {label} fit (shared A, C0 across {m} datasets):")
+    print(f"  A  = {A_fit:.2f} ± {A_err:.2f}")
+    print(f"  C0 = {C0_fit:.2f} ± {C0_err:.2f}")
+    print(
+        f"  Visibility V = {V:.4f} ± {V_err:.4f} "
+        f"[{V - V_err:.4f}, {V + V_err:.4f}]   (reduced χ² = {red_chi2:.2f})"
+    )
+
+    return {
+        "A": A_fit,
+        "A_err": A_err,
+        "C0": C0_fit,
+        "C0_err": C0_err,
+        "V": V,
+        "V_err": V_err,
+        "chi2red": red_chi2,
+    }
 
 
 # ---------------------------------------------------------------------------

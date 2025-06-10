@@ -255,6 +255,30 @@ def main():
             f" {red_chi2_c:.2f})"
         )
 
+        # ------------------------------------------------------------------
+        # Global hierarchical fit (shared A, C0 across all datasets)
+        # ------------------------------------------------------------------
+        try:
+            from plot_utils import global_cosine_fit
+
+            global_idler = global_cosine_fit(
+                datasets,
+                steps_per_2pi,
+                counts_key="Ni_corr",
+                raw_key="Ni",
+                label="Idler",
+            )
+
+            global_coinc = global_cosine_fit(
+                datasets,
+                steps_per_2pi,
+                counts_key="Nc_corr",
+                raw_key="Nc",
+                label="Coincidence",
+            )
+        except RuntimeError as e:
+            print(f"\nGlobal fit failed: {e}")
+
 
 if __name__ == "__main__":
     main()
