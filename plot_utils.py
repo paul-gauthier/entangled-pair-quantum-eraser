@@ -266,7 +266,7 @@ def plot_counts(
         f" {np.degrees(phi_err_c):.1f}°)"
     )
     print(
-        f"    Visibility V = {V_vis_c:.4f} ± {V_err_c:.4f}  [{V_vis_c - V_err_c:.4f},"
+        f"    Visibility Vc = {V_vis_c:.4f} ± {V_err_c:.4f}  [{V_vis_c - V_err_c:.4f},"
         f" {V_vis_c + V_err_c:.4f}]"
     )
     print(f"    reduced χ² = {red_chi2_c:.2f}")
@@ -281,7 +281,7 @@ def plot_counts(
         f" {np.degrees(phi_err_i):.1f}°)"
     )
     print(
-        f"    Visibility V = {V_vis_i:.4f} ± {V_err_i:.4f}  [{V_vis_i - V_err_i:.4f},"
+        f"    Visibility Vi = {V_vis_i:.4f} ± {V_err_i:.4f}  [{V_vis_i - V_err_i:.4f},"
         f" {V_vis_i + V_err_i:.4f}]"
     )
     print(f"    reduced χ² = {red_chi2_i:.2f}")
