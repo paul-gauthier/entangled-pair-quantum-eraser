@@ -150,7 +150,6 @@ def main():
         print("No valid datasets found!")
         sys.exit(1)
 
-
     # Fit STEPS_PER_2PI for each dataset individually (using raw Nc) and
     # combine the results with a 1/σ²-weighted average
     print("Fitting STEPS_PER_2PI for each dataset ...")
@@ -171,7 +170,6 @@ def main():
     if args.steps_per_two_pi:
         steps_per_2pi = args.steps_per_two_pi
         print(f"Using provided STEPS_PER_2PI = {steps_per_2pi:.3f} for all plots\n")
-
 
     # Second pass: generate plots with fitted parameter and collect visibilities
     V_i_list, V_i_err_list, V_c_list, V_c_err_list = [], [], [], []
@@ -236,12 +234,14 @@ def main():
 
         print("\nCombined visibility estimates (inverse-variance weighted):")
         print(
-            f"  Idler:       Vi = {V_i_comb:.4f} ± {V_i_comb_err:.4f}  [{V_i_comb - V_i_comb_err:.4f},"
-            f" {V_i_comb + V_i_comb_err:.4f}]   (reduced χ² = {red_chi2_i:.2f})"
+            f"  Idler:       Vi = {V_i_comb:.4f} ± {V_i_comb_err:.4f} "
+            f" [{V_i_comb - V_i_comb_err:.4f}, {V_i_comb + V_i_comb_err:.4f}]   (reduced χ² ="
+            f" {red_chi2_i:.2f})"
         )
         print(
-            f"  Coincidence: Vc = {V_c_comb:.4f} ± {V_c_comb_err:.4f}  [{V_c_comb - V_c_comb_err:.4f},"
-            f" {V_c_comb + V_c_comb_err:.4f}]   (reduced χ² = {red_chi2_c:.2f})"
+            f"  Coincidence: Vc = {V_c_comb:.4f} ± {V_c_comb_err:.4f} "
+            f" [{V_c_comb - V_c_comb_err:.4f}, {V_c_comb + V_c_comb_err:.4f}]   (reduced χ² ="
+            f" {red_chi2_c:.2f})"
         )
 
 
