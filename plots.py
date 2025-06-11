@@ -305,7 +305,10 @@ def main():
     print(f"Total photons (S+I): {int(total_photons):,}")
     print(f"Total duration:     {total_duration_s:.2f} s")
     if total_phase_scanned_pi > 0:
-        print(f"Total phase scanned: {total_phase_scanned_pi:.2f}π ({total_phase_scanned_pi/2:.2f} periods)")
+        print(
+            f"Total phase scanned: {total_phase_scanned_pi:.2f}π"
+            f" ({total_phase_scanned_pi/2:.2f} periods)"
+        )
 
 
 if __name__ == "__main__":
