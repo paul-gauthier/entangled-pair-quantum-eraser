@@ -158,8 +158,8 @@ def plot_joint_counts(
         f"$C_0 = {C0_c:.1f} \\pm {fit['C0_c_err']:.1f}$\n"
         f"$A = {A_c:.1f} \\pm {fit['A_c_err']:.1f}$\n"
         f"$V = {fit['V_c']:.4f} \\pm {fit['V_c_err']:.4f}$\n"
-        f"$\\phi_{{ic}} = {fit['phi_ic']:.2f} \\pm {fit['phi_ic_err']:.2f}$\\;\\text{{rad}}\\,"
-        f"({np.degrees(fit['phi_ic']):.1f} \\pm {np.degrees(fit['phi_ic_err']):.1f}^\\circ)$"
+        f"$\\phi_{{ic}} = {fit['phi_ic']:.2f} \\pm {fit['phi_ic_err']:.2f}\\,\\mathrm{{rad}}\\,"
+        f"({np.degrees(fit['phi_ic']):.1f} \\pm {np.degrees(fit['phi_ic_err']):.1f})^\\circ$"
     )
     props_c = dict(boxstyle="round", facecolor="lightblue", alpha=0.8)
     ax_c.text(
