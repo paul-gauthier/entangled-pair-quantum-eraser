@@ -7,7 +7,7 @@ import sys
 
 import numpy as np
 
-from plot_utils import fit_steps_per_2pi, plot_counts
+from plot_utils import fit_steps_per_2pi, plot_counts, global_joint_cosine_fit
 
 # ---------------------------------------------------------------------------
 # Dark–count handling
@@ -262,22 +262,15 @@ def main():
         # Global hierarchical fit (shared A, C0 across all datasets)
         # ------------------------------------------------------------------
         try:
-            from plot_utils import global_cosine_fit
+            from plot_utils import global_joint_cosine_fit
 
-            global_cosine_fit(
+            global_joint_cosine_fit(
                 datasets,
                 steps_per_2pi,
-                counts_key="Ni_corr",
-                raw_key="Ni",
-                label="Idler",
-            )
-
-            global_cosine_fit(
-                datasets,
-                steps_per_2pi,
-                counts_key="Nc_corr",
-                raw_key="Nc",
-                label="Coincidence",
+                ni_key="Ni_corr",
+                nc_key="Nc_corr",
+                ni_raw_key="Ni",
+                nc_raw_key="Nc",
             )
         except RuntimeError as e:
             print(f"\nGlobal fit failed: {e}")

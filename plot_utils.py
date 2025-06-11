@@ -187,6 +187,141 @@ def global_cosine_fit(
         "V_err": V_err,
         "chi2red": red_chi2,
     }
+    
+    
+# ---------------------------------------------------------------------------
+# Joint global cosine fit for Idler and Coincidence data
+# ---------------------------------------------------------------------------
+def global_joint_cosine_fit(
+    datasets: list[dict],
+    steps_per_2pi: float,
+    *,
+    ni_key: str = "Ni_corr",
+    nc_key: str = "Nc_corr",
+    ni_raw_key: str = "Ni",
+    nc_raw_key: str = "Nc",
+) -> dict[str, float]:
+    """
+    Perform a *single* hierarchical fit to all idler (N_i) and coincidence
+    (N_c) scans, sharing a per-dataset phase φ_k **and** one global phase
+    offset φ_ic between the two series::
+
+        N_i = C0_i + A_i · (1 + cos(δ + φ_k)) / 2
+        N_c = C0_c + A_c · (1 + cos(δ + φ_k + φ_ic)) / 2
+
+    The fit returns visibilities, phase offset and uncertainties.
+    """
+    deltas, y, sigma, idx, typ = [], [], [], [], []  # typ: 0 → N_i, 1 → N_c
+    for k, ds in enumerate(datasets):
+        δ = delta_from_steps(ds["piezo_steps"], steps_per_2pi)
+
+        # Idler
+        deltas.append(δ)
+        y.append(ds[ni_key])
+        sigma.append(np.sqrt(np.maximum(ds[ni_raw_key], 1)))
+        n_k = len(δ)
+        idx.append(np.full(n_k, k, dtype=int))
+        typ.append(np.zeros(n_k, dtype=int))
+
+        # Coincidence
+        deltas.append(δ)
+        y.append(ds[nc_key])
+        sigma.append(np.sqrt(np.maximum(ds[nc_raw_key], 1)))
+        idx.append(np.full(n_k, k, dtype=int))
+        typ.append(np.ones(n_k, dtype=int))
+
+    delta_all = np.concatenate(deltas)
+    y_all = np.concatenate(y)
+    sigma_all = np.concatenate(sigma)
+    idx_all = np.concatenate(idx)
+    typ_all = np.concatenate(typ)
+
+    m = len(datasets)  # number of φ_k parameters
+
+    def _residuals(p):
+        A_i, C0_i, A_c, C0_c, phi_ic = p[:5]
+        phis = p[5:]
+        phase_k = phis[idx_all]
+        model = np.where(
+            typ_all == 0,
+            C0_i + A_i * (1 + np.cos(delta_all + phase_k)) / 2,
+            C0_c + A_c * (1 + np.cos(delta_all + phase_k + phi_ic)) / 2,
+        )
+        return (y_all - model) / sigma_all
+
+    # Initial guesses
+    Ni_all = np.concatenate([ds[ni_key] for ds in datasets])
+    Nc_all = np.concatenate([ds[nc_key] for ds in datasets])
+    p0 = [
+        np.ptp(Ni_all) / 2,
+        np.mean(Ni_all),
+        np.ptp(Nc_all) / 2,
+        np.mean(Nc_all),
+        0.0,
+    ] + [0.0] * m
+
+    lower = [0.0, 0.0, 0.0, 0.0, -2 * np.pi] + [-2 * np.pi] * m
+    upper = [np.inf, np.inf, np.inf, np.inf, 2 * np.pi] + [2 * np.pi] * m
+
+    res = least_squares(_residuals, p0, bounds=(lower, upper), max_nfev=MAXFEV)
+    if not res.success:
+        raise RuntimeError(res.message)
+
+    J = res.jac
+    dof = y_all.size - J.shape[1]
+    chi2 = np.sum(res.fun**2)
+    red_chi2 = chi2 / dof if dof > 0 else float("nan")
+    cov = np.linalg.inv(J.T @ J) * chi2 / dof
+
+    A_i, C0_i, A_c, C0_c, phi_ic = res.x[:5]
+    A_i_err, C0_i_err, A_c_err, C0_c_err, phi_ic_err = np.sqrt(np.diag(cov)[:5])
+
+    phi_ic = phi_ic % (2 * np.pi)
+
+    # Visibilities
+    V_i = A_i / (A_i + 2 * C0_i)
+    V_c = A_c / (A_c + 2 * C0_c)
+    denom_i = (A_i + 2 * C0_i) ** 2
+    denom_c = (A_c + 2 * C0_c) ** 2
+    V_i_err = np.sqrt((2 * C0_i / denom_i * A_i_err) ** 2 + (-2 * A_i / denom_i * C0_i_err) ** 2)
+    V_c_err = np.sqrt((2 * C0_c / denom_c * A_c_err) ** 2 + (-2 * A_c / denom_c * C0_c_err) ** 2)
+
+    print("\nGlobal joint fit (N_i & N_c):")
+    print(f"  A_i  = {A_i:.2f} ± {A_i_err:.2f}")
+    print(f"  C0_i = {C0_i:.2f} ± {C0_i_err:.2f}")
+    print(f"  A_c  = {A_c:.2f} ± {A_c_err:.2f}")
+    print(f"  C0_c = {C0_c:.2f} ± {C0_c_err:.2f}")
+    print(
+        f"  φ_ic = {phi_ic:.2f} ± {phi_ic_err:.2f} rad "
+        f"({np.degrees(phi_ic):.1f} ± {np.degrees(phi_ic_err):.1f}°)"
+    )
+    print(
+        f"  Vi = {V_i:.4f} ± {V_i_err:.4f}   "
+        f"[{V_i - V_i_err:.4f}, {V_i + V_i_err:.4f}]"
+    )
+    print(
+        f"  Vc = {V_c:.4f} ± {V_c_err:.4f}   "
+        f"[{V_c - V_c_err:.4f}, {V_c + V_c_err:.4f}]"
+    )
+    print(f"  reduced χ² = {red_chi2:.2f}")
+
+    return {
+        "A_i": A_i,
+        "A_i_err": A_i_err,
+        "C0_i": C0_i,
+        "C0_i_err": C0_i_err,
+        "V_i": V_i,
+        "V_i_err": V_i_err,
+        "A_c": A_c,
+        "A_c_err": A_c_err,
+        "C0_c": C0_c,
+        "C0_c_err": C0_c_err,
+        "V_c": V_c,
+        "V_c_err": V_c_err,
+        "phi_ic": phi_ic,
+        "phi_ic_err": phi_ic_err,
+        "chi2red": red_chi2,
+    }
 
 
 # ---------------------------------------------------------------------------
