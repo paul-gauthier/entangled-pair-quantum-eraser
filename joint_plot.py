@@ -19,6 +19,7 @@ def plot_joint_counts(
     *,
     out: str = "all_datasets_joint.pdf",
     show: bool = False,
+    align_phase: bool = True,
 ) -> str:
     """
     Generate a figure showing every dataset’s N_i and N_c points on common
@@ -66,6 +67,8 @@ def plot_joint_counts(
 
     for k, ds in enumerate(datasets):
         δ = delta_from_steps(ds["piezo_steps"], steps_per_2pi)
+        if align_phase:
+            δ = δ + phis[k]  # shift each scan by its fitted phase
         col = colours[k % len(colours)]
 
         # --- Data points ---------------------------------------------------
@@ -92,18 +95,32 @@ def plot_joint_counts(
 
         # --- Smooth fitted curves -----------------------------------------
         δ_fine = np.linspace(δ.min(), δ.max(), 400)
-        ax_i.plot(
-            δ_fine,
-            C0_i + A_i * (1 + np.cos(δ_fine + phis[k])) / 2,
-            color=col,
-            ls="--",
-        )
-        ax_c.plot(
-            δ_fine,
-            C0_c + A_c * (1 + np.cos(δ_fine + phis[k] + phi_ic)) / 2,
-            color=col,
-            ls="--",
-        )
+        if align_phase:
+            ax_i.plot(
+                δ_fine,
+                C0_i + A_i * (1 + np.cos(δ_fine)) / 2,
+                color=col,
+                ls="--",
+            )
+            ax_c.plot(
+                δ_fine,
+                C0_c + A_c * (1 + np.cos(δ_fine + phi_ic)) / 2,
+                color=col,
+                ls="--",
+            )
+        else:
+            ax_i.plot(
+                δ_fine,
+                C0_i + A_i * (1 + np.cos(δ_fine + phis[k])) / 2,
+                color=col,
+                ls="--",
+            )
+            ax_c.plot(
+                δ_fine,
+                C0_c + A_c * (1 + np.cos(δ_fine + phis[k] + phi_ic)) / 2,
+                color=col,
+                ls="--",
+            )
 
     # Labels, grid, legend --------------------------------------------------
     ax_i.set_ylabel(r"Idler counts $N_i$")
