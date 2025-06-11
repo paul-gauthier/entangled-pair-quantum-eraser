@@ -187,8 +187,8 @@ def global_cosine_fit(
         "V_err": V_err,
         "chi2red": red_chi2,
     }
-    
-    
+
+
 # ---------------------------------------------------------------------------
 # Joint global cosine fit for Idler and Coincidence data
 # ---------------------------------------------------------------------------
@@ -295,14 +295,8 @@ def global_joint_cosine_fit(
         f"  φ_ic = {phi_ic:.2f} ± {phi_ic_err:.2f} rad "
         f"({np.degrees(phi_ic):.1f} ± {np.degrees(phi_ic_err):.1f}°)"
     )
-    print(
-        f"  Vi = {V_i:.4f} ± {V_i_err:.4f}   "
-        f"[{V_i - V_i_err:.4f}, {V_i + V_i_err:.4f}]"
-    )
-    print(
-        f"  Vc = {V_c:.4f} ± {V_c_err:.4f}   "
-        f"[{V_c - V_c_err:.4f}, {V_c + V_c_err:.4f}]"
-    )
+    print(f"  Vi = {V_i:.4f} ± {V_i_err:.4f}   [{V_i - V_i_err:.4f}, {V_i + V_i_err:.4f}]")
+    print(f"  Vc = {V_c:.4f} ± {V_c_err:.4f}   [{V_c - V_c_err:.4f}, {V_c + V_c_err:.4f}]")
     print(f"  reduced χ² = {red_chi2:.2f}")
 
     return {
