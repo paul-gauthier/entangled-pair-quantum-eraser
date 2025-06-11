@@ -7,10 +7,11 @@ already-computed fit) and produces a two-panel PDF figure.
 """
 from __future__ import annotations
 
+import os
+
 import matplotlib.pyplot as plt
 import numpy as np
 
-import os
 from plot_utils import delta_from_steps, global_joint_cosine_fit
 
 
