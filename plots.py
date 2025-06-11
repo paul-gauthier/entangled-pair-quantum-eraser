@@ -9,9 +9,9 @@ import numpy as np
 
 from plot_utils import (
     fit_steps_per_2pi,
-    plot_counts,
     global_cosine_fit,
     global_joint_cosine_fit,
+    plot_counts,
 )
 
 # ---------------------------------------------------------------------------
