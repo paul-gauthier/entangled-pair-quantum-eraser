@@ -151,7 +151,7 @@ def plot_joint_counts(
         elif m == -1:
             xticklabels.append(r"$-\pi$")
         else:
-            xticklabels.append(fr"{m}$\pi$")
+            xticklabels.append(rf"{m}$\pi$")
 
     ax_c.set_xticks(xticks)
     ax_c.set_xticklabels(xticklabels)
