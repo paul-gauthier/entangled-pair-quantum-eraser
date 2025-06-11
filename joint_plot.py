@@ -130,6 +130,32 @@ def plot_joint_counts(
     ax_c.grid(True, ls=":")
     ax_i.legend(fontsize=9, ncol=2)
     ax_c.legend(fontsize=9, ncol=2)
+
+    # -------- π–tick labels on the shared x–axis ---------------------------
+    delta_all = np.hstack(
+        [
+            delta_from_steps(ds["piezo_steps"], steps_per_2pi) + (phis[k] if align_phase else 0)
+            for k, ds in enumerate(datasets)
+        ]
+    )
+    start_tick = np.ceil(delta_all.min() / np.pi) * np.pi
+    xticks = np.arange(start_tick, delta_all.max() + np.pi / 2, np.pi)
+
+    xticklabels = []
+    for tick in xticks:
+        m = int(round(tick / np.pi))
+        if m == 0:
+            xticklabels.append("0")
+        elif m == 1:
+            xticklabels.append(r"$\pi$")
+        elif m == -1:
+            xticklabels.append(r"$-\pi$")
+        else:
+            xticklabels.append(fr"{m}$\pi$")
+
+    ax_c.set_xticks(xticks)
+    ax_c.set_xticklabels(xticklabels)
+
     fig.suptitle("Global joint cosine fit across all datasets")
     fig.tight_layout()
 
