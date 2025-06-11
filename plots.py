@@ -3,7 +3,6 @@
 import argparse
 import json
 import os
-import re
 import sys
 
 import numpy as np
@@ -240,13 +239,8 @@ def main():
         os.makedirs(os.path.dirname(joint_pdf) or ".", exist_ok=True)
         base_filename = os.path.basename(base)
         # Strip YYYY-MM-DD- prefix for a cleaner title
-        title_base = re.sub(r"^\d{4}-\d{2}-\d{2}-", "", base_filename)
-        if "-on" in title_base:
-            title = "Eraser On"
-        elif "-off" in title_base:
-            title = "Eraser Off"
-        else:
-            title = title_base
+        title_base = base_filename[21:]
+        title = title_base
         plot_joint_counts(datasets, steps_per_2pi, out=joint_pdf, title=title)
     except RuntimeError as e:
         print(f"Joint plot failed: {e}")
