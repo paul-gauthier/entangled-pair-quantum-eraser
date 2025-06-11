@@ -291,6 +291,11 @@ def main():
     total_photons = total_signals + total_idlers
     total_duration_s = sum(ds.get("duration", 0) for ds in datasets)
 
+    td_int = int(total_duration_s)
+    hours, remainder = divmod(td_int, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    duration_hms = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+
     total_phase_scanned_pi = 0
     if "steps_per_2pi" in locals() and steps_per_2pi > 0:
         for ds in datasets:
@@ -303,7 +308,7 @@ def main():
     print(f"Total idlers:       {int(total_idlers):,}")
     print(f"Total coincidences: {int(total_coincidences):,}")
     print(f"Total photons (S+I): {int(total_photons):,}")
-    print(f"Total duration:     {total_duration_s:.2f} s")
+    print(f"Total duration:     {duration_hms}")
     print(f"Total datasets:     {len(datasets)}")
     if total_phase_scanned_pi > 0:
         print(f"Total phase scanned: {total_phase_scanned_pi:.2f}π ({total_phase_scanned_pi/2:.2f} periods)")
