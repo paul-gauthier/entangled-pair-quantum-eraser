@@ -10,10 +10,7 @@ from __future__ import annotations
 import matplotlib.pyplot as plt
 import numpy as np
 
-from plot_utils import (
-    delta_from_steps,
-    global_joint_cosine_fit,
-)
+from plot_utils import delta_from_steps, global_joint_cosine_fit
 
 
 def plot_joint_counts(
