@@ -152,6 +152,9 @@ def main():
         type=float,
         help="Use this value for STEPS_PER_2PI instead of fitting it from the data.",
     )
+    parser.add_argument(
+        "--title-joint-plot", type=str, help="Specify a title for the joint plot."
+    )
     args = parser.parse_args()
 
     datasets = load_and_correct_datasets(args.jsonl_file)
@@ -237,10 +240,12 @@ def main():
         base = os.path.splitext(args.jsonl_file)[0]
         joint_pdf = f"{base}_joint.pdf"
         os.makedirs(os.path.dirname(joint_pdf) or ".", exist_ok=True)
-        base_filename = os.path.basename(base)
-        # Strip YYYY-MM-DD- prefix for a cleaner title
-        title_base = base_filename[21:]
-        title = title_base
+        title = args.title_joint_plot
+        if not title:
+            base_filename = os.path.basename(base)
+            # Strip YYYY-MM-DD- prefix for a cleaner title
+            title_base = base_filename[21:]
+            title = title_base
         plot_joint_counts(datasets, steps_per_2pi, out=joint_pdf, title=title)
     except RuntimeError as e:
         print(f"Joint plot failed: {e}")
