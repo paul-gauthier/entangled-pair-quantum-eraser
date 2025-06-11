@@ -234,7 +234,10 @@ def main():
     # Joint plot across all datasets using the global joint fit
     # ------------------------------------------------------------------
     try:
-        plot_joint_counts(datasets, steps_per_2pi, out="all_datasets_joint.pdf")
+        base = os.path.splitext(args.jsonl_file)[0]
+        joint_pdf = f"{base}_joint.pdf"
+        os.makedirs(os.path.dirname(joint_pdf) or ".", exist_ok=True)
+        plot_joint_counts(datasets, steps_per_2pi, out=joint_pdf)
     except RuntimeError as e:
         print(f"Joint plot failed: {e}")
 
