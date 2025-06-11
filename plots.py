@@ -99,6 +99,8 @@ def load_and_correct_datasets(jsonl_filename):
         Ns = np.array([d["N_s"] for d in dataset_data])
         Ni = np.array([d["N_i"] for d in dataset_data])
         Nc = np.array([d["N_c"] for d in dataset_data])
+        duration = sum(d.get("duration_s", 0) for d in dataset_data)
+        dark_duration = dark_record.get("duration_s", 0)
 
         # Apply dark correction using the dark record
         Ni_dark = dark_record["N_i"]
@@ -118,6 +120,7 @@ def load_and_correct_datasets(jsonl_filename):
                 "Nc": Nc,
                 "Ni_corr": Ni_corr,
                 "Nc_corr": Nc_corr,
+                "duration": duration + dark_duration,
             }
         )
 
@@ -278,6 +281,31 @@ def main():
             )
         except RuntimeError as e:
             print(f"\nGlobal fit failed: {e}")
+
+    # ------------------------------------------------------------------
+    # Final summary statistics
+    # ------------------------------------------------------------------
+    total_signals = sum(np.sum(ds["Ns"]) for ds in datasets)
+    total_idlers = sum(np.sum(ds["Ni"]) for ds in datasets)
+    total_coincidences = sum(np.sum(ds["Nc"]) for ds in datasets)
+    total_photons = total_signals + total_idlers
+    total_duration_s = sum(ds.get("duration", 0) for ds in datasets)
+
+    total_phase_scanned_pi = 0
+    if "steps_per_2pi" in locals() and steps_per_2pi > 0:
+        for ds in datasets:
+            steps_range = np.max(ds["piezo_steps"]) - np.min(ds["piezo_steps"])
+            phase_range_pi = 2 * steps_range / steps_per_2pi
+            total_phase_scanned_pi += phase_range_pi
+
+    print("\n--- Summary Statistics ---")
+    print(f"Total signals:      {int(total_signals):,}")
+    print(f"Total idlers:       {int(total_idlers):,}")
+    print(f"Total coincidences: {int(total_coincidences):,}")
+    print(f"Total photons (S+I): {int(total_photons):,}")
+    print(f"Total duration:     {total_duration_s:.2f} s")
+    if total_phase_scanned_pi > 0:
+        print(f"Total phase scanned: {total_phase_scanned_pi:.2f}π")
 
 
 if __name__ == "__main__":
