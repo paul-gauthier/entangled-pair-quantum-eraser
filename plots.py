@@ -99,8 +99,8 @@ def load_and_correct_datasets(jsonl_filename):
         Ns = np.array([d["N_s"] for d in dataset_data])
         Ni = np.array([d["N_i"] for d in dataset_data])
         Nc = np.array([d["N_c"] for d in dataset_data])
-        duration = sum(d.get("duration_s", 0) for d in dataset_data)
-        dark_duration = dark_record.get("duration_s", 0)
+        duration = sum(d.get("acq_time", 0) for d in dataset_data)
+        dark_duration = dark_record.get("acq_time", 0)
 
         # Apply dark correction using the dark record
         Ni_dark = dark_record["N_i"]
@@ -304,11 +304,9 @@ def main():
     print(f"Total coincidences: {int(total_coincidences):,}")
     print(f"Total photons (S+I): {int(total_photons):,}")
     print(f"Total duration:     {total_duration_s:.2f} s")
+    print(f"Total datasets:     {len(datasets)}")
     if total_phase_scanned_pi > 0:
-        print(
-            f"Total phase scanned: {total_phase_scanned_pi:.2f}π"
-            f" ({total_phase_scanned_pi/2:.2f} periods)"
-        )
+        print(f"Total phase scanned: {total_phase_scanned_pi:.2f}π ({total_phase_scanned_pi/2:.2f} periods)")
 
 
 if __name__ == "__main__":
