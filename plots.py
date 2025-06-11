@@ -152,9 +152,7 @@ def main():
         type=float,
         help="Use this value for STEPS_PER_2PI instead of fitting it from the data.",
     )
-    parser.add_argument(
-        "--title-joint-plot", type=str, help="Specify a title for the joint plot."
-    )
+    parser.add_argument("--title-joint-plot", type=str, help="Specify a title for the joint plot.")
     args = parser.parse_args()
 
     datasets = load_and_correct_datasets(args.jsonl_file)
