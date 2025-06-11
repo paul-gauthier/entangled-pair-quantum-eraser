@@ -22,6 +22,7 @@ def plot_joint_counts(
     out: str = "all_datasets_joint.pdf",
     show: bool = False,
     align_phase: bool = True,
+    title: str | None = None,
 ) -> str:
     """
     Generate a figure showing every dataset’s N_i and N_c points on common
@@ -158,7 +159,7 @@ def plot_joint_counts(
     ax_c.set_xticks(xticks)
     ax_c.set_xticklabels(xticklabels)
 
-    fig.suptitle("Global joint cosine fit across all datasets")
+    fig.suptitle(title if title is not None else "Global joint cosine fit across all datasets")
     fig.tight_layout()
 
     os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
