@@ -134,6 +134,43 @@ def plot_joint_counts(
     ax_i.legend(fontsize=9, ncol=2)
     ax_c.legend(fontsize=9, ncol=2)
 
+    # -------- Display global fit parameters on plot -----------------------
+    # Idler (top panel)
+    textstr_i = (
+        rf"$C_0 = {C0_i:.1f}$" "\n"
+        rf"$A = {A_i:.1f}$" "\n"
+        rf"$V = {fit['V_i']:.4f}$"
+    )
+    props_i = dict(boxstyle="round", facecolor="wheat", alpha=0.8)
+    ax_i.text(
+        0.98,
+        0.98,
+        textstr_i,
+        transform=ax_i.transAxes,
+        fontsize=12,
+        verticalalignment="top",
+        horizontalalignment="right",
+        bbox=props_i,
+    )
+
+    # Coincidence (bottom panel)
+    textstr_c = (
+        rf"$C_0 = {C0_c:.1f}$" "\n"
+        rf"$A = {A_c:.1f}$" "\n"
+        rf"$V = {fit['V_c']:.4f}$"
+    )
+    props_c = dict(boxstyle="round", facecolor="lightblue", alpha=0.8)
+    ax_c.text(
+        0.98,
+        0.98,
+        textstr_c,
+        transform=ax_c.transAxes,
+        fontsize=12,
+        verticalalignment="top",
+        horizontalalignment="right",
+        bbox=props_c,
+    )
+
     # -------- π–tick labels on the shared x–axis ---------------------------
     delta_all = np.hstack(
         [
