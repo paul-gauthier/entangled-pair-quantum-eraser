@@ -311,7 +311,10 @@ def main():
     print(f"Total duration:     {duration_hms}")
     print(f"Total datasets:     {len(datasets)}")
     if total_phase_scanned_pi > 0:
-        print(f"Total phase scanned: {total_phase_scanned_pi:.2f}π ({total_phase_scanned_pi/2:.2f} periods)")
+        print(
+            f"Total phase scanned: {total_phase_scanned_pi:.2f}π"
+            f" ({total_phase_scanned_pi/2:.2f} periods)"
+        )
 
 
 if __name__ == "__main__":
