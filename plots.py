@@ -13,6 +13,7 @@ from plot_utils import (
     global_joint_cosine_fit,
     plot_counts,
 )
+from joint_plot import plot_joint_counts
 
 # ---------------------------------------------------------------------------
 # Dark–count handling
@@ -228,6 +229,14 @@ def main():
             V_c_err_list.append(metrics["V_err_c"])
         except RuntimeError:
             print("Failed to fit dataset, skipping")
+
+    # ------------------------------------------------------------------
+    # Joint plot across all datasets using the global joint fit
+    # ------------------------------------------------------------------
+    try:
+        plot_joint_counts(datasets, steps_per_2pi, out="all_datasets_joint.pdf")
+    except RuntimeError as e:
+        print(f"Joint plot failed: {e}")
 
     # ------------------------------------------------------------------
     # Combine visibilities across all datasets using inverse-variance weighting

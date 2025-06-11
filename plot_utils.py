@@ -277,6 +277,8 @@ def global_joint_cosine_fit(
     A_i_err, C0_i_err, A_c_err, C0_c_err, phi_ic_err = np.sqrt(np.diag(cov)[:5])
 
     phi_ic = phi_ic % (2 * np.pi)
+    phis = res.x[5:] % (2 * np.pi)
+    phis_err = np.sqrt(np.diag(cov)[5:])
 
     # Visibilities
     V_i = A_i / (A_i + 2 * C0_i)
@@ -314,6 +316,8 @@ def global_joint_cosine_fit(
         "V_c_err": V_c_err,
         "phi_ic": phi_ic,
         "phi_ic_err": phi_ic_err,
+        "phis": phis,
+        "phis_err": phis_err,
         "chi2red": red_chi2,
     }
 
