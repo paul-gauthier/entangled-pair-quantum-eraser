@@ -136,7 +136,11 @@ def plot_joint_counts(
 
     # -------- Display global fit parameters on plot -----------------------
     # Idler (top panel)
-    textstr_i = rf"$C_0 = {C0_i:.1f}$" "\n" rf"$A = {A_i:.1f}$" "\n" rf"$V = {fit['V_i']:.4f}$"
+    textstr_i = (
+        rf"$C_0 = {C0_i:.1f} \pm {fit['C0_i_err']:.1f}$\n"
+        rf"$A = {A_i:.1f} \pm {fit['A_i_err']:.1f}$\n"
+        rf"$V = {fit['V_i']:.4f} \pm {fit['V_i_err']:.4f}$"
+    )
     props_i = dict(boxstyle="round", facecolor="wheat", alpha=0.8)
     ax_i.text(
         0.98,
@@ -150,7 +154,11 @@ def plot_joint_counts(
     )
 
     # Coincidence (bottom panel)
-    textstr_c = rf"$C_0 = {C0_c:.1f}$" "\n" rf"$A = {A_c:.1f}$" "\n" rf"$V = {fit['V_c']:.4f}$"
+    textstr_c = (
+        rf"$C_0 = {C0_c:.1f} \pm {fit['C0_c_err']:.1f}$\n"
+        rf"$A = {A_c:.1f} \pm {fit['A_c_err']:.1f}$\n"
+        rf"$V = {fit['V_c']:.4f} \pm {fit['V_c_err']:.4f}$"
+    )
     props_c = dict(boxstyle="round", facecolor="lightblue", alpha=0.8)
     ax_c.text(
         0.98,
