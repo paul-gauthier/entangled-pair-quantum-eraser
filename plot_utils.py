@@ -302,15 +302,32 @@ def global_joint_cosine_fit(
     print(f"  reduced χ² = {red_chi2:.2f}")
     # -------- Difference curve N_i - N_c parameters ------------------------
     A_d = np.sqrt(A_i**2 + A_c**2 - 2 * A_i * A_c * np.cos(phi_ic))
+
+    # phase of the difference cosine
     phi_0 = np.arctan2(A_c * np.sin(phi_ic), A_i - A_c * np.cos(phi_ic))
+
+    # 1-σ uncertainty on phi_0 (error propagation)
+    sinφ, cosφ = np.sin(phi_ic), np.cos(phi_ic)
+    dphi_dAi = -A_c * sinφ / A_d**2
+    dphi_dAc = A_i * sinφ / A_d**2
+    dphi_dφ = A_c * (A_i * cosφ - A_c) / A_d**2
+    g = np.array([dphi_dAi, dphi_dAc, dphi_dφ])
+    cov_sub = cov[np.ix_([0, 2, 4], [0, 2, 4])]  # A_i, A_c, phi_ic
+    phi_0_err = np.sqrt(g @ cov_sub @ g)
+
     C_d = C0_i - C0_c + (A_i - A_c) / 2
     C0_d = C_d - A_d / 2
     V_d = A_d / (A_d + 2 * C0_d)
 
     print("  Difference (N_i - N_c):")
-    print(f"    C0_D = {C0_d:.2f}")
-    print(f"    A_D  = {A_d:.2f}")
-    print(f"    Vd   = {V_d:.4f}")
+    print(f"    C0_D   = {C0_d:.2f}")
+    print(f"    A_D    = {A_d:.2f}")
+    print(
+        f"    φ0_D = {phi_0:.2f} ± {phi_0_err:.2f} rad "
+        f"({np.degrees(phi_0):.1f} ± {np.degrees(phi_0_err):.1f}°)"
+    )
+    print(f"    V_D    = {V_d:.4f}")
+    print(f"    reduced χ² = {red_chi2:.2f}")
 
     return {
         "A_i": A_i,
@@ -334,6 +351,7 @@ def global_joint_cosine_fit(
         "C0_d": C0_d,
         "V_d": V_d,
         "phi_0_d": phi_0,
+        "phi_0_d_err": phi_0_err,
         "chi2red": red_chi2,
     }
 
