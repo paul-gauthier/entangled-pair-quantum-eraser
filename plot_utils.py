@@ -345,9 +345,12 @@ def global_joint_cosine_fit(
     g_C0 = np.array([dC0d_dAi, dC0d_dC0i, dC0d_dAc, dC0d_dC0c, dC0d_dφ])
     g_V = np.array([dVd_dAi, dVd_dC0i, dVd_dAc, dVd_dC0c, dVd_dφ])
 
-    A_d_err = float(np.sqrt(g_A @ cov @ g_A))
-    C0_d_err = float(np.sqrt(g_C0 @ cov @ g_C0))
-    V_d_err = float(np.sqrt(g_V @ cov @ g_V))
+    # use only the 5×5 sub-covariance corresponding to [A_i, C0_i, A_c, C0_c, φ_ic]
+    cov5 = cov[:5, :5]
+
+    A_d_err = float(np.sqrt(g_A @ cov5 @ g_A))
+    C0_d_err = float(np.sqrt(g_C0 @ cov5 @ g_C0))
+    V_d_err = float(np.sqrt(g_V @ cov5 @ g_V))
 
     print("  Difference (N_i - N_c):")
     print(f"    C0_D   = {C0_d:.2f} ± {C0_d_err:.2f}")
