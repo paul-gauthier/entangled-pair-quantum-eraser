@@ -297,6 +297,11 @@ def global_joint_cosine_fit(
         f"  φ_ic = {phi_ic:.2f} ± {phi_ic_err:.2f} rad "
         f"({np.degrees(phi_ic):.1f} ± {np.degrees(phi_ic_err):.1f}°)"
     )
+    # Phase offset of the first dataset’s idler scan
+    print(
+        f"  φ_i0 = {phis[0]:.2f} ± {phis_err[0]:.2f} rad "
+        f"({np.degrees(phis[0]):.1f} ± {np.degrees(phis_err[0]):.1f}°)"
+    )
     print(f"  Vi = {V_i:.4f} ± {V_i_err:.4f}   [{V_i - V_i_err:.4f}, {V_i + V_i_err:.4f}]")
     print(f"  Vc = {V_c:.4f} ± {V_c_err:.4f}   [{V_c - V_c_err:.4f}, {V_c + V_c_err:.4f}]")
     print(f"  reduced χ² = {red_chi2:.2f}")
