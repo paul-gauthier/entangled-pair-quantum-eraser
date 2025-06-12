@@ -300,6 +300,17 @@ def global_joint_cosine_fit(
     print(f"  Vi = {V_i:.4f} ± {V_i_err:.4f}   [{V_i - V_i_err:.4f}, {V_i + V_i_err:.4f}]")
     print(f"  Vc = {V_c:.4f} ± {V_c_err:.4f}   [{V_c - V_c_err:.4f}, {V_c + V_c_err:.4f}]")
     print(f"  reduced χ² = {red_chi2:.2f}")
+    # -------- Difference curve N_i - N_c parameters ------------------------
+    A_d = np.sqrt(A_i**2 + A_c**2 - 2 * A_i * A_c * np.cos(phi_ic))
+    phi_0 = np.arctan2(A_c * np.sin(phi_ic), A_i - A_c * np.cos(phi_ic))
+    C_d = C0_i - C0_c + (A_i - A_c) / 2
+    C0_d = C_d - A_d / 2
+    V_d = A_d / (A_d + 2 * C0_d)
+
+    print("  Difference (N_i - N_c):")
+    print(f"    C0_D = {C0_d:.2f}")
+    print(f"    A_D  = {A_d:.2f}")
+    print(f"    Vd   = {V_d:.4f}")
 
     return {
         "A_i": A_i,
@@ -318,6 +329,11 @@ def global_joint_cosine_fit(
         "phi_ic_err": phi_ic_err,
         "phis": phis,
         "phis_err": phis_err,
+        # Difference curve N_i - N_c
+        "A_d": A_d,
+        "C0_d": C0_d,
+        "V_d": V_d,
+        "phi_0_d": phi_0,
         "chi2red": red_chi2,
     }
 
