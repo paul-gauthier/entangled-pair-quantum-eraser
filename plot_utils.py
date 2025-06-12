@@ -319,14 +319,44 @@ def global_joint_cosine_fit(
     C0_d = C_d - A_d / 2
     V_d = A_d / (A_d + 2 * C0_d)
 
+    # --- Uncertainties for A_D, C0_D, V_D ----------------------------------
+    # derivatives of A_d
+    dAd_dAi = (A_i - A_c * cosφ) / A_d
+    dAd_dAc = (A_c - A_i * cosφ) / A_d
+    dAd_dφ = (A_i * A_c * sinφ) / A_d
+
+    # derivatives of C0_d
+    dC0d_dAi = 0.5 - 0.5 * dAd_dAi
+    dC0d_dAc = -0.5 - 0.5 * dAd_dAc
+    dC0d_dC0i = 1.0
+    dC0d_dC0c = -1.0
+    dC0d_dφ = -0.5 * dAd_dφ
+
+    # derivatives of V_d
+    denom = A_d + 2 * C0_d
+    dVd_dAi = 2 * (C0_d * dAd_dAi - A_d * dC0d_dAi) / denom**2
+    dVd_dAc = 2 * (C0_d * dAd_dAc - A_d * dC0d_dAc) / denom**2
+    dVd_dC0i = -2 * A_d * dC0d_dC0i / denom**2
+    dVd_dC0c = -2 * A_d * dC0d_dC0c / denom**2
+    dVd_dφ = 2 * (C0_d * dAd_dφ - A_d * dC0d_dφ) / denom**2
+
+    # gradient vectors in parameter order [A_i, C0_i, A_c, C0_c, phi_ic]
+    g_A = np.array([dAd_dAi, 0.0, dAd_dAc, 0.0, dAd_dφ])
+    g_C0 = np.array([dC0d_dAi, dC0d_dC0i, dC0d_dAc, dC0d_dC0c, dC0d_dφ])
+    g_V = np.array([dVd_dAi, dVd_dC0i, dVd_dAc, dVd_dC0c, dVd_dφ])
+
+    A_d_err = float(np.sqrt(g_A @ cov @ g_A))
+    C0_d_err = float(np.sqrt(g_C0 @ cov @ g_C0))
+    V_d_err = float(np.sqrt(g_V @ cov @ g_V))
+
     print("  Difference (N_i - N_c):")
-    print(f"    C0_D   = {C0_d:.2f}")
-    print(f"    A_D    = {A_d:.2f}")
+    print(f"    C0_D   = {C0_d:.2f} ± {C0_d_err:.2f}")
+    print(f"    A_D    = {A_d:.2f} ± {A_d_err:.2f}")
     print(
         f"    φ0_D = {phi_0:.2f} ± {phi_0_err:.2f} rad "
         f"({np.degrees(phi_0):.1f} ± {np.degrees(phi_0_err):.1f}°)"
     )
-    print(f"    V_D    = {V_d:.4f}")
+    print(f"    V_D    = {V_d:.4f} ± {V_d_err:.4f}")
     print(f"    reduced χ² = {red_chi2:.2f}")
 
     return {
@@ -348,8 +378,11 @@ def global_joint_cosine_fit(
         "phis_err": phis_err,
         # Difference curve N_i - N_c
         "A_d": A_d,
+        "A_d_err": A_d_err,
         "C0_d": C0_d,
+        "C0_d_err": C0_d_err,
         "V_d": V_d,
+        "V_d_err": V_d_err,
         "phi_0_d": phi_0,
         "phi_0_d_err": phi_0_err,
         "chi2red": red_chi2,
