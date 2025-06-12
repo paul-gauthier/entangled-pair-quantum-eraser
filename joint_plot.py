@@ -137,8 +137,6 @@ def plot_joint_counts(
     ax_c.set_xlabel(r"Phase delay $\delta$ (rad)")
     ax_i.grid(True, ls=":")
     ax_c.grid(True, ls=":")
-    ax_i.legend(fontsize=9, ncol=2, loc="lower left")
-    ax_c.legend(fontsize=9, ncol=2, loc="lower left")
 
     # -------- Display global fit parameters on plot -----------------------
     # Idler (top panel)
