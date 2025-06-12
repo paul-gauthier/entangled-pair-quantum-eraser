@@ -127,9 +127,11 @@ def plot_joint_counts(
 
     # Labels, grid, legend --------------------------------------------------
     ax_i.set_ylabel(r"Idler counts $N_i$")
-    ax_i.set_ylim(37_500, 41_500)
+    center_i = C0_i + A_i / 2
+    ax_i.set_ylim(center_i - 1000, center_i + 1000)
     ax_c.set_ylabel(r"Coinc. counts $N_c$")
-    ax_c.set_ylim(300, 1200)
+    center_c = C0_c + A_c / 2
+    ax_c.set_ylim(center_c - 1000, center_c + 1000)
     ax_c.set_xlabel(r"Phase delay $\delta$ (rad)")
     ax_i.grid(True, ls=":")
     ax_c.grid(True, ls=":")
