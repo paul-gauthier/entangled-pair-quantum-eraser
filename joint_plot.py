@@ -140,7 +140,10 @@ def plot_joint_counts(
 
     # -------- Display global fit parameters on plot -----------------------
     # Idler (top panel)
+    mean_i = C0_i + A_i / 2
+    mean_i_err = np.sqrt(fit["C0_i_err"] ** 2 + (fit["A_i_err"] / 2) ** 2)
     textstr_i = (
+        f"$\\langle N_i \\rangle = {mean_i:.1f} \\pm {mean_i_err:.1f}$\n"
         f"$C_0 = {C0_i:.1f} \\pm {fit['C0_i_err']:.1f}$\n"
         f"$A = {A_i:.1f} \\pm {fit['A_i_err']:.1f}$\n"
         f"$V = {fit['V_i']:.4f} \\pm {fit['V_i_err']:.4f}$"
@@ -158,7 +161,10 @@ def plot_joint_counts(
     )
 
     # Coincidence (bottom panel)
+    mean_c = C0_c + A_c / 2
+    mean_c_err = np.sqrt(fit["C0_c_err"] ** 2 + (fit["A_c_err"] / 2) ** 2)
     textstr_c = (
+        f"$\\langle N_c \\rangle = {mean_c:.1f} \\pm {mean_c_err:.1f}$\n"
         f"$C_0 = {C0_c:.1f} \\pm {fit['C0_c_err']:.1f}$\n"
         f"$A = {A_c:.1f} \\pm {fit['A_c_err']:.1f}$\n"
         f"$V = {fit['V_c']:.4f} \\pm {fit['V_c_err']:.4f}$\n"
