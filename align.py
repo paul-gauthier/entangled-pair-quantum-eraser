@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import json
 import sys
 
@@ -12,6 +13,7 @@ def read_jsonl(fname):
     """Read data from a jsonl file."""
     signal_lp_angles, signal_counts = [], []
     mzi_lp_angles, idler_counts = [], []
+    mzi_hwp_angles = []
 
     with open(fname, "r") as f:
         for line in f:
@@ -22,12 +24,16 @@ def read_jsonl(fname):
             if "mzi_lp" in data and "N_i" in data:
                 mzi_lp_angles.append(data["mzi_lp"])
                 idler_counts.append(data["N_i"])
+                # Also collect mzi_hwp if available
+                if "mzi_hwp" in data:
+                    mzi_hwp_angles.append(data["mzi_hwp"])
 
     return (
         np.array(signal_lp_angles),
         np.array(signal_counts),
         np.array(mzi_lp_angles),
         np.array(idler_counts),
+        np.array(mzi_hwp_angles),
     )
 
 
@@ -36,7 +42,7 @@ def cos_squared_model(theta, A, B, phi):
     return A * np.cos(np.radians(theta + phi)) ** 2 + B
 
 
-def fit_and_plot(signal_angles, signal_counts, mzi_angles, idler_counts, fname):
+def fit_and_plot(signal_angles, signal_counts, mzi_angles, idler_counts, fname, use_mzi_hwp=False):
     """Fit cosine squared curves to signal and idler data."""
     # Initial parameter guesses
     # For signal: amplitude, offset, phase shift
@@ -87,16 +93,17 @@ def fit_and_plot(signal_angles, signal_counts, mzi_angles, idler_counts, fname):
     plt.grid(True, alpha=0.3)
 
     plt.subplot(1, 2, 2)
-    plt.scatter(mzi_angles, idler_counts, color="red", label="MZI LP", alpha=0.7)
+    mzi_label = "MZI HWP" if use_mzi_hwp else "MZI LP"
+    plt.scatter(mzi_angles, idler_counts, color="red", label=mzi_label, alpha=0.7)
     plt.plot(
         mzi_angles_smooth,
         idler_fit,
         "r-",
         label=f"Fit: {idler_params[0]:.0f}cos²(θ+{idler_params[2]:.1f}°)+{idler_params[1]:.0f}",
     )
-    plt.xlabel("MZI LP Angle (degrees)")
+    plt.xlabel(f"{mzi_label} Angle (degrees)")
     plt.ylabel("Idler counts (N_i)")
-    plt.title(f"Idler vs MZI LP Angle\n({fname})")
+    plt.title(f"Idler vs {mzi_label} Angle\n({fname})")
     plt.xticks(np.arange(-45, 180, 45))
     plt.legend()
     plt.grid(True, alpha=0.3)
@@ -109,10 +116,21 @@ def fit_and_plot(signal_angles, signal_counts, mzi_angles, idler_counts, fname):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print(f"Usage: {sys.argv[0]} <jsonl_file>")
-        sys.exit(1)
-
-    fname = sys.argv[1]
-    signal_angles, signal_counts, mzi_angles, idler_counts = read_jsonl(fname)
-    fit_and_plot(signal_angles, signal_counts, mzi_angles, idler_counts, fname)
+    parser = argparse.ArgumentParser(description="Fit and plot polarizer alignment data")
+    parser.add_argument("jsonl_file", help="JSONL file containing the data")
+    parser.add_argument("--x-mzi-hwp", action="store_true", 
+                       help="Use MZI HWP angle on x-axis instead of MZI LP angle")
+    
+    args = parser.parse_args()
+    
+    signal_angles, signal_counts, mzi_lp_angles, idler_counts, mzi_hwp_angles = read_jsonl(args.jsonl_file)
+    
+    if args.x_mzi_hwp:
+        if len(mzi_hwp_angles) == 0:
+            print("Error: --x-mzi-hwp specified but no mzi_hwp data found in file")
+            sys.exit(1)
+        mzi_angles = mzi_hwp_angles
+    else:
+        mzi_angles = mzi_lp_angles
+    
+    fit_and_plot(signal_angles, signal_counts, mzi_angles, idler_counts, args.jsonl_file, args.x_mzi_hwp)
