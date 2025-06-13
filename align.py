@@ -123,6 +123,12 @@ if __name__ == "__main__":
         action="store_true",
         help="Use MZI HWP angle on x-axis instead of MZI LP angle",
     )
+    parser.add_argument(
+        "--offset",
+        type=float,
+        default=0.0,
+        help="Offset to add to MZI angles (degrees)",
+    )
 
     args = parser.parse_args()
 
@@ -137,6 +143,9 @@ if __name__ == "__main__":
         mzi_angles = mzi_hwp_angles
     else:
         mzi_angles = mzi_lp_angles
+
+    # Apply offset to mzi_angles
+    mzi_angles = mzi_angles + args.offset
 
     fit_and_plot(
         signal_angles, signal_counts, mzi_angles, idler_counts, args.jsonl_file, args.x_mzi_hwp
