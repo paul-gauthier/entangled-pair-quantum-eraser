@@ -174,8 +174,8 @@ def main():
             print(f"  Failed to fit STEPS_PER_2PI for dataset {ds['dataset_index']}, skipping.")
 
     if not sp2pi_vals:
-        print("\nCould not fit STEPS_PER_2PI for any dataset. Exiting.")
-        sys.exit(1)
+        print("\nCould not fit STEPS_PER_2PI for any dataset.")
+        # sys.exit(1)
 
     weights = 1.0 / np.square(sp2pi_errs)
     steps_per_2pi = float(np.sum(weights * sp2pi_vals) / np.sum(weights))
