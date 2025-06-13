@@ -118,13 +118,18 @@ def fit_and_plot(signal_angles, signal_counts, mzi_angles, idler_counts, fname, 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Fit and plot polarizer alignment data")
     parser.add_argument("jsonl_file", help="JSONL file containing the data")
-    parser.add_argument("--x-mzi-hwp", action="store_true", 
-                       help="Use MZI HWP angle on x-axis instead of MZI LP angle")
-    
+    parser.add_argument(
+        "--x-mzi-hwp",
+        action="store_true",
+        help="Use MZI HWP angle on x-axis instead of MZI LP angle",
+    )
+
     args = parser.parse_args()
-    
-    signal_angles, signal_counts, mzi_lp_angles, idler_counts, mzi_hwp_angles = read_jsonl(args.jsonl_file)
-    
+
+    signal_angles, signal_counts, mzi_lp_angles, idler_counts, mzi_hwp_angles = read_jsonl(
+        args.jsonl_file
+    )
+
     if args.x_mzi_hwp:
         if len(mzi_hwp_angles) == 0:
             print("Error: --x-mzi-hwp specified but no mzi_hwp data found in file")
@@ -132,5 +137,7 @@ if __name__ == "__main__":
         mzi_angles = mzi_hwp_angles
     else:
         mzi_angles = mzi_lp_angles
-    
-    fit_and_plot(signal_angles, signal_counts, mzi_angles, idler_counts, args.jsonl_file, args.x_mzi_hwp)
+
+    fit_and_plot(
+        signal_angles, signal_counts, mzi_angles, idler_counts, args.jsonl_file, args.x_mzi_hwp
+    )
