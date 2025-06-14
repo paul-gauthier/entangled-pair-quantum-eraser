@@ -106,7 +106,7 @@ def fit_and_plot(signal_angles, signal_counts, mzi_angles, idler_counts, fname, 
     plt.xlabel(f"{mzi_label} Angle (degrees)")
     plt.ylabel("Idler counts (N_i)")
     plt.title(f"Idler vs {mzi_label} Angle\n({fname})")
-    plt.xticks(np.arange(-45, 180, 45))
+    # plt.xticks(np.arange(-45, 180, 45))
     plt.legend()
     plt.grid(True, alpha=0.3)
 
@@ -138,9 +138,6 @@ if __name__ == "__main__":
         args.jsonl_file
     )
 
-    print(f"Found {len(signal_angles)} signal data points.")
-    print(f"Found {len(mzi_lp_angles)} idler data points.")
-
     if args.x_mzi_hwp:
         if len(mzi_hwp_angles) == 0:
             print("Error: --x-mzi-hwp specified but no mzi_hwp data found in file")
@@ -150,6 +147,8 @@ if __name__ == "__main__":
     else:
         mzi_angles = mzi_lp_angles - args.offset
 
+    print(f"Found {len(signal_angles)} signal data points.")
+    print(f"Found {len(mzi_lp_angles)} idler data points.")
     fit_and_plot(
         signal_angles, signal_counts, mzi_angles, idler_counts, args.jsonl_file, args.x_mzi_hwp
     )
