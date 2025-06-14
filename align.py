@@ -59,15 +59,15 @@ def fit_and_plot(signal_angles, signal_counts, mzi_angles, idler_counts, fname, 
 
     # Print fit parameters
     print("Signal fit parameters:")
-    print(f"  Amplitude (A): {signal_params[0]:.1f} ± {np.sqrt(signal_cov[0,0]):.1f}")
-    print(f"  Offset (B): {signal_params[1]:.1f} ± {np.sqrt(signal_cov[1,1]):.1f}")
-    print(f"  Phase shift (φ): {signal_params[2]:.1f}° ± {np.sqrt(signal_cov[2,2]):.1f}°")
+    print(f"  Amplitude (A): {signal_params[0]:.1f} ± {np.sqrt(signal_cov[0, 0]):.1f}")
+    print(f"  Offset (B): {signal_params[1]:.1f} ± {np.sqrt(signal_cov[1, 1]):.1f}")
+    print(f"  Phase shift (φ): {signal_params[2]:.1f}° ± {np.sqrt(signal_cov[2, 2]):.1f}°")
     print()
 
     print("Idler fit parameters:")
-    print(f"  Amplitude (A): {idler_params[0]:.1f} ± {np.sqrt(idler_cov[0,0]):.1f}")
-    print(f"  Offset (B): {idler_params[1]:.1f} ± {np.sqrt(idler_cov[1,1]):.1f}")
-    print(f"  Phase shift (φ): {idler_params[2]:.1f}° ± {np.sqrt(idler_cov[2,2]):.1f}°")
+    print(f"  Amplitude (A): {idler_params[0]:.1f} ± {np.sqrt(idler_cov[0, 0]):.1f}")
+    print(f"  Offset (B): {idler_params[1]:.1f} ± {np.sqrt(idler_cov[1, 1]):.1f}")
+    print(f"  Phase shift (φ): {idler_params[2]:.1f}° ± {np.sqrt(idler_cov[2, 2]):.1f}°")
     print()
 
     # Generate smooth curves for plotting
