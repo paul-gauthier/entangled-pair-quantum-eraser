@@ -196,7 +196,6 @@ def main():
         for ds in datasets:
             ds["steps_per_2pi"] = steps_per_2pi
 
-
     # Second pass: generate plots with fitted parameter and collect visibilities
     V_i_list, V_i_err_list, V_c_list, V_c_err_list = [], [], [], []
     for ds in datasets:
