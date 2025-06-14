@@ -92,9 +92,13 @@ def main():
     df = pd.DataFrame(all_results)
 
     if "A_i" in df.columns and "A_i_err" in df.columns:
-        df["A_i"] = df.apply(lambda r: f"{r.A_i:.2f} ± {r.A_i_err:.2f}", axis=1)
+        df["A_i"] = df.apply(
+            lambda r: f"{f'{r.A_i:.2f}':>7} ± {f'{r.A_i_err:.2f}':<7}", axis=1
+        )
     if "A_c" in df.columns and "A_c_err" in df.columns:
-        df["A_c"] = df.apply(lambda r: f"{r.A_c:.2f} ± {r.A_c_err:.2f}", axis=1)
+        df["A_c"] = df.apply(
+            lambda r: f"{f'{r.A_c:.2f}':>7} ± {f'{r.A_c_err:.2f}':<7}", axis=1
+        )
 
     # Add _off columns, calculated as offset from nearest multiple of 45
     for col in ["signal_lp", "mzi_hwp", "mzi_lp"]:
