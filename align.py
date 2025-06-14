@@ -137,6 +137,9 @@ if __name__ == "__main__":
         args.jsonl_file
     )
 
+    print(f"Found {len(signal_angles)} signal data points.")
+    print(f"Found {len(mzi_lp_angles)} idler data points.")
+
     if args.x_mzi_hwp:
         if len(mzi_hwp_angles) == 0:
             print("Error: --x-mzi-hwp specified but no mzi_hwp data found in file")
