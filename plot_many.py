@@ -17,10 +17,10 @@ import sys
 import numpy as np
 import pandas as pd
 
+from dump import dump  # noqa
 from plot_utils import global_joint_cosine_fit
 from plots import _fit_and_assign_steps_per_2pi, load_and_correct_datasets
 
-from dump import dump # noqa
 
 def main():
     """Main entry point for the script."""
