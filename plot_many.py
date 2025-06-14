@@ -90,10 +90,12 @@ def main():
 
     df = pd.DataFrame(all_results)
 
-    # Add _off columns, calculated as angle mod 45
+    # Add _off columns, calculated as offset from nearest multiple of 45
     for col in ["signal_lp", "mzi_hwp", "mzi_lp"]:
         if col in df.columns:
-            df[f"{col}_off"] = df[col].apply(lambda x: x % 45 if x is not None else None)
+            df[f"{col}_off"] = df[col].apply(
+                lambda x: x - round(x / 45) * 45 if x is not None else None
+            )
 
     # Sort by angle settings
     sort_cols = ["signal_lp", "mzi_hwp", "mzi_lp"]
