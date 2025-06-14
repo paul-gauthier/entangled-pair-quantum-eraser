@@ -166,6 +166,8 @@ def main():
     sp2pi_vals = []
     sp2pi_errs = []
     for ds in datasets:
+        # For each dataset try fitting with Ni and Nc ai
+        # Use the combined estimate if Ni and Nc succeed ai!
         try:
             sp2pi, sp2pi_err = fit_steps_per_2pi(ds["piezo_steps"], ds["Nc_corr"], ds["Nc"])
             sp2pi_vals.append(sp2pi)
