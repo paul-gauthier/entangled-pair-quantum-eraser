@@ -166,15 +166,45 @@ def main():
     sp2pi_vals = []
     sp2pi_errs = []
     for ds in datasets:
-        # For each dataset try fitting with Ni and Nc ai
-        # Use the combined estimate if Ni and Nc succeed ai!
+        sp2pi_i, sp2pi_err_i = None, None
+        sp2pi_c, sp2pi_err_c = None, None
+
         try:
-            sp2pi, sp2pi_err = fit_steps_per_2pi(ds["piezo_steps"], ds["Nc_corr"], ds["Nc"])
-            sp2pi_vals.append(sp2pi)
-            sp2pi_errs.append(sp2pi_err)
-            ds["steps_per_2pi"] = sp2pi
+            sp2pi_i, sp2pi_err_i = fit_steps_per_2pi(
+                ds["piezo_steps"], ds["Ni_corr"], ds["Ni"], label="Idler"
+            )
         except RuntimeError:
-            print(f"  Failed to fit STEPS_PER_2PI for dataset {ds['dataset_index']}, skipping.")
+            print(f"  Failed to fit STEPS_PER_2PI for dataset {ds['dataset_index']} using Ni.")
+
+        try:
+            sp2pi_c, sp2pi_err_c = fit_steps_per_2pi(
+                ds["piezo_steps"], ds["Nc_corr"], ds["Nc"], label="Coincidence"
+            )
+        except RuntimeError:
+            print(f"  Failed to fit STEPS_PER_2PI for dataset {ds['dataset_index']} using Nc.")
+
+        if sp2pi_i is not None and sp2pi_c is not None:
+            # Both fits succeeded, combine them with inverse-variance weighting
+            w_i = 1.0 / sp2pi_err_i**2
+            w_c = 1.0 / sp2pi_err_c**2
+            sp2pi = (sp2pi_i * w_i + sp2pi_c * w_c) / (w_i + w_c)
+            sp2pi_err = 1.0 / np.sqrt(w_i + w_c)
+            print(f"  Combined STEPS_PER_2PI = {sp2pi:.3f} ± {sp2pi_err:.3f}")
+        elif sp2pi_i is not None:
+            sp2pi, sp2pi_err = sp2pi_i, sp2pi_err_i
+        elif sp2pi_c is not None:
+            sp2pi, sp2pi_err = sp2pi_c, sp2pi_err_c
+        else:
+            # Both failed
+            print(
+                f"  Failed to fit STEPS_PER_2PI for dataset {ds['dataset_index']} using Ni or Nc,"
+                " skipping."
+            )
+            continue
+
+        sp2pi_vals.append(sp2pi)
+        sp2pi_errs.append(sp2pi_err)
+        ds["steps_per_2pi"] = sp2pi
 
     if not sp2pi_vals:
         print("\nCould not fit STEPS_PER_2PI for any dataset.")
