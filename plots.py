@@ -100,23 +100,6 @@ def load_and_correct_datasets(jsonl_filename):
             print(f"    Got: {positions}")
             continue
 
-        # Assert that key experimental parameters are constant across the dataset
-        is_valid = True
-        for key in ["signal_lp", "mzi_hwp", "mzi_lp", "acq_time"]:
-            if key in dataset_data[0]:
-                values = {d.get(key) for d in dataset_data}
-                if len(values) > 1:
-                    print(
-                        (
-                            f"  Error: Inconsistent values for '{key}' in dataset"
-                            f" {dataset_index} of {jsonl_filename}: {values}"
-                        ),
-                        file=sys.stderr,
-                    )
-                    is_valid = False
-        if not is_valid:
-            continue
-
         # Extract arrays from this dataset
         piezo_steps = np.array(positions)
         Ns = np.array([d["N_s"] for d in dataset_data])

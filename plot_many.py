@@ -50,39 +50,38 @@ def main():
 
         _fit_and_assign_steps_per_2pi(datasets, args.steps_per_two_pi)
 
-        try:
-            # Perform a single joint fit across all datasets in the file
-            fit_results = global_joint_cosine_fit(
-                datasets,
-                ni_key="Ni_corr",
-                nc_key="Nc_corr",
-                ni_raw_key="Ni",
-                nc_raw_key="Nc",
-            )
+        for ds in datasets:
+            try:
+                # global_joint_cosine_fit expects a list of datasets
+                fit_results = global_joint_cosine_fit(
+                    [ds],  # fit each dataset individually
+                    ni_key="Ni_corr",
+                    nc_key="Nc_corr",
+                    ni_raw_key="Ni",
+                    nc_raw_key="Nc",
+                )
 
-            A_i = fit_results["A_i"]
-            A_c = fit_results["A_c"]
-            first_ds = datasets[0]
+                A_i = fit_results["A_i"]
+                A_c = fit_results["A_c"]
+                result = {
+                    "signal_lp": ds.get("signal_lp"),
+                    "mzi_hwp": ds.get("mzi_hwp"),
+                    "mzi_lp": ds.get("mzi_lp"),
+                    "V_i": fit_results["V_i"],
+                    "V_c": fit_results["V_c"],
+                    "A_i": A_i,
+                    "A_c": A_c,
+                    "Ai/Ac": A_i / A_c if A_c else np.nan,
+                    "acq_dur": ds.get("acq_time"),
+                }
+                all_results.append(result)
 
-            result = {
-                "signal_lp": first_ds.get("signal_lp"),
-                "mzi_hwp": first_ds.get("mzi_hwp"),
-                "mzi_lp": first_ds.get("mzi_lp"),
-                "V_i": fit_results["V_i"],
-                "V_c": fit_results["V_c"],
-                "A_i": A_i,
-                "A_c": A_c,
-                "Ai/Ac": A_i / A_c if A_c else np.nan,
-                "acq_dur": first_ds.get("acq_time"),
-            }
-            all_results.append(result)
-
-        except RuntimeError as e:
-            print(
-                f"  Could not fit datasets from {jsonl_file}: {e}",
-                file=sys.stderr,
-            )
-            continue
+            except RuntimeError as e:
+                print(
+                    f"  Could not fit dataset {ds['dataset_index']} from {jsonl_file}: {e}",
+                    file=sys.stderr,
+                )
+                continue
 
     if not all_results:
         print("\nNo results to display.")
