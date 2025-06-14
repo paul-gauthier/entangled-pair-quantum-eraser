@@ -154,9 +154,7 @@ def _fit_and_assign_steps_per_2pi(
     6. Backfills this global average for any datasets where the fit failed.
     """
     if steps_per_two_pi_override:
-        print(
-            f"Using provided STEPS_PER_2PI = {steps_per_two_pi_override:.3f} for all plots\n"
-        )
+        print(f"Using provided STEPS_PER_2PI = {steps_per_two_pi_override:.3f} for all plots\n")
         for ds in datasets:
             ds["steps_per_2pi"] = steps_per_two_pi_override
         return
