@@ -18,6 +18,7 @@ import numpy as np
 import pandas as pd
 
 from dump import dump  # noqa
+from joint_plot import plot_joint_counts
 from plot_utils import global_joint_cosine_fit
 from plots import _fit_and_assign_steps_per_2pi, load_and_correct_datasets
 
@@ -32,6 +33,11 @@ def main():
         "--steps-per-two-pi",
         type=float,
         help="Use this value for STEPS_PER_2PI instead of fitting it from the data.",
+    )
+    parser.add_argument(
+        "--plots-dir",
+        type=str,
+        help="Directory to save joint plots for each dataset.",
     )
     args = parser.parse_args()
 
@@ -60,6 +66,22 @@ def main():
                     ni_raw_key="Ni",
                     nc_raw_key="Nc",
                 )
+
+                if args.plots_dir:
+                    os.makedirs(args.plots_dir, exist_ok=True)
+                    base_name = os.path.splitext(os.path.basename(jsonl_file))[0]
+                    dataset_index = ds["dataset_index"]
+                    plot_filename = os.path.join(
+                        args.plots_dir, f"{base_name}_{dataset_index}.pdf"
+                    )
+                    title = (
+                        f"Dataset {dataset_index} from {os.path.basename(jsonl_file)}"
+                    )
+                    plot_joint_counts(
+                        [ds],
+                        out=plot_filename,
+                        title=title,
+                    )
 
                 A_i = fit_results["A_i"]
                 A_c = fit_results["A_c"]
