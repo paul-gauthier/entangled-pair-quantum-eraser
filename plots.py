@@ -128,9 +128,9 @@ def load_and_correct_datasets(jsonl_filename):
                 "Ni_corr": Ni_corr,
                 "Nc_corr": Nc_corr,
                 "duration": duration + dark_duration,
-                "signal_lp": first_record.get("signal_lp_angle"),
-                "mzi_hwp": first_record.get("mzi_hwp_angle"),
-                "mzi_lp": first_record.get("mzi_lp_angle"),
+                "signal_lp": first_record.get("signal_lp"),
+                "mzi_hwp": first_record.get("mzi_hwp"),
+                "mzi_lp": first_record.get("mzi_lp"),
             }
         )
 
