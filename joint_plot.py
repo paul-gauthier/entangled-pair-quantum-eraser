@@ -128,11 +128,11 @@ def plot_joint_counts(
     center_i = C0_i + A_i / 2
     scale = 300
     ymin_i = max(0, center_i - scale)
-    ax_i.set_ylim(ymin_i, ymin_i + 2*scale)
+    ax_i.set_ylim(ymin_i, ymin_i + 2 * scale)
     ax_c.set_ylabel(r"Coinc. counts $N_c$")
     center_c = C0_c + A_c / 2
     ymin_c = max(0, center_c - scale)
-    ax_c.set_ylim(ymin_c, ymin_c + 2*scale)
+    ax_c.set_ylim(ymin_c, ymin_c + 2 * scale)
     ax_c.set_xlabel(r"Phase delay $\delta$ (rad)")
     ax_i.grid(True, ls=":")
     ax_c.grid(True, ls=":")
