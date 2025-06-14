@@ -383,11 +383,10 @@ def main():
     duration_hms = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
 
     total_phase_scanned_pi = 0
-    if "steps_per_2pi" in locals() and steps_per_2pi > 0:
-        for ds in datasets:
-            steps_range = np.max(ds["piezo_steps"]) - np.min(ds["piezo_steps"])
-            phase_range_pi = 2 * steps_range / steps_per_2pi
-            total_phase_scanned_pi += phase_range_pi
+    for ds in datasets:
+        steps_range = np.max(ds["piezo_steps"]) - np.min(ds["piezo_steps"])
+        phase_range_pi = 2 * steps_range / ds["steps_per_2pi"]
+        total_phase_scanned_pi += phase_range_pi
 
     print("\n--- Summary Statistics ---")
     print(f"Total signals:      {int(total_signals):,}")
