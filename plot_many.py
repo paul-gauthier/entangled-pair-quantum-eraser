@@ -62,6 +62,7 @@ def main():
             A_i = fit_results["A_i"]
             A_c = fit_results["A_c"]
             first_ds = datasets[0]
+            total_duration = sum(ds["duration"] for ds in datasets)
             result = {
                 "signal_lp": first_ds.get("signal_lp"),
                 "mzi_hwp": first_ds.get("mzi_hwp"),
@@ -71,6 +72,7 @@ def main():
                 "A_i": A_i,
                 "A_c": A_c,
                 "Ai/Ac": A_i / A_c if A_c else np.nan,
+                "acq_dur": total_duration,
             }
             all_results.append(result)
 
@@ -109,6 +111,7 @@ def main():
         "A_i",
         "A_c",
         "Ai/Ac",
+        "acq_dur",
     ]
     final_cols = [c for c in output_cols if c in df.columns]
 
