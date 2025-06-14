@@ -116,6 +116,7 @@ def load_and_correct_datasets(jsonl_filename):
         accidental = Ns_dark * Ni_dark * ACCIDENTAL_WINDOW
         Nc_corr = np.clip(Nc - accidental, 0, None)
 
+        first_record = dataset_data[0]
         corrected_datasets.append(
             {
                 "filename": jsonl_filename,
@@ -127,6 +128,9 @@ def load_and_correct_datasets(jsonl_filename):
                 "Ni_corr": Ni_corr,
                 "Nc_corr": Nc_corr,
                 "duration": duration + dark_duration,
+                "signal_lp": first_record.get("signal_lp_angle"),
+                "mzi_hwp": first_record.get("mzi_hwp_angle"),
+                "mzi_lp": first_record.get("mzi_lp_angle"),
             }
         )
 
