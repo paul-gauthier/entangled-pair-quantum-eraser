@@ -20,6 +20,7 @@ import pandas as pd
 from plot_utils import global_joint_cosine_fit
 from plots import _fit_and_assign_steps_per_2pi, load_and_correct_datasets
 
+from dump import dump # noqa
 
 def main():
     """Main entry point for the script."""
@@ -62,7 +63,7 @@ def main():
             A_i = fit_results["A_i"]
             A_c = fit_results["A_c"]
             first_ds = datasets[0]
-            total_duration = sum(ds["duration"] for ds in datasets)
+
             result = {
                 "signal_lp": first_ds.get("signal_lp"),
                 "mzi_hwp": first_ds.get("mzi_hwp"),
@@ -72,7 +73,7 @@ def main():
                 "A_i": A_i,
                 "A_c": A_c,
                 "Ai/Ac": A_i / A_c if A_c else np.nan,
-                "acq_dur": total_duration,
+                "acq_dur": first_ds.get("duration") / len(first_ds["piezo_steps"]),
             }
             all_results.append(result)
 
