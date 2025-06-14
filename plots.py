@@ -170,6 +170,9 @@ def main():
             sp2pi, sp2pi_err = fit_steps_per_2pi(ds["piezo_steps"], ds["Nc_corr"], ds["Nc"])
             sp2pi_vals.append(sp2pi)
             sp2pi_errs.append(sp2pi_err)
+
+            # Update as noted to ensure each dataset uses its own locally computed steps_per_2pi when available, or falls back to the global value if unavailable. ai!
+            # ai: compute and store ds["steps_per_2pi"] for each dataset
         except RuntimeError:
             print(f"  Failed to fit STEPS_PER_2PI for dataset {ds['dataset_index']}, skipping.")
 
@@ -184,10 +187,14 @@ def main():
         f"Computed weighted STEPS_PER_2PI = {steps_per_2pi:.3f} ± {combined_err:.3f} for all"
         " plots\n"
     )
+    # ai: backfill the global steps_per_2pi into ds["steps_per_2pi"] for any datasets that don't have it
 
     if args.steps_per_two_pi:
         steps_per_2pi = args.steps_per_two_pi
         print(f"Using provided STEPS_PER_2PI = {steps_per_2pi:.3f} for all plots\n")
+
+        # ai: overwrite ds["steps_per_2pi"] for all datasets
+
 
     # Second pass: generate plots with fitted parameter and collect visibilities
     V_i_list, V_i_err_list, V_c_list, V_c_err_list = [], [], [], []
@@ -217,7 +224,7 @@ def main():
                 Ns,
                 Ni_corr,
                 Nc_corr,
-                steps_per_2pi,
+                steps_per_2pi, # pass in ds[steps_per_2pi] ai
                 output_filename=output_filename,
                 label_suffix=label_suffix,
                 Nc_raw=ds["Nc"],
@@ -244,7 +251,12 @@ def main():
             # Strip YYYY-MM-DD- prefix for a cleaner title
             title_base = base_filename[21:]
             title = title_base
-        plot_joint_counts(datasets, steps_per_2pi, out=joint_pdf, title=title)
+        plot_joint_counts(
+            datasets,
+            steps_per_2pi # ai: Don't pass this, have it use the individual ds[steps_per_2pi]
+            out=joint_pdf,
+            title=title,
+        )
     except RuntimeError as e:
         print(f"Joint plot failed: {e}")
 
@@ -288,14 +300,14 @@ def main():
         try:
             global_cosine_fit(
                 datasets,
-                steps_per_2pi,
+                steps_per_2pi, # ai: Don't pass this, have it use the individual ds[steps_per_2pi]
                 counts_key="Ni_corr",
                 raw_key="Ni",
                 label="Idler",
             )
             global_cosine_fit(
                 datasets,
-                steps_per_2pi,
+                steps_per_2pi, # ai: Don't pass this, have it use the individual ds[steps_per_2pi]
                 counts_key="Nc_corr",
                 raw_key="Nc",
                 label="Coincidence",
@@ -309,7 +321,7 @@ def main():
         try:
             global_joint_cosine_fit(
                 datasets,
-                steps_per_2pi,
+                steps_per_2pi, # ai: Don't pass this, have it use the individual ds[steps_per_2pi]
                 ni_key="Ni_corr",
                 nc_key="Nc_corr",
                 ni_raw_key="Ni",
