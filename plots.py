@@ -27,6 +27,8 @@ def load_and_correct_datasets(jsonl_filename):
 
     The file contains multiple datasets separated by dark count records with dark=True.
     Each dataset is corrected using the dark record that immediately follows it.
+    If the file ends with a dataset that is not followed by a dark record,
+    the dark record from the preceding dataset is used for correction.
 
     Parameters
     ----------
@@ -67,9 +69,22 @@ def load_and_correct_datasets(jsonl_filename):
         else:
             current_dataset.append(record)
 
-    # Discard any final records after the last dark=True
+    # Handle any final records after the last dark=True
     if current_dataset:
-        print(f"  Warning: Discarding {len(current_dataset)} records after last dark measurement")
+        if datasets:
+            # Re-use the dark record from the previous dataset
+            last_dark_record = datasets[-1][1]
+            datasets.append((current_dataset, last_dark_record))
+            print(
+                f"  Found {len(current_dataset)} records after last dark measurement, "
+                "re-using previous dark record."
+            )
+        else:
+            # No previous dark record available to use
+            print(
+                f"  Warning: Discarding {len(current_dataset)} records with no available dark"
+                " measurement"
+            )
 
     if not datasets:
         print(f"  Warning: No datasets found in {jsonl_filename}")
