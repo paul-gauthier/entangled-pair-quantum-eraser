@@ -68,6 +68,7 @@ def main():
                     "mzi_hwp": ds.get("mzi_hwp"),
                     "mzi_lp": ds.get("mzi_lp"),
                     "V_i": fit_results["V_i"],
+                    "V_i_err": fit_results["V_i_err"],
                     "V_c": fit_results["V_c"],
                     "A_i": A_i,
                     "A_i_err": fit_results["A_i_err"],
@@ -105,6 +106,11 @@ def main():
     if "A_i" in df.columns:
         df["A_i_rolling_avg"] = df["A_i"].rolling(window=3, center=True).mean()
 
+    if "V_i" in df.columns:
+        df["V_i_rolling_avg"] = df["V_i"].rolling(window=3, center=True).mean()
+
+    if "V_i" in df.columns and "V_i_err" in df.columns:
+        df["V_i"] = df.apply(lambda r: f"{f'{r.V_i:.3f}':>5} ± {f'{r.V_i_err:.3f}':>5}", axis=1)
     if "A_i" in df.columns and "A_i_err" in df.columns:
         df["A_i"] = df.apply(lambda r: f"{f'{r.A_i:.2f}':>7} ± {f'{r.A_i_err:.2f}':>6}", axis=1)
     if "A_c" in df.columns and "A_c_err" in df.columns:
@@ -119,6 +125,7 @@ def main():
         "mzi_lp",
         "mzi_lp_off",
         "V_i",
+        "V_i_rolling_avg",
         "V_c",
         "A_i",
         "A_i_rolling_avg",
