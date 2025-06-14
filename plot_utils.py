@@ -94,7 +94,9 @@ def fit_steps_per_2pi(
     se_steps_per_2pi = np.sqrt(pcov[3, 3])
 
     label_str = f" for {label}" if label else ""
-    print(f"  Fitted STEPS_PER_2PI{label_str} = {fitted_steps_per_2pi:.3f} ± {se_steps_per_2pi:.3f}")
+    print(
+        f"  Fitted STEPS_PER_2PI{label_str} = {fitted_steps_per_2pi:.3f} ± {se_steps_per_2pi:.3f}"
+    )
     return fitted_steps_per_2pi, se_steps_per_2pi
 
 
