@@ -107,8 +107,10 @@ def load_and_correct_datasets(jsonl_filename):
                 values = {d.get(key) for d in dataset_data}
                 if len(values) > 1:
                     print(
-                        f"  Error: Inconsistent values for '{key}' in dataset"
-                        f" {dataset_index} of {jsonl_filename}: {values}",
+                        (
+                            f"  Error: Inconsistent values for '{key}' in dataset"
+                            f" {dataset_index} of {jsonl_filename}: {values}"
+                        ),
                         file=sys.stderr,
                     )
                     is_valid = False
