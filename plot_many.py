@@ -147,7 +147,7 @@ def main():
         if pd.isna(val):
             val_str = "None"
         elif isinstance(val, float):
-            val_str = f"{val:.3f}"
+            val_str = f"{val:.4f}"
         else:
             val_str = str(val)
         print(f"{col}: {val_str}")
@@ -156,7 +156,7 @@ def main():
         print("-" * 20)
 
     if cols_to_print:
-        print(df.to_string(columns=cols_to_print, index=False, float_format="%.3f"))
+        print(df.to_string(columns=cols_to_print, index=False, float_format="%.4f"))
     elif elided_cols:
         print(f"({len(df)} rows with above values)")
 
