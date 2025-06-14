@@ -71,12 +71,8 @@ def main():
                     os.makedirs(args.plots_dir, exist_ok=True)
                     base_name = os.path.splitext(os.path.basename(jsonl_file))[0]
                     dataset_index = ds["dataset_index"]
-                    plot_filename = os.path.join(
-                        args.plots_dir, f"{base_name}_{dataset_index}.pdf"
-                    )
-                    title = (
-                        f"Dataset {dataset_index} from {os.path.basename(jsonl_file)}"
-                    )
+                    plot_filename = os.path.join(args.plots_dir, f"{base_name}_{dataset_index}.pdf")
+                    title = f"Dataset {dataset_index} from {os.path.basename(jsonl_file)}"
                     plot_joint_counts(
                         [ds],
                         out=plot_filename,
