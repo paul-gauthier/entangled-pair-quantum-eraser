@@ -138,31 +138,29 @@ def load_and_correct_datasets(jsonl_filename):
     return corrected_datasets
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Plot Mach-Zehnder interferometer data.")
-    parser.add_argument("jsonl_file", help="JSONL data file to process.")
-    parser.add_argument(
-        "--max-phase",
-        type=float,
-        metavar="X",
-        help="Only use data up to a phase delay of X*π.",
-    )
-    parser.add_argument(
-        "--steps-per-two-pi",
-        type=float,
-        help="Use this value for STEPS_PER_2PI instead of fitting it from the data.",
-    )
-    parser.add_argument("--title-joint-plot", type=str, help="Specify a title for the joint plot.")
-    args = parser.parse_args()
+def _fit_and_assign_steps_per_2pi(
+    datasets: list[dict], steps_per_two_pi_override: float | None = None
+):
+    """
+    Fit STEPS_PER_2PI for each dataset, combine, and assign to datasets.
 
-    datasets = load_and_correct_datasets(args.jsonl_file)
-    if not datasets:
-        print("No valid datasets found!")
-        sys.exit(1)
+    This function modifies the `datasets` list in-place.
 
-    # refactor into a helper function that updates all the ds[steps_per_2pi] ai!
-    # Fit STEPS_PER_2PI for each dataset individually (using raw Nc) and
-    # combine the results with a 1/σ²-weighted average
+    1. If `steps_per_two_pi_override` is provided, it is used for all datasets.
+    2. Otherwise, fits STEPS_PER_2PI for each dataset using both Ni and Nc counts.
+    3. Combines Ni and Nc fits if both are successful.
+    4. Stores the per-dataset fit in ds["steps_per_2pi"].
+    5. Computes a weighted average of all per-dataset fits.
+    6. Backfills this global average for any datasets where the fit failed.
+    """
+    if steps_per_two_pi_override:
+        print(
+            f"Using provided STEPS_PER_2PI = {steps_per_two_pi_override:.3f} for all plots\n"
+        )
+        for ds in datasets:
+            ds["steps_per_2pi"] = steps_per_two_pi_override
+        return
+
     print("Fitting STEPS_PER_2PI for each dataset ...")
     sp2pi_vals = []
     sp2pi_errs = []
@@ -207,27 +205,44 @@ def main():
         sp2pi_errs.append(sp2pi_err)
         ds["steps_per_2pi"] = sp2pi
 
-    if not sp2pi_vals:
-        print("\nCould not fit STEPS_PER_2PI for any dataset.")
-        # sys.exit(1)
-
-    weights = 1.0 / np.square(sp2pi_errs)
-    steps_per_2pi = float(np.sum(weights * sp2pi_vals) / np.sum(weights))
-    combined_err = float(1.0 / np.sqrt(np.sum(weights)))
-    print(
-        f"Computed weighted STEPS_PER_2PI = {steps_per_2pi:.3f} ± {combined_err:.3f} for all"
-        " plots\n"
-    )
-    for ds in datasets:
-        if "steps_per_2pi" not in ds:
-            ds["steps_per_2pi"] = steps_per_2pi
-
-    if args.steps_per_two_pi:
-        steps_per_2pi = args.steps_per_two_pi
-        print(f"Using provided STEPS_PER_2PI = {steps_per_2pi:.3f} for all plots\n")
-
+    if sp2pi_vals:
+        weights = 1.0 / np.square(sp2pi_errs)
+        steps_per_2pi = float(np.sum(weights * sp2pi_vals) / np.sum(weights))
+        combined_err = float(1.0 / np.sqrt(np.sum(weights)))
+        print(
+            f"Computed weighted STEPS_PER_2PI = {steps_per_2pi:.3f} ± {combined_err:.3f} for all"
+            " plots\n"
+        )
         for ds in datasets:
-            ds["steps_per_2pi"] = steps_per_2pi
+            if "steps_per_2pi" not in ds:
+                ds["steps_per_2pi"] = steps_per_2pi
+    else:
+        print("\nCould not fit STEPS_PER_2PI for any dataset.")
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Plot Mach-Zehnder interferometer data.")
+    parser.add_argument("jsonl_file", help="JSONL data file to process.")
+    parser.add_argument(
+        "--max-phase",
+        type=float,
+        metavar="X",
+        help="Only use data up to a phase delay of X*π.",
+    )
+    parser.add_argument(
+        "--steps-per-two-pi",
+        type=float,
+        help="Use this value for STEPS_PER_2PI instead of fitting it from the data.",
+    )
+    parser.add_argument("--title-joint-plot", type=str, help="Specify a title for the joint plot.")
+    args = parser.parse_args()
+
+    datasets = load_and_correct_datasets(args.jsonl_file)
+    if not datasets:
+        print("No valid datasets found!")
+        sys.exit(1)
+
+    _fit_and_assign_steps_per_2pi(datasets, args.steps_per_two_pi)
 
     # Second pass: generate plots with fitted parameter and collect visibilities
     V_i_list, V_i_err_list, V_c_list, V_c_err_list = [], [], [], []
