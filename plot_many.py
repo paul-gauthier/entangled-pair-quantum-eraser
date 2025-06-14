@@ -91,11 +91,6 @@ def main():
 
     df = pd.DataFrame(all_results)
 
-    if "A_i" in df.columns and "A_i_err" in df.columns:
-        df["A_i"] = df.apply(lambda r: f"{f'{r.A_i:.2f}':>7} ± {f'{r.A_i_err:.2f}':>6}", axis=1)
-    if "A_c" in df.columns and "A_c_err" in df.columns:
-        df["A_c"] = df.apply(lambda r: f"{f'{r.A_c:.2f}':>7} ± {f'{r.A_c_err:.2f}':>6}", axis=1)
-
     # Add _off columns, calculated as offset from nearest multiple of 45
     for col in ["signal_lp", "mzi_hwp", "mzi_lp"]:
         if col in df.columns:
@@ -106,6 +101,14 @@ def main():
     # Sort by angle settings
     sort_cols = ["signal_lp", "mzi_hwp", "mzi_lp"]
     df = df.sort_values(by=[c for c in sort_cols if c in df.columns])
+
+    if "A_i" in df.columns:
+        df["A_i_rolling_avg"] = df["A_i"].rolling(window=3, center=True).mean()
+
+    if "A_i" in df.columns and "A_i_err" in df.columns:
+        df["A_i"] = df.apply(lambda r: f"{f'{r.A_i:.2f}':>7} ± {f'{r.A_i_err:.2f}':>6}", axis=1)
+    if "A_c" in df.columns and "A_c_err" in df.columns:
+        df["A_c"] = df.apply(lambda r: f"{f'{r.A_c:.2f}':>7} ± {f'{r.A_c_err:.2f}':>6}", axis=1)
 
     # Define and filter columns for the final output table
     output_cols = [
@@ -118,6 +121,7 @@ def main():
         "V_i",
         "V_c",
         "A_i",
+        "A_i_rolling_avg",
         "A_c",
         "Ai/Ac",
         "acq_dur",
