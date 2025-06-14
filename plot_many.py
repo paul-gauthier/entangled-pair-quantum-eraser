@@ -109,7 +109,7 @@ def main():
     final_cols = [c for c in output_cols if c in df.columns]
 
     print("\n--- Summary Table ---")
-    print(df.to_string(columns=final_cols, index=False, float_format="%.4f"))
+    print(df.to_string(columns=final_cols, index=False, float_format="%.3f"))
 
 
 if __name__ == "__main__":
