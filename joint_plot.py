@@ -69,7 +69,7 @@ def plot_joint_counts(
     fig, (ax_i, ax_c) = plt.subplots(2, 1, sharex=True, figsize=(10, 8))
 
     for k, ds in enumerate(datasets):
-        δ = delta_from_steps(ds["piezo_steps"], steps_per_2pi)
+        δ = delta_from_steps(ds["piezo_steps"], ds.get("steps_per_2pi", steps_per_2pi))
         if align_phase:
             δ = δ + phis[k]  # shift each scan by its fitted phase
         col = colours[k % len(colours)]
@@ -187,7 +187,8 @@ def plot_joint_counts(
     # -------- π–tick labels on the shared x–axis ---------------------------
     delta_all = np.hstack(
         [
-            delta_from_steps(ds["piezo_steps"], steps_per_2pi) + (phis[k] if align_phase else 0)
+            delta_from_steps(ds["piezo_steps"], ds.get("steps_per_2pi", steps_per_2pi))
+            + (phis[k] if align_phase else 0)
             for k, ds in enumerate(datasets)
         ]
     )
