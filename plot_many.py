@@ -128,11 +128,11 @@ def main():
         df["V_i_rolling_avg"] = df["V_i"].rolling(window=3, center=True).mean()
 
     if "V_i" in df.columns and "V_i_err" in df.columns:
-        df["V_i"] = df.apply(lambda r: f"{f'{r.V_i:.3f}':>5} ± {f'{r.V_i_err:.3f}':>5}", axis=1)
+        df["V_i"] = df.apply(lambda r: f"{f'{r.V_i:.4f}':>5} ±{f'{r.V_i_err:.4f}':>5}", axis=1)
     if "A_i" in df.columns and "A_i_err" in df.columns:
-        df["A_i"] = df.apply(lambda r: f"{f'{r.A_i:.2f}':>7} ± {f'{r.A_i_err:.2f}':>6}", axis=1)
+        df["A_i"] = df.apply(lambda r: f"{f'{r.A_i:.1f}':>7} ±{f'{r.A_i_err:.0f}':>4}", axis=1)
     if "A_c" in df.columns and "A_c_err" in df.columns:
-        df["A_c"] = df.apply(lambda r: f"{f'{r.A_c:.2f}':>7} ± {f'{r.A_c_err:.2f}':>6}", axis=1)
+        df["A_c"] = df.apply(lambda r: f"{f'{r.A_c:.1f}':>7} ±{f'{r.A_c_err:.0f}':>4}", axis=1)
 
     # Define and filter columns for the final output table
     output_cols = [
