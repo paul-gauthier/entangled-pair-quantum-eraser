@@ -160,6 +160,7 @@ def main():
         print("No valid datasets found!")
         sys.exit(1)
 
+    # refactor into a helper function that updates all the ds[steps_per_2pi] ai!
     # Fit STEPS_PER_2PI for each dataset individually (using raw Nc) and
     # combine the results with a 1/σ²-weighted average
     print("Fitting STEPS_PER_2PI for each dataset ...")
