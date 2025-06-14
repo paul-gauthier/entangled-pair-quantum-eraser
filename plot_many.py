@@ -60,14 +60,17 @@ def main():
                     nc_raw_key="Nc",
                 )
 
+                A_i = fit_results["A_i"]
+                A_c = fit_results["A_c"]
                 result = {
                     "signal_lp": ds.get("signal_lp"),
                     "mzi_hwp": ds.get("mzi_hwp"),
                     "mzi_lp": ds.get("mzi_lp"),
                     "V_i": fit_results["V_i"],
                     "V_c": fit_results["V_c"],
-                    "A_i": fit_results["A_i"],
-                    "A_c": fit_results["A_c"],
+                    "A_i": A_i,
+                    "A_c": A_c,
+                    "Ai/Ac": A_i / A_c if A_c else np.nan,
                 }
                 all_results.append(result)
 
@@ -105,6 +108,7 @@ def main():
         "V_c",
         "A_i",
         "A_c",
+        "Ai/Ac",
     ]
     final_cols = [c for c in output_cols if c in df.columns]
 
