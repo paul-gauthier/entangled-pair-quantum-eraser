@@ -17,7 +17,6 @@ from plot_utils import delta_from_steps, global_joint_cosine_fit
 
 def plot_joint_counts(
     datasets: list[dict],
-    steps_per_2pi: float,
     *,
     out: str = "all_datasets_joint.pdf",
     show: bool = False,
@@ -50,7 +49,6 @@ def plot_joint_counts(
     # ------------------------------------------------------------------
     fit = global_joint_cosine_fit(
         datasets,
-        steps_per_2pi,
         ni_key="Ni_corr",
         nc_key="Nc_corr",
         ni_raw_key="Ni",
@@ -69,7 +67,7 @@ def plot_joint_counts(
     fig, (ax_i, ax_c) = plt.subplots(2, 1, sharex=True, figsize=(10, 8))
 
     for k, ds in enumerate(datasets):
-        δ = delta_from_steps(ds["piezo_steps"], ds.get("steps_per_2pi", steps_per_2pi))
+        δ = delta_from_steps(ds["piezo_steps"], ds["steps_per_2pi"])
         if align_phase:
             δ = δ + phis[k]  # shift each scan by its fitted phase
         col = colours[k % len(colours)]
@@ -187,7 +185,7 @@ def plot_joint_counts(
     # -------- π–tick labels on the shared x–axis ---------------------------
     delta_all = np.hstack(
         [
-            delta_from_steps(ds["piezo_steps"], ds.get("steps_per_2pi", steps_per_2pi))
+            delta_from_steps(ds["piezo_steps"], ds["steps_per_2pi"])
             + (phis[k] if align_phase else 0)
             for k, ds in enumerate(datasets)
         ]

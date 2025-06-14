@@ -100,7 +100,6 @@ def fit_steps_per_2pi(
 # ---------------------------------------------------------------------------
 def global_cosine_fit(
     datasets: list[dict],
-    steps_per_2pi: float,
     *,
     counts_key: str,
     raw_key: str,
@@ -122,7 +121,7 @@ def global_cosine_fit(
     # -------- Flatten all scans into one big array ------------------------
     deltas, y, sigma, idx = [], [], [], []
     for k, ds in enumerate(datasets):
-        δ = delta_from_steps(ds["piezo_steps"], ds.get("steps_per_2pi", steps_per_2pi))
+        δ = delta_from_steps(ds["piezo_steps"], ds["steps_per_2pi"])
         y_k = ds[counts_key]
         σ_k = np.sqrt(np.maximum(ds[raw_key], 1))
         n_k = len(y_k)
@@ -194,7 +193,6 @@ def global_cosine_fit(
 # ---------------------------------------------------------------------------
 def global_joint_cosine_fit(
     datasets: list[dict],
-    steps_per_2pi: float,
     *,
     ni_key: str = "Ni_corr",
     nc_key: str = "Nc_corr",
@@ -213,7 +211,7 @@ def global_joint_cosine_fit(
     """
     deltas, y, sigma, idx, typ = [], [], [], [], []  # typ: 0 → N_i, 1 → N_c
     for k, ds in enumerate(datasets):
-        δ = delta_from_steps(ds["piezo_steps"], ds.get("steps_per_2pi", steps_per_2pi))
+        δ = delta_from_steps(ds["piezo_steps"], ds["steps_per_2pi"])
 
         # Idler
         deltas.append(δ)
