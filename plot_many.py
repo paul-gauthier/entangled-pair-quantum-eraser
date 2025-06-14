@@ -73,7 +73,7 @@ def main():
                 "A_i": A_i,
                 "A_c": A_c,
                 "Ai/Ac": A_i / A_c if A_c else np.nan,
-                "acq_dur": first_ds.get("duration") / len(first_ds["piezo_steps"]),
+                "acq_dur": first_ds.get("acq_time"),
             }
             all_results.append(result)
 

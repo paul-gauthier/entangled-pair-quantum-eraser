@@ -102,7 +102,7 @@ def load_and_correct_datasets(jsonl_filename):
 
         # Assert that key experimental parameters are constant across the dataset
         is_valid = True
-        for key in ["signal_lp", "mzi_hwp", "mzi_lp"]:
+        for key in ["signal_lp", "mzi_hwp", "mzi_lp", "acq_time"]:
             if key in dataset_data[0]:
                 values = {d.get(key) for d in dataset_data}
                 if len(values) > 1:
@@ -148,6 +148,7 @@ def load_and_correct_datasets(jsonl_filename):
                 "signal_lp": first_record.get("signal_lp"),
                 "mzi_hwp": first_record.get("mzi_hwp"),
                 "mzi_lp": first_record.get("mzi_lp"),
+                "acq_time": first_record.get("acq_time"),
             }
         )
 
