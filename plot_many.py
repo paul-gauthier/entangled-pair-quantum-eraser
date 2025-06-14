@@ -113,7 +113,36 @@ def main():
     final_cols = [c for c in output_cols if c in df.columns]
 
     print("\n--- Summary Table ---")
-    print(df.to_string(columns=final_cols, index=False, float_format="%.3f"))
+
+    if df.empty:
+        print(df.to_string(columns=final_cols, index=False))
+        return
+
+    elided_cols = {}
+    cols_to_print = list(final_cols)
+
+    if len(df) > 1:
+        for col in final_cols:
+            if df[col].nunique(dropna=False) == 1:
+                elided_cols[col] = df[col].iloc[0]
+                cols_to_print.remove(col)
+
+    for col, val in elided_cols.items():
+        if pd.isna(val):
+            val_str = "None"
+        elif isinstance(val, float):
+            val_str = f"{val:.3f}"
+        else:
+            val_str = str(val)
+        print(f"{col}: {val_str}")
+
+    if elided_cols and cols_to_print:
+        print("-" * 20)
+
+    if cols_to_print:
+        print(df.to_string(columns=cols_to_print, index=False, float_format="%.3f"))
+    elif elided_cols:
+        print(f"({len(df)} rows with above values)")
 
 
 if __name__ == "__main__":
