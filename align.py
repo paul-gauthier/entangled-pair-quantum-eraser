@@ -3,11 +3,12 @@
 import argparse
 import json
 import sys
-from dump import dump
 
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import curve_fit
+
+from dump import dump
 
 
 def read_jsonl(fname):
@@ -144,7 +145,7 @@ if __name__ == "__main__":
         if len(mzi_hwp_angles) == 0:
             print("Error: --x-mzi-hwp specified but no mzi_hwp data found in file")
             sys.exit(1)
-        mzi_angles = (mzi_hwp_angles - args.offset) *2
+        mzi_angles = (mzi_hwp_angles - args.offset) * 2
         dump(mzi_hwp_angles)
     else:
         mzi_angles = mzi_lp_angles - args.offset
