@@ -70,7 +70,9 @@ def main():
                     "V_i": fit_results["V_i"],
                     "V_c": fit_results["V_c"],
                     "A_i": A_i,
+                    "A_i_err": fit_results["A_i_err"],
                     "A_c": A_c,
+                    "A_c_err": fit_results["A_c_err"],
                     "Ai/Ac": A_i / A_c if A_c else np.nan,
                     "acq_dur": ds.get("acq_time"),
                 }
@@ -88,6 +90,11 @@ def main():
         return
 
     df = pd.DataFrame(all_results)
+
+    if "A_i" in df.columns and "A_i_err" in df.columns:
+        df["A_i"] = df.apply(lambda r: f"{r.A_i:.2f} ± {r.A_i_err:.2f}", axis=1)
+    if "A_c" in df.columns and "A_c_err" in df.columns:
+        df["A_c"] = df.apply(lambda r: f"{r.A_c:.2f} ± {r.A_c_err:.2f}", axis=1)
 
     # Add _off columns, calculated as offset from nearest multiple of 45
     for col in ["signal_lp", "mzi_hwp", "mzi_lp"]:
