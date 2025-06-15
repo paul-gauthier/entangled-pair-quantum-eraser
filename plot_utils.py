@@ -164,7 +164,11 @@ def global_cosine_fit(
     dof = y_all.size - J.shape[1]
     chi2 = np.sum(res.fun**2)
     red_chi2 = chi2 / dof if dof > 0 else float("nan")
-    cov = np.linalg.inv(J.T @ J) * chi2 / dof
+    try:
+        cov = np.linalg.inv(J.T @ J) * chi2 / dof
+    except np.linalg.LinAlgError:
+        print("  Warning: Singular matrix, cannot compute uncertainties.")
+        cov = np.full((J.shape[1], J.shape[1]), np.nan)
 
     A_fit, C0_fit = res.x[:2]
     A_err, C0_err = np.sqrt(np.diag(cov)[:2])
@@ -274,7 +278,11 @@ def global_joint_cosine_fit(
     dof = y_all.size - J.shape[1]
     chi2 = np.sum(res.fun**2)
     red_chi2 = chi2 / dof if dof > 0 else float("nan")
-    cov = np.linalg.inv(J.T @ J) * chi2 / dof
+    try:
+        cov = np.linalg.inv(J.T @ J) * chi2 / dof
+    except np.linalg.LinAlgError:
+        print("  Warning: Singular matrix, cannot compute uncertainties.")
+        cov = np.full((J.shape[1], J.shape[1]), np.nan)
 
     A_i, C0_i, A_c, C0_c, phi_ic = res.x[:5]
     A_i_err, C0_i_err, A_c_err, C0_c_err, phi_ic_err = np.sqrt(np.diag(cov)[:5])
