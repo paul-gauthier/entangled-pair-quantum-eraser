@@ -102,7 +102,7 @@ def main():
                 }
                 all_results.append(result)
 
-            except (RuntimeError, np.linalg.LinAlgError) as e:
+            except (RuntimeError,) as e:
                 print(
                     f"  Could not fit dataset {ds['dataset_index']} from {jsonl_file}: {e}",
                     file=sys.stderr,
