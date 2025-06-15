@@ -164,6 +164,7 @@ def _fit_and_assign_steps_per_2pi(
     datasets: list[dict],
     steps_per_two_pi_override: float | None = None,
     use_global: bool = False,
+    use_ni: bool = True,
 ):
     """
     Fit STEPS_PER_2PI for each dataset, combine, and assign to datasets.
@@ -191,12 +192,13 @@ def _fit_and_assign_steps_per_2pi(
         sp2pi_i, sp2pi_err_i = None, None
         sp2pi_c, sp2pi_err_c = None, None
 
-        try:
-            sp2pi_i, sp2pi_err_i = fit_steps_per_2pi(
-                ds["piezo_steps"], ds["Ni_corr"], ds["Ni"], label="Idler"
-            )
-        except RuntimeError:
-            print(f"  Failed to fit STEPS_PER_2PI for dataset {ds['dataset_index']} using Ni.")
+        if use_ni:
+            try:
+                sp2pi_i, sp2pi_err_i = fit_steps_per_2pi(
+                    ds["piezo_steps"], ds["Ni_corr"], ds["Ni"], label="Idler"
+                )
+            except RuntimeError:
+                print(f"  Failed to fit STEPS_PER_2PI for dataset {ds['dataset_index']} using Ni.")
 
         try:
             sp2pi_c, sp2pi_err_c = fit_steps_per_2pi(
@@ -267,6 +269,11 @@ def main():
         action="store_true",
         help="Use a single globally-fitted STEPS_PER_2PI for all datasets.",
     )
+    parser.add_argument(
+        "--no-ni-steps",
+        action="store_true",
+        help="Do not use idler (Ni) counts to fit STEPS_PER_2PI.",
+    )
     parser.add_argument("--title-joint-plot", type=str, help="Specify a title for the joint plot.")
     args = parser.parse_args()
 
@@ -275,7 +282,9 @@ def main():
         print("No valid datasets found!")
         sys.exit(1)
 
-    _fit_and_assign_steps_per_2pi(datasets, args.steps_per_two_pi, use_global=args.global_steps)
+    _fit_and_assign_steps_per_2pi(
+        datasets, args.steps_per_two_pi, use_global=args.global_steps, use_ni=not args.no_ni_steps
+    )
 
     # Second pass: generate plots with fitted parameter and collect visibilities
     V_i_list, V_i_err_list, V_c_list, V_c_err_list = [], [], [], []

@@ -39,6 +39,11 @@ def main():
         help="Use a single globally-fitted STEPS_PER_2PI for all datasets.",
     )
     parser.add_argument(
+        "--no-ni-steps",
+        action="store_true",
+        help="Do not use idler (Ni) counts to fit STEPS_PER_2PI.",
+    )
+    parser.add_argument(
         "--plots-dir",
         type=str,
         help="Directory to save joint plots for each dataset.",
@@ -63,7 +68,9 @@ def main():
             print(f"  No valid datasets found in {jsonl_file}", file=sys.stderr)
             continue
 
-        _fit_and_assign_steps_per_2pi(datasets, args.steps_per_two_pi, use_global=args.global_steps)
+        _fit_and_assign_steps_per_2pi(
+            datasets, args.steps_per_two_pi, use_global=args.global_steps, use_ni=not args.no_ni_steps
+        )
 
         for ds in datasets:
             try:
