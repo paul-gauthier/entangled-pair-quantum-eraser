@@ -69,7 +69,10 @@ def main():
             continue
 
         _fit_and_assign_steps_per_2pi(
-            datasets, args.steps_per_two_pi, use_global=args.global_steps, use_ni=not args.no_ni_steps
+            datasets,
+            args.steps_per_two_pi,
+            use_global=args.global_steps,
+            use_ni=not args.no_ni_steps,
         )
 
         for ds in datasets:
