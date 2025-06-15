@@ -159,7 +159,9 @@ def load_and_correct_datasets(jsonl_filename):
 
 
 def _fit_and_assign_steps_per_2pi(
-    datasets: list[dict], steps_per_two_pi_override: float | None = None
+    datasets: list[dict],
+    steps_per_two_pi_override: float | None = None,
+    use_global: bool = False,
 ):
     """
     Fit STEPS_PER_2PI for each dataset, combine, and assign to datasets.
@@ -171,7 +173,8 @@ def _fit_and_assign_steps_per_2pi(
     3. Combines Ni and Nc fits if both are successful.
     4. Stores the per-dataset fit in ds["steps_per_2pi"].
     5. Computes a weighted average of all per-dataset fits.
-    6. Backfills this global average for any datasets where the fit failed.
+    6. If `use_global` is True, this global average is used for all datasets.
+       Otherwise, it is used to backfill for any datasets where the fit failed.
     """
     if steps_per_two_pi_override:
         print(f"Using provided STEPS_PER_2PI = {steps_per_two_pi_override:.3f} for all plots\n")
@@ -223,19 +226,24 @@ def _fit_and_assign_steps_per_2pi(
         sp2pi_errs.append(sp2pi_err)
         ds["steps_per_2pi"] = sp2pi
 
-    if sp2pi_vals:
-        weights = 1.0 / np.square(sp2pi_errs)
-        steps_per_2pi = float(np.sum(weights * sp2pi_vals) / np.sum(weights))
-        combined_err = float(1.0 / np.sqrt(np.sum(weights)))
-        print(
-            f"Computed weighted STEPS_PER_2PI = {steps_per_2pi:.3f} ± {combined_err:.3f} for all"
-            " plots\n"
-        )
+    if not sp2pi_vals:
+        print("\nCould not fit STEPS_PER_2PI for any dataset.")
+        return
+
+    weights = 1.0 / np.square(sp2pi_errs)
+    steps_per_2pi = float(np.sum(weights * sp2pi_vals) / np.sum(weights))
+    combined_err = float(1.0 / np.sqrt(np.sum(weights)))
+    print(f"Computed weighted STEPS_PER_2PI = {steps_per_2pi:.3f} ± {combined_err:.3f}")
+
+    if use_global:
+        print("Using global STEPS_PER_2PI for all datasets.\n")
+        for ds in datasets:
+            ds["steps_per_2pi"] = steps_per_2pi
+    else:
+        print("Using per-dataset STEPS_PER_2PI (backfilling for failed fits).\n")
         for ds in datasets:
             if "steps_per_2pi" not in ds:
                 ds["steps_per_2pi"] = steps_per_2pi
-    else:
-        print("\nCould not fit STEPS_PER_2PI for any dataset.")
 
 
 def main():
@@ -252,6 +260,11 @@ def main():
         type=float,
         help="Use this value for STEPS_PER_2PI instead of fitting it from the data.",
     )
+    parser.add_argument(
+        "--global-steps",
+        action="store_true",
+        help="Use a single globally-fitted STEPS_PER_2PI for all datasets.",
+    )
     parser.add_argument("--title-joint-plot", type=str, help="Specify a title for the joint plot.")
     args = parser.parse_args()
 
@@ -260,7 +273,9 @@ def main():
         print("No valid datasets found!")
         sys.exit(1)
 
-    _fit_and_assign_steps_per_2pi(datasets, args.steps_per_two_pi)
+    _fit_and_assign_steps_per_2pi(
+        datasets, args.steps_per_two_pi, use_global=args.global_steps
+    )
 
     # Second pass: generate plots with fitted parameter and collect visibilities
     V_i_list, V_i_err_list, V_c_list, V_c_err_list = [], [], [], []
