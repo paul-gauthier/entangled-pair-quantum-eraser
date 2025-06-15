@@ -105,6 +105,7 @@ def main():
                     "signal_lp": ds.get("signal_lp"),
                     "mzi_hwp": ds.get("mzi_hwp"),
                     "mzi_lp": ds.get("mzi_lp"),
+                    "beam_block": ds.get("beam_block"),
                     "V_i": fit_results["V_i"],
                     "V_i_err": fit_results["V_i_err"],
                     "V_c": fit_results["V_c"],
@@ -139,7 +140,7 @@ def main():
             )
 
     # Sort by angle settings
-    sort_cols = ["signal_lp", "mzi_hwp", "mzi_lp"]
+    sort_cols = ["signal_lp", "mzi_hwp", "mzi_lp", "beam_block"]
     df = df.sort_values(by=[c for c in sort_cols if c in df.columns])
 
     if args.roll:
@@ -172,6 +173,7 @@ def main():
         "mzi_hwp_off",
         "mzi_lp",
         "mzi_lp_off",
+        "beam_block",
         "V_i",
         "V_i_rolling_avg",
         "V_c",

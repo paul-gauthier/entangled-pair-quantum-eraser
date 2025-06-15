@@ -148,6 +148,7 @@ def load_and_correct_datasets(jsonl_filename):
                 "signal_lp": first_record.get("signal_lp"),
                 "mzi_hwp": first_record.get("mzi_hwp"),
                 "mzi_lp": first_record.get("mzi_lp"),
+                "beam_block": first_record.get("beam_block"),
                 "acq_time": first_record.get("acq_time"),
             }
         )
