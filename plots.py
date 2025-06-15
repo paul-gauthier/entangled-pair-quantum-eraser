@@ -113,7 +113,7 @@ def load_and_correct_datasets(jsonl_filename):
             print(f"  Warning: Dataset {dataset_index} has different stage positions, skipping")
             print(f"    Expected: {reference_positions}")
             print(f"    Got: {positions}")
-            continue
+            #continue
 
         # Extract arrays from this dataset
         piezo_steps = np.array(positions)
