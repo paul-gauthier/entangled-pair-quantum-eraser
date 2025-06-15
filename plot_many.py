@@ -43,6 +43,11 @@ def main():
         type=str,
         help="Directory to save joint plots for each dataset.",
     )
+    parser.add_argument(
+        "--roll",
+        action="store_true",
+        help="Show rolling average columns in the summary table.",
+    )
     args = parser.parse_args()
 
     all_results = []
@@ -126,17 +131,18 @@ def main():
     sort_cols = ["signal_lp", "mzi_hwp", "mzi_lp"]
     df = df.sort_values(by=[c for c in sort_cols if c in df.columns])
 
-    if "A_i" in df.columns:
-        df["A_i_rolling_avg"] = df["A_i"].rolling(window=3, center=True).mean()
-        if len(df) > 1:
-            df.loc[df.index[0], "A_i_rolling_avg"] = df["A_i"].iloc[0:2].mean()
-            df.loc[df.index[-1], "A_i_rolling_avg"] = df["A_i"].iloc[-2:].mean()
+    if args.roll:
+        if "A_i" in df.columns:
+            df["A_i_rolling_avg"] = df["A_i"].rolling(window=3, center=True).mean()
+            if len(df) > 1:
+                df.loc[df.index[0], "A_i_rolling_avg"] = df["A_i"].iloc[0:2].mean()
+                df.loc[df.index[-1], "A_i_rolling_avg"] = df["A_i"].iloc[-2:].mean()
 
-    if "V_i" in df.columns:
-        df["V_i_rolling_avg"] = df["V_i"].rolling(window=3, center=True).mean()
-        if len(df) > 1:
-            df.loc[df.index[0], "V_i_rolling_avg"] = df["V_i"].iloc[0:2].mean()
-            df.loc[df.index[-1], "V_i_rolling_avg"] = df["V_i"].iloc[-2:].mean()
+        if "V_i" in df.columns:
+            df["V_i_rolling_avg"] = df["V_i"].rolling(window=3, center=True).mean()
+            if len(df) > 1:
+                df.loc[df.index[0], "V_i_rolling_avg"] = df["V_i"].iloc[0:2].mean()
+                df.loc[df.index[-1], "V_i_rolling_avg"] = df["V_i"].iloc[-2:].mean()
 
     if "V_i" in df.columns and "V_i_err" in df.columns:
         df["V_i"] = df.apply(lambda r: f"{f'{r.V_i:.4f}':>5} {f'±{r.V_i_err:.4f}':>5}", axis=1)
@@ -162,6 +168,10 @@ def main():
         "Ai/Ac",
         "acq_dur",
     ]
+    if not args.roll:
+        output_cols.remove("V_i_rolling_avg")
+        output_cols.remove("A_i_rolling_avg")
+
     final_cols = [c for c in output_cols if c in df.columns]
 
     print("\n--- Summary Table ---")
