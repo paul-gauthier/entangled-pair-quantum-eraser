@@ -59,9 +59,7 @@ def main():
             print(f"  No valid datasets found in {jsonl_file}", file=sys.stderr)
             continue
 
-        _fit_and_assign_steps_per_2pi(
-            datasets, args.steps_per_two_pi, use_global=args.global_steps
-        )
+        _fit_and_assign_steps_per_2pi(datasets, args.steps_per_two_pi, use_global=args.global_steps)
 
         for ds in datasets:
             try:

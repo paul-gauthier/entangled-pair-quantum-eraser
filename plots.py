@@ -113,7 +113,7 @@ def load_and_correct_datasets(jsonl_filename):
             print(f"  Warning: Dataset {dataset_index} has different stage positions, skipping")
             print(f"    Expected: {reference_positions}")
             print(f"    Got: {positions}")
-            #continue
+            # continue
 
         # Extract arrays from this dataset
         piezo_steps = np.array(positions)
@@ -273,9 +273,7 @@ def main():
         print("No valid datasets found!")
         sys.exit(1)
 
-    _fit_and_assign_steps_per_2pi(
-        datasets, args.steps_per_two_pi, use_global=args.global_steps
-    )
+    _fit_and_assign_steps_per_2pi(datasets, args.steps_per_two_pi, use_global=args.global_steps)
 
     # Second pass: generate plots with fitted parameter and collect visibilities
     V_i_list, V_i_err_list, V_c_list, V_c_err_list = [], [], [], []
