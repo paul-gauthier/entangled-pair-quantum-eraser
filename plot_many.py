@@ -18,8 +18,7 @@ import numpy as np
 import pandas as pd
 
 from dump import dump  # noqa
-from joint_plot import plot_joint_counts
-from plot_utils import global_joint_cosine_fit
+from plot_utils import plot_counts
 from plots import _fit_and_assign_steps_per_2pi, load_and_correct_datasets
 
 
@@ -63,26 +62,29 @@ def main():
 
         for ds in datasets:
             try:
-                # global_joint_cosine_fit expects a list of datasets
-                fit_results = global_joint_cosine_fit(
-                    [ds],  # fit each dataset individually
-                    ni_key="Ni_corr",
-                    nc_key="Nc_corr",
-                    ni_raw_key="Ni",
-                    nc_raw_key="Nc",
-                )
+                plot_filename = None
+                dataset_index = ds["dataset_index"]
+                title = f"Dataset {dataset_index} from {os.path.basename(jsonl_file)}"
 
                 if args.plots_dir:
                     os.makedirs(args.plots_dir, exist_ok=True)
                     base_name = os.path.splitext(os.path.basename(jsonl_file))[0]
-                    dataset_index = ds["dataset_index"]
-                    plot_filename = os.path.join(args.plots_dir, f"{base_name}_{dataset_index}.pdf")
-                    title = f"Dataset {dataset_index} from {os.path.basename(jsonl_file)}"
-                    plot_joint_counts(
-                        [ds],
-                        out=plot_filename,
-                        title=title,
+                    plot_filename = os.path.join(
+                        args.plots_dir, f"{base_name}_{dataset_index}.pdf"
                     )
+
+                _, fit_results = plot_counts(
+                    piezo_steps=ds["piezo_steps"],
+                    Ns=ds["Ns"],
+                    Ni=ds["Ni_corr"],
+                    Nc=ds["Nc_corr"],
+                    steps_per_2pi=ds["steps_per_2pi"],
+                    output_filename=plot_filename,
+                    label_suffix=title,
+                    Ni_raw=ds["Ni"],
+                    Nc_raw=ds["Nc"],
+                    return_metrics=True,
+                )
 
                 A_i = fit_results["A_i"]
                 A_c = fit_results["A_c"]

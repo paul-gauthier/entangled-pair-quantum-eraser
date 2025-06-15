@@ -418,7 +418,7 @@ def plot_counts(
     Nc: np.ndarray,
     steps_per_2pi: float,
     *,
-    output_filename: str = "counts_vs_phase_delay.pdf",
+    output_filename: str | None = "counts_vs_phase_delay.pdf",
     label_suffix: str = "",
     show: bool = False,
     Nc_raw: np.ndarray | None = None,
@@ -451,16 +451,18 @@ def plot_counts(
     show :
         If ``True`` also display the figure interactively.
     return_metrics :
-        If ``True`` also return a dict containing the fitted visibilities
-        and their 1σ uncertainties.
+        If ``True`` also return a dict containing the fitted amplitudes and
+        visibilities for both idler and coincidence counts (``A_i``,
+        ``A_c``, ``V_i``, ``V_c``) and their 1σ uncertainties.
 
     Returns
     -------
     str | tuple[str, dict]
         If ``return_metrics`` is ``False`` returns just the output
         filename. Otherwise returns ``(output_filename, metrics_dict)``
-        where ``metrics_dict`` contains ``V_vis_c``, ``V_err_c``,
-        ``V_vis_i``, and ``V_err_i``.
+        where ``metrics_dict`` contains fitted amplitudes and visibilities
+        for both idler and coincidence counts (``A_i``, ``A_c``, ``V_i``,
+        ``V_c``) and their 1σ uncertainties.
     """
 
     print()
@@ -729,17 +731,23 @@ def plot_counts(
 
     # Layout & save ----------------------------------------------------------
     fig.tight_layout()
-    plt.savefig(output_filename)
+    if output_filename:
+        plt.savefig(output_filename)
     if show:
         plt.show()
     plt.close(fig)
 
-    print(f"Plot saved as {output_filename}")
+    if output_filename:
+        print(f"Plot saved as {output_filename}")
     if return_metrics:
         return output_filename, {
-            "V_vis_c": V_vis_c,
-            "V_err_c": V_err_c,
-            "V_vis_i": V_vis_i,
-            "V_err_i": V_err_i,
+            "V_c": V_vis_c,
+            "V_c_err": V_err_c,
+            "A_c": A_fit_c,
+            "A_c_err": A_err_c,
+            "V_i": V_vis_i,
+            "V_i_err": V_err_i,
+            "A_i": A_fit_i,
+            "A_i_err": A_err_i,
         }
     return output_filename
