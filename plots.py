@@ -80,11 +80,13 @@ def load_and_correct_datasets(jsonl_filename):
                 "re-using previous dark record."
             )
         else:
-            # No previous dark record available to use
+            # No previous dark record available, assume all darks are 0.
             print(
-                f"  Warning: Discarding {len(current_dataset)} records with no available dark"
-                " measurement"
+                f"  Warning: No dark measurement found for initial {len(current_dataset)} records."
+                " Assuming zero dark counts."
             )
+            dark_record = {"N_i": 0, "N_s": 0, "acq_time": 0}
+            datasets.append((current_dataset, dark_record))
 
     if not datasets:
         print(f"  Warning: No datasets found in {jsonl_filename}")
