@@ -98,6 +98,7 @@ def main():
                     "V_i": fit_results["V_i"],
                     "V_i_err": fit_results["V_i_err"],
                     "V_c": fit_results["V_c"],
+                    "V_c_err": fit_results["V_c_err"],
                     "A_i": A_i,
                     "A_i_err": fit_results["A_i_err"],
                     "A_c": A_c,
@@ -146,6 +147,8 @@ def main():
 
     if "V_i" in df.columns and "V_i_err" in df.columns:
         df["V_i"] = df.apply(lambda r: f"{f'{r.V_i:.4f}':>5} {f'±{r.V_i_err:.4f}':>5}", axis=1)
+    if "V_c" in df.columns and "V_c_err" in df.columns:
+        df["V_c"] = df.apply(lambda r: f"{f'{r.V_c:.4f}':>5} {f'±{r.V_c_err:.4f}':>5}", axis=1)
     if "A_i" in df.columns and "A_i_err" in df.columns:
         df["A_i"] = df.apply(lambda r: f"{f'{r.A_i:.1f}':>7} {f'±{r.A_i_err:.0f}':>4}", axis=1)
     if "A_c" in df.columns and "A_c_err" in df.columns:
