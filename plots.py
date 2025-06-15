@@ -310,10 +310,10 @@ def main():
                 Ni_raw=ds["Ni"],
                 return_metrics=True,
             )
-            V_i_list.append(metrics["V_vis_i"])
-            V_i_err_list.append(metrics["V_err_i"])
-            V_c_list.append(metrics["V_vis_c"])
-            V_c_err_list.append(metrics["V_err_c"])
+            V_i_list.append(metrics["V_i"])
+            V_i_err_list.append(metrics["V_i_err"])
+            V_c_list.append(metrics["V_c"])
+            V_c_err_list.append(metrics["V_c_err"])
         except RuntimeError:
             print("Failed to fit dataset, skipping")
 
