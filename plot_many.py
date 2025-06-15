@@ -69,9 +69,7 @@ def main():
                 if args.plots_dir:
                     os.makedirs(args.plots_dir, exist_ok=True)
                     base_name = os.path.splitext(os.path.basename(jsonl_file))[0]
-                    plot_filename = os.path.join(
-                        args.plots_dir, f"{base_name}_{dataset_index}.pdf"
-                    )
+                    plot_filename = os.path.join(args.plots_dir, f"{base_name}_{dataset_index}.pdf")
 
                 _, fit_results = plot_counts(
                     piezo_steps=ds["piezo_steps"],
