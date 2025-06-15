@@ -287,8 +287,9 @@ def main():
         datasets, args.steps_per_two_pi, use_global=args.global_steps, use_ni=not args.no_ni_steps
     )
 
-    # Second pass: generate plots with fitted parameter and collect visibilities
+    # Second pass: generate plots with fitted parameters and collect visibilities & amplitudes
     V_i_list, V_i_err_list, V_c_list, V_c_err_list = [], [], [], []
+    A_i_list, A_i_err_list, A_c_list, A_c_err_list = [], [], [], []
     for ds in datasets:
         jsonl_filename = ds["filename"]
         dataset_index = ds["dataset_index"]
@@ -326,6 +327,10 @@ def main():
             V_i_err_list.append(metrics["V_i_err"])
             V_c_list.append(metrics["V_c"])
             V_c_err_list.append(metrics["V_c_err"])
+            A_i_list.append(metrics["A_i"])
+            A_i_err_list.append(metrics["A_i_err"])
+            A_c_list.append(metrics["A_c"])
+            A_c_err_list.append(metrics["A_c_err"])
         except RuntimeError:
             print("Failed to fit dataset, skipping")
 
@@ -368,6 +373,14 @@ def main():
             np.array(V_c_list), np.array(V_c_err_list)
         )
 
+        # Combined amplitude estimates
+        A_i_comb, A_i_comb_err, red_chi2_Ai = _weighted_mean(
+            np.array(A_i_list), np.array(A_i_err_list)
+        )
+        A_c_comb, A_c_comb_err, red_chi2_Ac = _weighted_mean(
+            np.array(A_c_list), np.array(A_c_err_list)
+        )
+
         print("\nCombined visibility estimates (inverse-variance weighted):")
         print(
             f"  Idler:       Vi = {V_i_comb:.4f} ± {V_i_comb_err:.4f} "
@@ -378,6 +391,17 @@ def main():
             f"  Coincidence: Vc = {V_c_comb:.4f} ± {V_c_comb_err:.4f} "
             f" [{V_c_comb - V_c_comb_err:.4f}, {V_c_comb + V_c_comb_err:.4f}]   (reduced χ² ="
             f" {red_chi2_c:.2f})"
+        )
+        print("\nCombined amplitude estimates (inverse-variance weighted):")
+        print(
+            f"  Idler amplitude:       Ai = {A_i_comb:.2f} ± {A_i_comb_err:.2f} "
+            f" [{A_i_comb - A_i_comb_err:.2f}, {A_i_comb + A_i_comb_err:.2f}]   (reduced χ² ="
+            f" {red_chi2_Ai:.2f})"
+        )
+        print(
+            f"  Coincidence amplitude: Ac = {A_c_comb:.2f} ± {A_c_comb_err:.2f} "
+            f" [{A_c_comb - A_c_comb_err:.2f}, {A_c_comb + A_c_comb_err:.2f}]   (reduced χ² ="
+            f" {red_chi2_Ac:.2f})"
         )
 
         # ------------------------------------------------------------------
