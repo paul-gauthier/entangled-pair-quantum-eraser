@@ -90,7 +90,7 @@ def fit_and_plot(signal_angles, signal_counts, mzi_angles, idler_counts, fname, 
     plt.xlabel("Signal LP Angle (degrees)")
     plt.ylabel("Signal counts (N_s)")
     plt.title(f"Signal vs Signal LP Angle\n({fname})")
-    plt.xticks(np.arange(-45, 180, 45))
+    # plt.xticks(np.arange(-45, 180, 45))
     plt.legend()
     plt.grid(True, alpha=0.3)
 

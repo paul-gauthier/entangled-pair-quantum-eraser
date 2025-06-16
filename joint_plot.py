@@ -64,7 +64,7 @@ def plot_joint_counts(
     # Plotting
     # ------------------------------------------------------------------
     colours = plt.rcParams["axes.prop_cycle"].by_key()["color"]
-    fig, (ax_i, ax_c) = plt.subplots(2, 1, sharex=True, figsize=(10, 8))
+    fig, (ax_i, ax_c) = plt.subplots(2, 1, sharex=True, figsize=(12, 8))
 
     for k, ds in enumerate(datasets):
         δ = delta_from_steps(ds["piezo_steps"], ds["steps_per_2pi"])
@@ -78,7 +78,7 @@ def plot_joint_counts(
             ds["Ni_corr"],
             yerr=np.sqrt(np.maximum(ds["Ni"], 1)),
             fmt="o",
-            ms=3,
+            ms=4,
             capsize=2,
             elinewidth=0.7,
             color=col,
@@ -89,7 +89,7 @@ def plot_joint_counts(
             ds["Nc_corr"],
             yerr=np.sqrt(np.maximum(ds["Nc"], 1)),
             fmt="x",
-            ms=3,
+            ms=4,
             capsize=2,
             elinewidth=0.7,
             color=col,
