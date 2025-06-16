@@ -13,7 +13,7 @@
 \usepackage{standalone}
 \usetikzlibrary{positioning,arrows.meta,calc,decorations.pathmorphing,fit,shapes.geometric}
 
-\title{Quantum Eraser Experiment Results: Visibilities and Graphs (2025-06-10)}
+\title{Quantum Eraser Experiment Results: Visibilities and Graphs (2025-06-15)}
 \author{Group 13} % Assuming the same group as lab-6-entangled.tex
 \date{\today}
 
@@ -22,12 +22,12 @@
 
 \begin{table}[h!]
 \centering
-\begin{tabular}{lccc}
+\begin{tabular}{lccccc}
 \toprule
-Condition & \makecell{Signal \\ LP angle} & \makecell{Coincidence \\ visibility ($V_{\text{c}}$)} & \makecell{Idler Singles \\ visibility ($V_{\text{i}}$)} \\
+Condition & \makecell{Signal \\ LP angle} & \makecell{Coincidence \\ visibility ($V_{\text{c}}$)} & \makecell{Idler Singles \\ visibility ($V_{\text{i}}$)} & \makecell{Coincidence \\ amplitude ($A_{\text{c}}$)} & \makecell{Idler Singles \\ amplitude ($A_{\text{i}}$)} \\
 \midrule
-Eraser On   & $45^\circ$ & $0.4142 \pm 0.0051$ & $0.0085 \pm 0.0011$ \\
-Eraser Off  & $0^\circ$  & $0.0652 \pm 0.0060$ & $0.0094 \pm 0.0009$ \\
+Eraser On   & $45^\circ$ & $0.3435 \pm 0.0031$ & $0.0056 \pm 0.0007$ & $596.3 \pm 7.1$ & $469.7 \pm 54.7$ \\
+Eraser Off  & $0^\circ$  & $0.0837 \pm 0.0040$ & $0.0054 \pm 0.0007$ & $152.6 \pm 8.0$ & $452.1 \pm 59.2$ \\
 \bottomrule
 \end{tabular}
 \caption*{
@@ -38,17 +38,17 @@ Eraser Off  & $0^\circ$  & $0.0652 \pm 0.0060$ & $0.0094 \pm 0.0009$ \\
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=0.55\textwidth]{data/2025-06-10-10-44-20--stack30-on_joint.pdf}
+\includegraphics[width=0.55\textwidth]{data/2025-06-15-09-31-29--sigaligned-on_joint.pdf}
 \caption*{
-  With the signal LP at $45^\circ$, which-way information is erased, resulting in high coincidence visibility ($V_{\text{c,on}}=0.4142 \pm 0.0051$). The idler singles visibility is low ($V_{\text{i,on}}=0.0085 \pm 0.0011$).
+  With the signal LP at $45^\circ$, which-way information is erased, resulting in high coincidence visibility ($V_{\text{c,on}}=0.3435 \pm 0.0031$). The idler singles visibility is low ($V_{\text{i,on}}=0.0056 \pm 0.0007$).
 }
 \end{figure}
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=0.55\textwidth]{data/2025-06-10-10-44-20--stack30-off_joint.pdf}
+\includegraphics[width=0.55\textwidth]{data/2025-06-15-09-31-29--sigaligned-off_joint.pdf}
 \caption*{
-  With the signal LP at $0^\circ$, which-way information is preserved, resulting in low coincidence visibility ($V_{\text{c,off}}=0.0652 \pm 0.0060$). The idler singles visibility is low ($V_{\text{i,off}}=0.0094 \pm 0.0009$).
+  With the signal LP at $0^\circ$, which-way information is preserved, resulting in low coincidence visibility ($V_{\text{c,off}}=0.0837 \pm 0.0040$). The idler singles visibility is low ($V_{\text{i,off}}=0.0054 \pm 0.0007$).
 }
 \end{figure}
 
