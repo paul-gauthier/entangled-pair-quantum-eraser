@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass[twocolumn]{article}
 \usepackage{graphicx} % Required for including images
 \usepackage{booktabs} % For professional looking tables
 \usepackage{makecell} % For line breaks in table cells
@@ -33,14 +33,13 @@ Eraser Off  & $0^\circ$  & $0.0837 \pm 0.0040$ & $0.0054 \pm 0.0007$ & $152.6 \p
 \bottomrule
 \end{tabular}
 \caption*{
-  The coincidence \emph{amplitude} jumps four-fold when the eraser is engaged: 
-  $A_{\text{c,off}} = 152.6 \pm 8.0$ rises to 
+  The coincidence \emph{amplitude} jumps four-fold with the eraser on: 
+  from $A_{\text{c,off}} = 152.6 \pm 8.0$ to
   $A_{\text{c,on}} = 596.3 \pm 7.1$. 
-  Meanwhile the idler singles amplitude is statistically unchanged 
+  The idler singles amplitude is statistically unchanged 
   ($A_{\text{i}} \approx 450 \pm 60$) regardless of the eraser setting. 
-  This confirms that erasing which-way information is a \emph{post-selection} effect that
-  alters only the coincidence subset of events; nothing physical happens to the idler photons
-  themselves.  With one signal arm blocked the coincidence amplitude is compatible with zero.
+  This confirms that erasing is a \emph{post-selection} effect that
+  alters only the coincidence counts.
 }
 \end{table}
 
@@ -48,32 +47,30 @@ Eraser Off  & $0^\circ$  & $0.0837 \pm 0.0040$ & $0.0054 \pm 0.0007$ & $152.6 \p
 \centering
 \includegraphics[width=0.55\textwidth]{data/2025-06-15-09-31-29--sigaligned-on_joint.pdf}
 \caption*{
-  \textbf{Eraser ON} ($\text{signal LP}=45^\circ$).  Post-selecting on coincidences
+  \textbf{Eraser On} ($\text{signal LP}=45^\circ$).  Post-selecting on coincidences
   erases which-way information and the coincidence fringe amplitude shoots up to
   $A_{\text{c,on}} = 596.3 \pm 7.1$.
   The idler singles remain unaffected at
-  $A_{\text{i,on}} = 469.7 \pm 54.7$, demonstrating that the erasure acts only
-  through post-selection and does not modify the idler photons themselves.
+  $A_{\text{i,on}} = 469.7 \pm 54.7$.
 }
 \end{figure}
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=0.55\textwidth]{data/2025-06-15-09-31-29--sigaligned-off_joint.pdf}
+\includegraphics[width=0.50\textwidth]{data/2025-06-15-09-31-29--sigaligned-off_joint.pdf}
 \caption*{
-  \textbf{Eraser OFF} ($\text{signal LP}=0^\circ$).  With which-way information left
+  \textbf{Eraser Off} ($\text{signal LP}=0^\circ$).  With which-way information left
   intact the coincidence fringe collapses to
   $A_{\text{c,off}} = 152.6 \pm 8.0$.
   The idler singles amplitude remains the same within uncertainties
-  ($A_{\text{i,off}} = 452.1 \pm 59.2$), reinforcing that the eraser’s effect
-  appears only after we condition on coincidences.
+  ($A_{\text{i,off}} = 452.1 \pm 59.2$).
 }
 \end{figure}
 
 \begin{comment}
 \begin{figure}[h!]
 \centering
-\includegraphics[width=0.55\textwidth]{data/2025-06-15-09-31-29--sigaligned-blocked_joint.pdf}
+\includegraphics[width=0.50\textwidth]{data/2025-06-15-09-31-29--sigaligned-blocked_joint.pdf}
 \caption*{
   With one path blocked, no interference is expected, and coincidence visibility is near zero ($V_{\text{c,blocked}}=0.1887 \pm 1.6822$). The idler singles visibility is also low ($V_{\text{i,blocked}}=0.0047 \pm 0.0005$).
 }
