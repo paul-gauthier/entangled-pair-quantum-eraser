@@ -25,7 +25,7 @@
 \centering
 \begin{tabular}{lccccc}
 \toprule
-Condition & \makecell{Signal \\ LP angle} & \makecell{Coincidence \\ visibility ($V_{\text{c}}$)} & \makecell{Idler Singles \\ visibility ($V_{\text{i}}$)} & \makecell{Coincidence \\ amplitude ($A_{\text{c}}$)} & \makecell{Idler Singles \\ amplitude ($A_{\text{i}}$)} \\
+Condition & \makecell{Signal \\ LP angle} & \makecell{Coincidence \\ visibility ($V_{\text{c}}$)} & \makecell{Idler Singles \\ visibility ($V_{\text{i}}$)} & \makecell{Coincidence fringe \\ amplitude ($A_{\text{c}}$)} & \makecell{Idler Singles \\ fringe amplitude \\ ($A_{\text{i}}$)} \\
 \midrule
 Eraser On   & $45^\circ$ & $0.3435 \pm 0.0031$ & $0.0056 \pm 0.0007$ & $596 \pm 7$ & $470 \pm 55$ \\
 Eraser Off  & $0^\circ$  & $0.0837 \pm 0.0040$ & $0.0054 \pm 0.0007$ & $153 \pm 8$ & $452 \pm 59$ \\
@@ -33,13 +33,16 @@ Eraser Off  & $0^\circ$  & $0.0837 \pm 0.0040$ & $0.0054 \pm 0.0007$ & $153 \pm 
 \bottomrule
 \end{tabular}
 \caption*{
-  The coincidence \emph{amplitude} jumps four-fold with the eraser on: 
-  from $A_{\text{c,off}} = 153 \pm 8$ to
+  The coincidence interference fringe \emph{amplitude}
+  jumps four-fold with the eraser on: 
+   $A_{\text{c,off}} = 153 \pm 8$ to
   $A_{\text{c,on}} = 596 \pm 7$. 
-  The idler singles amplitude is statistically unchanged 
-  ($A_{\text{i}} \approx 450 \pm 60$) regardless of the eraser setting. 
-  This confirms that erasing is a \emph{post-selection} effect that
-  alters only the coincidence counts.
+  The idler singles amplitude remains statistically unchanged 
+  ($A_{\text{i}} \approx 460 \pm 60$) regardless of the eraser setting. 
+  This confirms that erasing is a \emph{post-selection} effect,
+  only impacting
+  the coincidence counts.
+  Amplitudes are photon counts from 30-sec acquisitions.
 }
 \end{table*}
 
@@ -62,8 +65,8 @@ Eraser Off  & $0^\circ$  & $0.0837 \pm 0.0040$ & $0.0054 \pm 0.0007$ & $153 \pm 
   \textbf{Eraser Off} ($\text{signal LP}=0^\circ$).  With which-way information left
   intact the coincidence fringe collapses to
   $A_{\text{c,off}} = 153 \pm 8$.
-  The idler singles amplitude remains the same within uncertainties
-  ($A_{\text{i,off}} = 452 \pm 59$).
+  The idler singles amplitude remains the same within uncertainties at
+  $A_{\text{i,off}} = 452 \pm 59$.
 }
 \end{figure}
 
