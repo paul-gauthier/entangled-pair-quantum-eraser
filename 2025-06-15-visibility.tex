@@ -25,7 +25,7 @@
 \centering
 \begin{tabular}{lccccc}
 \toprule
-Condition & \makecell{Signal \\ LP angle} & \makecell{Coincidence \\ visibility \\ ($V_{\text{c}}$)} & \makecell{Idler Singles \\ visibility \\ ($V_{\text{i}}$)} & \makecell{Coincidence fringe \\ amplitude \\ ($A_{\text{c}}$)} & \makecell{Idler Singles \\ fringe amplitude \\ ($A_{\text{i}}$)} \\
+Condition & \makecell{Signal \\ LP angle} & \makecell{Coincidence \\ visibility \\ ($V_{\text{c}}$)} & \makecell{Idler Singles \\ visibility \\ ($V_{\text{i}}$)} & \makecell{Coincidence \\ fringe amplitude \\ ($A_{\text{c}}$)} & \makecell{Idler Singles \\ fringe amplitude \\ ($A_{\text{i}}$)} \\
 \midrule
 Eraser On   & $45^\circ$ & $0.3435 \pm 0.0031$ & $0.0056 \pm 0.0007$ & $596 \pm 7$ & $470 \pm 55$ \\
 Eraser Off  & $0^\circ$  & $0.0837 \pm 0.0040$ & $0.0054 \pm 0.0007$ & $153 \pm 8$ & $452 \pm 59$ \\
@@ -38,20 +38,20 @@ Eraser Off  & $0^\circ$  & $0.0837 \pm 0.0040$ & $0.0054 \pm 0.0007$ & $153 \pm 
    $A_{\text{c,off}} = 153 \pm 8$ to
   $A_{\text{c,on}} = 596 \pm 7$. 
   The idler singles amplitude remains statistically unchanged 
-  ($A_{\text{i}} \approx 460 \pm 60$) regardless of the eraser setting. 
+  at $A_{\text{i}} \approx 460 \pm 60$, regardless of the eraser setting. 
   This confirms that erasing is a \emph{post-selection} effect,
   only impacting
   the coincidence counts.
-  Amplitudes are photon counts from 30-sec acquisitions.
+  Amplitudes are based on photon counts from 30-sec acquisitions.
 }
 \end{table*}
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=0.50\textwidth]{data/2025-06-15-09-31-29--sigaligned-on_joint.pdf}
+\includegraphics[width=0.6\textwidth]{data/2025-06-15-09-31-29--sigaligned-on_joint.pdf}
 \caption*{
-  \textbf{Eraser On} ($\text{signal LP}=45^\circ$).  Post-selecting on coincidences
-  erases which-way information and the coincidence fringe amplitude shoots up to
+  \textbf{Eraser On} ($\text{signal LP}=45^\circ$).
+  Erasing the which-way information increases the coincidence fringe amplitude to
   $A_{\text{c,on}} = 596 \pm 7$.
   The idler singles remain unaffected at
   $A_{\text{i,on}} = 470 \pm 55$.
@@ -60,15 +60,17 @@ Eraser Off  & $0^\circ$  & $0.0837 \pm 0.0040$ & $0.0054 \pm 0.0007$ & $153 \pm 
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=0.50\textwidth]{data/2025-06-15-09-31-29--sigaligned-off_joint.pdf}
+\includegraphics[width=0.6\textwidth]{data/2025-06-15-09-31-29--sigaligned-off_joint.pdf}
 \caption*{
   \textbf{Eraser Off} ($\text{signal LP}=0^\circ$).  With which-way information left
-  intact the coincidence fringe collapses to
+  intact, the coincidence fringe drops to
   $A_{\text{c,off}} = 153 \pm 8$.
   The idler singles amplitude remains the same within uncertainties at
   $A_{\text{i,off}} = 452 \pm 59$.
 }
 \end{figure}
+
+\emph{Note: The y-axis scale is the same in all four graph panels.}
 
 \begin{comment}
 \begin{figure}[h!]
