@@ -5,7 +5,7 @@
 \usepackage{amsmath}  % For math symbols if needed
 \usepackage{parskip}  % Add space between paragraphs
 \setlength{\parindent}{0pt} % Remove paragraph indentation
-\usepackage[margin=1in]{geometry} % Set margins to 1 inch
+\usepackage[margin=0.75in]{geometry} % Set margins to 1 inch
 \usepackage{caption}  % For caption* to suppress figure numbering
 \usepackage{tikz}
 \usepackage{pgfplots}
@@ -18,7 +18,7 @@
 \author{Group 13} % Assuming the same group as lab-6-entangled.tex
 \date{\today}
 
-\newcommand{\figwidth}{0.6\textwidth}
+\newcommand{\figwidth}{0.64\textwidth}
 
 \begin{document}
 \pagestyle{empty} % No page numbers for a single page doc
@@ -35,8 +35,9 @@ Eraser Off  & $0^\circ$  & $0.0837 \pm 0.0040$ & $0.0054 \pm 0.0007$ & $153 \pm 
 \bottomrule
 \end{tabular}
 \caption*{
-  The coincidence interference fringe \emph{amplitude}
-  jumps four-fold with the eraser on: 
+  Turning the eraser on
+  quadruples the coincidence interference fringe \emph{amplitude},
+  from
    $A_{\text{c,off}} = 153 \pm 8$ to
   $A_{\text{c,on}} = 596 \pm 7$. 
   The idler singles amplitude remains statistically unchanged 
@@ -44,7 +45,9 @@ Eraser Off  & $0^\circ$  & $0.0837 \pm 0.0040$ & $0.0054 \pm 0.0007$ & $153 \pm 
   This confirms that erasing is a \emph{post-selection} effect,
   only impacting
   the coincidence counts.
-  Amplitudes are based on photon counts from 30-sec acquisitions.
+  Results are based on photon counts from 
+  312 acquisitions of 30-sec,  
+  for both eraser-on and off.
 }
 \end{table*}
 
@@ -72,7 +75,7 @@ Eraser Off  & $0^\circ$  & $0.0837 \pm 0.0040$ & $0.0054 \pm 0.0007$ & $153 \pm 
 }
 \end{figure}
 
-\emph{Note: The y-axis scale is the same in all four graph panels.}
+\emph{Note: All four graph panels use the same y-axis scale, to facilitate visual comparisons.}
 
 \begin{comment}
 \begin{figure}[h!]
