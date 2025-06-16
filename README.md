@@ -10,9 +10,13 @@ Mach–Zehnder–based entangled pair quantum-eraser experiment.
 
 - [Description of the experiment, relevant theory](render/lab-6-entangled.pdf) 
 - [Results showing the quantum eraser working](render/2025-06-02-visibility.pdf). These results show that erasing which-way information from the signal photon (by changing the signal linear polarizer angle) controls self-interference of the idler in the MZI.
-- [Results showing that the eraser on visibility is a post-selection effect](render/2025-06-15-visibility.pdf). These results show that the idler singles visibility doesn't change with the eraser on/off setting. The high visibility "eraser on" coincidences interference fringe appears to be purely a post-selection effect.
-These results were from a 5 hour automated run where apparatus recorded 
-113M single photon detections and over 50 periods of interference fringes.
+- [Results showing that the eraser on visibility is a post-selection effect](render/2025-06-15-visibility.pdf). 
+These results show that the idler singles fringe amplitude
+doesn't change with the eraser on/off setting. 
+This confirms that the
+coincidences interference fringe is purely a post-selection effect.
+These results were from a 5 hour automated run where the apparatus recorded 
+113M single photon detections across over 50 periods of interference fringes.
 
 
 ## SymPy model of experiment as quantum operator
