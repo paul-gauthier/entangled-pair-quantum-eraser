@@ -1,0 +1,55 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for including images
+\usepackage{booktabs} % For professional looking tables
+\usepackage{makecell} % For line breaks in table cells
+\usepackage{amsmath}  % For math symbols if needed
+\usepackage{parskip}  % Add space between paragraphs
+\setlength{\parindent}{0pt} % Remove paragraph indentation
+\usepackage[margin=1in]{geometry} % Set margins to 1 inch
+\usepackage{caption}  % For caption* to suppress figure numbering
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
+\usepackage{standalone}
+\usetikzlibrary{positioning,arrows.meta,calc,decorations.pathmorphing,fit,shapes.geometric}
+
+\title{Quantum Eraser Experiment Results: Visibilities and Graphs (2025-06-10)}
+\author{Group 13} % Assuming the same group as lab-6-entangled.tex
+\date{\today}
+
+\begin{document}
+\pagestyle{empty} % No page numbers for a single page doc
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{lccc}
+\toprule
+Condition & \makecell{Signal \\ LP angle} & \makecell{Coincidence \\ visibility ($V_{\text{c}}$)} & \makecell{Idler Singles \\ visibility ($V_{\text{i}}$)} \\
+\midrule
+Eraser On   & $45^\circ$ & $0.4142 \pm 0.0051$ & $0.0085 \pm 0.0011$ \\
+Eraser Off  & $0^\circ$  & $0.0652 \pm 0.0060$ & $0.0094 \pm 0.0009$ \\
+\bottomrule
+\end{tabular}
+\caption*{
+  The coincidence counts fringe visibility is very different with eraser on/off (signal LP at 45/0 degrees).
+  But the idler singles counts fringe visibility seems nearly indistinguishable between eraser on/off.
+}
+\end{table}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.55\textwidth]{data/2025-06-10-10-44-20--stack30-on_joint.pdf}
+\caption*{
+  With the signal LP at $45^\circ$, which-way information is erased, resulting in high coincidence visibility ($V_{\text{c,on}}=0.4142 \pm 0.0051$). The idler singles visibility is low ($V_{\text{i,on}}=0.0085 \pm 0.0011$).
+}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.55\textwidth]{data/2025-06-10-10-44-20--stack30-off_joint.pdf}
+\caption*{
+  With the signal LP at $0^\circ$, which-way information is preserved, resulting in low coincidence visibility ($V_{\text{c,off}}=0.0652 \pm 0.0060$). The idler singles visibility is low ($V_{\text{i,off}}=0.0094 \pm 0.0009$).
+}
+\end{figure}
+
+\end{document}
