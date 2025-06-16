@@ -33,9 +33,14 @@ Eraser Off  & $0^\circ$  & $0.0837 \pm 0.0040$ & $0.0054 \pm 0.0007$ & $152.6 \p
 \bottomrule
 \end{tabular}
 \caption*{
-  The coincidence counts fringe visibility is very different with eraser on/off (signal LP at 45/0 degrees).
-  When one path is blocked, the coincidence visibility is consistent with zero.
-  The idler singles counts fringe visibility seems nearly indistinguishable across all conditions.
+  The coincidence \emph{amplitude} jumps four-fold when the eraser is engaged: 
+  $A_{\text{c,off}} = 152.6 \pm 8.0$ rises to 
+  $A_{\text{c,on}} = 596.3 \pm 7.1$. 
+  Meanwhile the idler singles amplitude is statistically unchanged 
+  ($A_{\text{i}} \approx 450 \pm 60$) regardless of the eraser setting. 
+  This confirms that erasing which-way information is a \emph{post-selection} effect that
+  alters only the coincidence subset of events; nothing physical happens to the idler photons
+  themselves.  With one signal arm blocked the coincidence amplitude is compatible with zero.
 }
 \end{table}
 
@@ -43,7 +48,12 @@ Eraser Off  & $0^\circ$  & $0.0837 \pm 0.0040$ & $0.0054 \pm 0.0007$ & $152.6 \p
 \centering
 \includegraphics[width=0.55\textwidth]{data/2025-06-15-09-31-29--sigaligned-on_joint.pdf}
 \caption*{
-  With the signal LP at $45^\circ$, which-way information is erased, resulting in high coincidence visibility ($V_{\text{c,on}}=0.3435 \pm 0.0031$). The idler singles visibility is low ($V_{\text{i,on}}=0.0056 \pm 0.0007$).
+  \textbf{Eraser ON} ($\text{signal LP}=45^\circ$).  Post-selecting on coincidences
+  erases which-way information and the coincidence fringe amplitude shoots up to
+  $A_{\text{c,on}} = 596.3 \pm 7.1$.
+  The idler singles remain unaffected at
+  $A_{\text{i,on}} = 469.7 \pm 54.7$, demonstrating that the erasure acts only
+  through post-selection and does not modify the idler photons themselves.
 }
 \end{figure}
 
@@ -51,7 +61,12 @@ Eraser Off  & $0^\circ$  & $0.0837 \pm 0.0040$ & $0.0054 \pm 0.0007$ & $152.6 \p
 \centering
 \includegraphics[width=0.55\textwidth]{data/2025-06-15-09-31-29--sigaligned-off_joint.pdf}
 \caption*{
-  With the signal LP at $0^\circ$, which-way information is preserved, resulting in low coincidence visibility ($V_{\text{c,off}}=0.0837 \pm 0.0040$). The idler singles visibility is low ($V_{\text{i,off}}=0.0054 \pm 0.0007$).
+  \textbf{Eraser OFF} ($\text{signal LP}=0^\circ$).  With which-way information left
+  intact the coincidence fringe collapses to
+  $A_{\text{c,off}} = 152.6 \pm 8.0$.
+  The idler singles amplitude remains the same within uncertainties
+  ($A_{\text{i,off}} = 452.1 \pm 59.2$), reinforcing that the eraser’s effect
+  appears only after we condition on coincidences.
 }
 \end{figure}
 
