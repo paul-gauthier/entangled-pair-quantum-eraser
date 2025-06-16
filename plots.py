@@ -463,7 +463,8 @@ def main():
     print(f"Total coincidences: {int(total_coincidences):,}")
     print(f"Total photons (S+I): {int(total_photons):,}")
     print(f"Total duration:     {duration_hms}")
-    print(f"Total datasets:     {len(datasets)} ({len(datasets) * len(datasets[0]["Ni"])} data points)")
+    total_data_points = len(datasets) * len(datasets[0]["Ni"])
+    print(f"Total datasets:     {len(datasets)} ({total_data_points} data points)")
     if total_phase_scanned_pi > 0:
         print(
             f"Total phase scanned: {total_phase_scanned_pi:.2f}π"
