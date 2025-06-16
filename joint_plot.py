@@ -126,7 +126,7 @@ def plot_joint_counts(
     # Labels, grid, legend --------------------------------------------------
     ax_i.set_ylabel(r"Idler counts $N_i$")
     center_i = C0_i + A_i / 2
-    scale = 300
+    scale = 500
     ymin_i = max(0, center_i - scale)
     ax_i.set_ylim(ymin_i, ymin_i + 2 * scale)
     ax_c.set_ylabel(r"Coinc. counts $N_c$")
