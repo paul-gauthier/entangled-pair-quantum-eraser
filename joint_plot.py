@@ -78,8 +78,9 @@ def plot_joint_counts(
             ds["Ni_corr"],
             yerr=np.sqrt(np.maximum(ds["Ni"], 1)),
             fmt="o",
-            ms=4,
-            capsize=3,
+            ms=3,
+            capsize=2,
+            elinewidth=0.7,
             color=col,
             label=f"$N_i$ #{k}",
         )
@@ -88,8 +89,9 @@ def plot_joint_counts(
             ds["Nc_corr"],
             yerr=np.sqrt(np.maximum(ds["Nc"], 1)),
             fmt="x",
-            ms=5,
-            capsize=3,
+            ms=3,
+            capsize=2,
+            elinewidth=0.7,
             color=col,
             label=f"$N_c$ #{k}",
         )
