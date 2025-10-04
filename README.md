@@ -2,7 +2,16 @@
 # Entangled pair quantum eraser
 
 This repository contains a lightweight SymPy toolkit that models a
-Mach–Zehnder–based entangled pair quantum-eraser experiment.
+Mach–Zehnder interferometer based entangled pair quantum-eraser experiment.
+
+The included experimental results show that
+erasing "which-way" information from one photon in an entangled
+pair can restore the self-interference of its partner at the exit of a MZI.
+
+The results also demonstrate that such "quantum erasing" is purely
+a post-selection effect.
+Interference fringes are only visible in the coincident detections of
+both the erased idler photon and the signal at the MZI exit.
 
 ![fig.png](fig.png)
 
