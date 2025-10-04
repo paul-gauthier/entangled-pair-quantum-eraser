@@ -13,7 +13,7 @@ Mach–Zehnder–based entangled pair quantum-eraser experiment.
 - [Results showing that the eraser is a post-selection effect](render/2025-06-15-visibility.pdf). 
 These results show that the idler singles counts
 don't change with the eraser on/off setting. 
-Only the coincidence counts interference fridge changes
+Only the coincidence counts interference fringe changes
 when the eraser is turned on or off.
 This confirms that the
 coincidences interference fringe is purely a post-selection effect.
