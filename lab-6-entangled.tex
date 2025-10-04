@@ -19,7 +19,7 @@
 
 \subsection*{Introduction}
 
-The existing Lab 6 apparatus seems capable of an even more compelling quantum
+The existing apparatus seems capable of an even more compelling quantum
 eraser experiment that uses entangled pairs.
 Rather than marking the idler with its own ``which-way'' information, it is possible
 to mark the \emph{signal} with the idler's path through the MZI.
@@ -52,13 +52,13 @@ Adjusting the signal LP$_s$ to $45^\circ$ erases the which-way information
 by projecting the signal's polarization onto D.
 This restores self-interference of the idler in the MZI.
 
-\subsection*{Operator for Lab 6}
+\subsection*{MZI Operator}
 
-In the prelab, we created the MZI operator $\hat{Z}'(\vartheta)$
+We previously created the MZI operator $\hat{Z}'(\vartheta)$
 where $\vartheta$ is the MZI HWP$_t$ angle.
 Let's compose a polarizer operator for the idler polarizer
 $LP_i$ onto $\hat{Z}'$
-to create an operator for the full Lab 6 experiment.
+to create an operator for the full single photon quantum eraser experiment.
 
 \paragraph{Linear polarizer operator}
 Here's an operator for a LP at angle $\theta$,
@@ -74,9 +74,10 @@ while leaving the top path $|\psi_t\rangle$ unchanged.
 
 $$  \hat{P'}(\theta) = (|\psi_b\rangle\langle\psi_b| \otimes \hat{P}(\theta)) + (|\psi_t\rangle\langle\psi_t| \otimes \hat{I}) $$
 
-\paragraph{Lab 6 operator for a single photon}
+\paragraph{Operator for a single photon}
 And now we can compose $\hat{P'}$ and $\hat{Z}'$
-to create an operator that encompasses all of the Lab 6 apparatus:
+to create an operator that encompasses all of the single photon quantum eraser
+apparatus:
 
 $$\hat{E}'(\theta,\vartheta) = \hat{P'}(\theta) \hat{Z}'(\vartheta)$$
 
@@ -113,7 +114,7 @@ Each photon spans a four–dimensional Hilbert space
 \((2\text{ paths} \otimes 2\text{ polarisations})\)
 so a pair occupies
 \(\mathcal{H}_{\mathrm{s}}\otimes\mathcal{H}_{\mathrm{i}}\) (dimension 16).
-First, let's apply the Lab 6 operator to the idler photon:
+First, let's apply the single photon eraser operator to the idler photon:
 \[
 \hat{\mathcal{E}}=
 \mathbb{I}_{4}\otimes\hat{E}'_{45,90}
