@@ -11,7 +11,7 @@ pair can restore the self-interference of its partner at the exit of a MZI.
 The results also demonstrate that such "quantum erasing" is purely
 a post-selection effect.
 Interference fringes are only visible in the coincident detections of
-both the erased idler photon and the signal at the MZI exit.
+both the erased photon and the entangled photon exiting the MZI.
 
 ![fig.png](fig.png)
 
